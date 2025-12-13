@@ -1,0 +1,17 @@
+{
+  "name": "claude-code-plugin",
+  "description": "Claude Codeの機能拡張スキル集。Claude Codeガイド、スラッシュコマンド作成、サブエージェント作成、スキル作成、プラグインガイド、フックガイドを含みます。",
+  "version": "1.0.0",
+  "author": {
+    "name": "Claude Code Marketplace"
+  },
+  "keywords": [
+    "claude-code",
+    "skills",
+    "guide",
+    "slash-command",
+    "subagent",
+    "plugin",
+    "hooks"
+  ]
+}

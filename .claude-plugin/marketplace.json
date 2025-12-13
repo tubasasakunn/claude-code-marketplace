@@ -1,0 +1,14 @@
+{
+  "name": "claude-code-marketplace",
+  "owner": {
+    "name": "Claude Code Marketplace"
+  },
+  "description": "Claude Code プラグインのマーケットプレイス",
+  "plugins": [
+    {
+      "name": "claude-code-plugin",
+      "source": "./claude-code-plugin",
+      "description": "Claude Codeの機能拡張スキル集"
+    }
+  ]
+}
