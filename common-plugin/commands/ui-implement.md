@@ -5,6 +5,19 @@ argument-hint: [UI実装の要件]
 
 # UI実装コマンド
 
+## ステップ0: ブランチ作成
+
+**最初に必ず作業用ブランチを作成してください。**
+
+```bash
+git checkout -b feature/<作業内容を表す名前>
+```
+
+- mainブランチで直接作業しない
+- ブランチ名は作業内容がわかる名前にする（例: `feature/add-button-ui`, `feature/settings-screen`）
+
+---
+
 ## 前提条件の確認
 
 以下のサブエージェントの存在を確認してください：
