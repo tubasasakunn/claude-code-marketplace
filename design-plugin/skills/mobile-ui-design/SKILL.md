@@ -70,6 +70,10 @@ description: モバイルアプリUI/UXデザインの包括的原則と品質�
 **内部余白 < 外部余白** を厳守:
 - カード内8px → カード間16px以上
 
+## iOS意思決定フレームワーク
+
+iOSアプリ固有の設計判断（Sheet vs Push、ボタン配置、タブ構成等）は[iOS-DECISION-FRAMEWORK.md](iOS-DECISION-FRAMEWORK.md)を参照。
+
 ## アンチパターン（回避必須）
 
 詳細は[REFERENCE.md](REFERENCE.md)を参照。
