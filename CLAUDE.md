@@ -6,6 +6,44 @@ Claude Code プラグインのマーケットプレイスです。
 
 - `claude-code-plugin` - Claude Codeの機能拡張スキル集
 - `ios-develop-plugin` - iOS/Swift開発支援プラグイン
+- `design-plugin` - デザインレビュープラグイン
+- `common-plugin` - 汎用的な開発支援プラグイン
+
+---
+
+## プラグインのインストール方法
+
+### 1. マーケットプレイスを追加
+
+```
+/plugin marketplace add ~/workspace/claude-code-marketplace
+```
+
+### 2. プラグインをインストール
+
+```
+/plugin install <plugin-name>@claude-code-marketplace
+```
+
+例：
+```
+/plugin install ios-develop-plugin@claude-code-marketplace
+/plugin install common-plugin@claude-code-marketplace
+```
+
+### 3. Claude Codeを再起動
+
+インストール後、Claude Codeを再起動してプラグインを読み込む
+
+### よく使うコマンド
+
+| 操作 | コマンド |
+|------|---------|
+| マーケットプレイス追加 | `/plugin marketplace add <path>` |
+| マーケットプレイス削除 | `/plugin marketplace remove <name>` |
+| プラグインインストール | `/plugin install <name>@<marketplace>` |
+| プラグインアンインストール | `/plugin uninstall <name>@<marketplace>` |
+| 対話メニュー | `/plugin` |
 
 ---
 
@@ -28,6 +66,25 @@ Skill: plugin-guide
 ```
 
 > **重要**: 最初は雛形のみ作成し、中身（skills, agents, commands等）は後から追加する
+
+### 1.5. marketplace.jsonへの登録
+
+**プラグイン作成後、必ず`.claude-plugin/marketplace.json`の`plugins`配列に追加する：**
+
+```json
+{
+  "plugins": [
+    // 既存のプラグイン...
+    {
+      "name": "<plugin-name>",
+      "source": "./<plugin-name>",
+      "description": "プラグインの説明"
+    }
+  ]
+}
+```
+
+> **重要**: この登録を忘れると`/plugin install`でプラグインが見つからないエラーになる
 
 ---
 

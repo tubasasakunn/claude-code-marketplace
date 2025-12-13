@@ -9,6 +9,21 @@
       "name": "claude-code-plugin",
       "source": "./claude-code-plugin",
       "description": "Claude Codeの機能拡張スキル集"
+    },
+    {
+      "name": "ios-develop-plugin",
+      "source": "./ios-develop-plugin",
+      "description": "iOS/Swift開発支援プラグイン"
+    },
+    {
+      "name": "design-plugin",
+      "source": "./design-plugin",
+      "description": "デザインレビュープラグイン"
+    },
+    {
+      "name": "common-plugin",
+      "source": "./common-plugin",
+      "description": "汎用的な開発支援プラグイン"
     }
   ]
 }
