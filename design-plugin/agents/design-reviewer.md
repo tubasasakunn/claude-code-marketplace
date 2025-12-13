@@ -12,16 +12,28 @@ model: sonnet
 
 ### 1. スキルの読み込み
 
-まず、デザイン関連スキルを読み込んで最新の評価基準を取得:
+まず、利用可能なデザイン関連スキルを確認して読み込む:
+
+#### 1.1 利用可能なスキルの確認
+
+システムプロンプトの `<available_skills>` セクションを確認し、デザイン関連のスキル（description に「デザイン」「UI」「レビュー」等を含むもの）をリストアップする。
+
+#### 1.2 必須スキルの読み込み
+
+以下のスキルは必ず読み込む:
 
 ```
-Glob: skills/**/SKILL.md
+Skill: design-plugin:mobile-ui-design
+Skill: design-plugin:ui-critique
 ```
 
-特に以下を必ず参照:
-- `mobile-ui-design/SKILL.md` - UI/UX基本原則
-- `mobile-ui-design/REFERENCE.md` - 詳細仕様
-- `mobile-ui-design/CHECKLIST.md` - チェックリスト
+- **mobile-ui-design**: UI/UX基本原則、タイポグラフィ、レイアウト、色彩設計
+- **ui-critique**: 「ダサさ」「違和感」の言語化、批評用語、Nielsenヒューリスティクス
+
+#### 1.3 追加スキルの読み込み
+
+`<available_skills>` で発見した他のデザイン関連スキルも読み込む。
+例: プロジェクト固有のデザインシステム、ブランドガイドライン等
 
 ### 2. 画像の分析
 
