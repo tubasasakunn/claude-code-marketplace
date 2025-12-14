@@ -106,21 +106,37 @@ Text("Welcome").foregroundStyle(.primaryText)
 
 ## 6. iOS 26 Liquid Glassデザイン
 
-### 設計思想
+詳細は[LIQUID_GLASS.md](LIQUID_GLASS.md)を参照。
 
-- グラデーションなどの人工的な装飾を排除
-- 光学的なリアリティと流体的なモーションで構成
-- 背景コンテンツを透過・屈折させてUIの存在を示す
+### ネイティブAPI（iOS 26+）
 
-### 3つの柱
+```swift
+// 基本
+Text("Hello")
+    .glassEffect()
 
-| 柱 | 概要 | 実装キーワード |
-|---|---|---|
-| Crystal Clarity | 水晶のように透き通った質感 | `blendMode(.overlay)`, low blur radius |
-| Fluidity | 液体のように融合・分離するUI | `Canvas`, `alphaThreshold`, Metaballs |
-| Refraction | レンズのように光を曲げる | Metal Shader, `distortionEffect` |
+// 形状とティント指定
+Button("Action") { }
+    .glassEffect(.regular.tint(.blue), in: RoundedRectangle(cornerRadius: 16))
 
-### CrystalGlassModifier
+// インタラクティブ
+Button("Submit") { }
+    .glassEffect(.regular.interactive())
+```
+
+### モーフィング
+
+```swift
+@Namespace private var ns
+
+GlassEffectContainer(spacing: 20) {
+    Button { } label: { Image(systemName: "plus") }
+        .glassEffect()
+        .glassEffectID("main", in: ns)
+}
+```
+
+### フォールバック実装（iOS 25以前）
 
 ```swift
 struct CrystalGlassModifier: ViewModifier {
