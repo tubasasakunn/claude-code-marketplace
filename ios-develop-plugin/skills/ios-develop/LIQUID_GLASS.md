@@ -2,27 +2,95 @@
 
 iOS 26で導入された物理ベースの新しいマテリアルシステム。
 
-## 設計思想
+## エグゼクティブサマリー
 
-Liquid Glassは単なる視覚効果（VFX）ではなく、UIコンポーネントの「状態」と「関係性」を物理的に表現するための**機能的マテリアル**。
+iOS 26の「Liquid Glass」は、過去10年で最も重要なHIGパラダイムシフト。iOS 7のフラットデザイン、Big Surの静的グラスモーフィズムを超え、**動的マテリアリティ（Dynamic Materiality）**を確立。
 
-### 3つの柱
-
-| 柱 | 概要 |
-|----|------|
-| Crystal Clarity | 水晶のように透き通った質感。背景コンテンツを透過・屈折させてUIの存在を示す |
-| Fluidity | 液体のように融合・分離するUI。要素同士が近づくと水滴のように結合 |
-| Refraction | レンズのように光を曲げる。厚みと深度を表現 |
-
-### 従来デザインからの脱却
-
-- グラデーションなどの人工的な装飾を排除
-- 光学的なリアリティと流体的なモーションで構成
-- 背景コンテンツを透過・屈折させてUIの存在を示す
+- **物理ベースレンダリング**: Metalパイプラインによるリアルタイム処理
+- **リアルタイム光屈折**: レンズのように背景を歪ませる
+- **流体相互作用**: メタボール技術による要素の融合・分離
 
 ---
 
-## 実装方針：ネイティブAPI優先
+## 第1章 哲学と物理的基盤
+
+### 1.1 デザインの進化：静止画から流体へ
+
+Liquid Glassは「Aqua」の光沢感とiOS 7以降の「機能的レイヤー構造」の統合。
+
+- **スキューモーフィズム**: 静的なビットマップによる模倣
+- **Liquid Glass**: センサーと演算能力を用いた「シミュレーション」
+
+UI要素は高屈折率を持つ粘性流体として扱われ、ボタンはツールバーから分離（分化）し、不要になれば再び融合する。
+
+### 1.2 光学特性：屈折、反射、レンズ効果
+
+| 特性 | 説明 | 効果 |
+|------|------|------|
+| **リアルタイム屈折** | 背景を光学的に歪ませる（単純なブラーではない） | 物理的な厚みとボリューム感 |
+| **スペキュラー反射** | ジャイロスコープ連動の反射ハイライト | 実在感と触れられる感覚 |
+| **流動性（Fluidity）** | 表面張力による融合（メタボール技術） | 継ぎ目のない変形・合体 |
+
+### 1.3 物理エンジンとSDF（符号付き距離場）
+
+GlassEffectContainer内では、子ビューの形状が**符号付き距離場（SDF）**として解析される。
+
+- 要素間距離が近づくとフィールドが干渉
+- 自然な融合形状（フィレット）が動的に生成
+- `spacing`プロパティ = 融合が起こる「近接閾値」
+
+---
+
+## 第2章 システム全体のデザイン言語
+
+### 2.1 フローティング・ナビゲーション
+
+画面端からUIが「剥離」し、浮遊する「島（Island）」として再定義。
+
+| 要素 | iOS 18以前 | iOS 26 |
+|------|-----------|--------|
+| ボトムナビゲーション | 画面下端に固定 | 下端から浮いた角丸カプセル |
+| ツールバー | 固定幅、静的配置 | コンテキストに応じて伸縮・分割 |
+| プライマリアクション | ナビゲーション内 | 分離した独立ボタン |
+
+### 2.2 プライマリアクションの分離
+
+メッセージアプリの「新規作成」等は、ボトムナビゲーションから分離配置。
+
+- スクロール・コンテキスト変化に応じて融合/変形
+- 「現在の主要アクション」を直感的に伝達
+
+### 2.3 アイコンと多層構造
+
+ホーム画面アイコンは複数レイヤーで構成：
+- 最前面：ガラス層
+- 中間：グリフ（シンボル）層
+- 背景層
+
+デバイスを傾けると視差効果（パララックス）が発生。
+
+---
+
+## 第3章 レンダリングアーキテクチャ
+
+### 3.1 Metalレンダリングパイプライン
+
+1. **バックドロップサンプリング**: 背後コンテンツをキャプチャ・ダウンサンプリング
+2. **SDF生成とモーフィング演算**: 統合距離場を計算、融合処理
+3. **法線マップ生成**: SDFの勾配からレンズ効果の基礎を算出
+4. **ライティングと屈折合成**: ピクセルシェーダーで最終合成
+
+### 3.2 パフォーマンス最適化
+
+- **Tile-Based Deferred Rendering**: 可視領域のみで高負荷シェーダー実行
+- **キャッシング**: 静止状態ではSDF計算結果をキャッシュ
+- **注意**: PhaseAnimatorで常時変化する場合は毎フレーム再計算
+
+---
+
+## 第4章 実装方針
+
+### ネイティブAPI優先
 
 **カスタム実装は避け、ネイティブAPIを使用すること。**
 
@@ -35,272 +103,207 @@ Text("Hello")
 Text("Hello")
     .background(.ultraThinMaterial)
     .overlay(RoundedRectangle(...).stroke(...))
-    .shadow(...)
 ```
 
-### 理由
-
-1. **システム統合**: アクセシビリティ設定（透明度を下げる等）に自動対応
-2. **パフォーマンス**: GPUレベルで最適化されたレンダリング
-3. **一貫性**: OS全体のデザイン言語と調和
-4. **将来互換性**: OSアップデート時に自動的に改善される
-5. **モーフィング**: `GlassEffectContainer`による融合アニメーションはネイティブAPIでのみ実現可能
-
-### カスタム実装が許容されるケース
-
-- iOS 25以前をサポートする必要がある場合のフォールバック
-- ネイティブAPIでは実現できない特殊な視覚効果が必要な場合
+**理由:**
+1. アクセシビリティ設定に自動対応
+2. GPUレベルで最適化
+3. OS全体のデザイン言語と調和
+4. モーフィングはネイティブAPIでのみ実現可能
 
 ---
 
-## 1. 概要：従来のすりガラスとの違い
+## 第5章 .glassEffect() 修飾子
 
-| 特性 | 従来のすりガラス (Blur) | Liquid Glass (Lensing) |
-|------|------------------------|------------------------|
-| 処理ロジック | ピクセルの平均化 (Low Pass Filter) | ピクセル座標の変位 (Displacement Mapping) |
-| 視覚効果 | 平面的、均一な曇り | 3次元的、エッジでの光の屈折、厚みの表現 |
-| 動的挙動 | 静的 (Static) | 動的 (Dynamic) - 要素の移動に合わせて歪みが変化 |
-| 計算リソース | CPU/GPU (定数コスト) | GPU (フラグメントシェーダーによるピクセル毎計算) |
-
-Liquid Glassは「Lensing（レンズ効果）」と「Fluidity（流動性）」を持ち、UI要素同士が接近した際に水滴のように融合し、離れる際には有機的に分離する。
-
-### 背景ブラーの自動適用
-
-**重要**: `.glassEffect()`を適用するだけで、背景のブラー＋屈折効果が自動的に付与される。
+### APIシグネチャ
 
 ```swift
-// ✅ これだけで背景ブラー効果が付く
-Text("Content")
-    .padding()
-    .glassEffect()
-
-// ❌ 不要：別途Material/Blurを追加する必要はない
-Text("Content")
-    .padding()
-    .background(.ultraThinMaterial)  // 不要
-    .glassEffect()
+func glassEffect(
+    _ style: Glass = .regular,
+    in shape: some Shape = .capsule,
+    isEnabled: Bool = true
+) -> some View
 ```
 
-### 光学的4特性
+### スタイルバリアント
 
-Liquid Glassは以下の4つの光学特性をシミュレートする：
+| バリアント | 説明 | 推奨ユースケース |
+|-----------|------|-----------------|
+| `.regular` | 標準。ライト/ダークに自動適応 | ツールバー、タブバー、FAB |
+| `.clear` | 高透明。背景ディテールを保持 | 写真・地図上のオーバーレイ |
+| `.identity` | 無効化。条件付きオン/オフに使用 | アクセシビリティ対応 |
+| `.interactive()` | タッチ反応を有効化 | ボタン、トグル、リスト項目 |
 
-| 特性 | 物理的役割 | ネイティブAPIでの実現 |
-|------|-----------|---------------------|
-| 屈折 (Refraction) | 背景の光を曲げ、オブジェクトの厚みを示唆 | `.glassEffect()`に含まれる |
-| 拡散 (Diffusion) | 背景をぼかし、前景の可読性を確保 | `.glassEffect()`に含まれる |
-| 鏡面反射 (Specular) | 光源からの光がエッジに反射し表面張力を表現 | `.glassEffect()`に含まれる |
-| 投影 (Cast Shadow) | オブジェクトの浮遊感（エレベーション）を定義 | `.shadow()`で追加 |
-
-**ネイティブAPIを使えば、屈折・拡散・鏡面反射は自動処理される。** 開発者が追加で対応するのは影（Shadow）のみ。
-
-## 2. マテリアルバリアント
-
-### .regular（標準）
-
-タブバー、ツールバー、ナビゲーションバー、標準ボタンに使用。
+### カラーティント
 
 ```swift
-Text("Hello")
-    .padding()
-    .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+Image(systemName: "heart.fill")
+    .glassEffect(.regular.tint(.red.opacity(0.4)).interactive(), in: .circle)
 ```
 
-### .clear（クリア）
-
-写真や地図の上に配置される小さなフローティングコントロール向け。
-
-```swift
-Button(action: {}) {
-    Image(systemName: "location")
-}
-.glassEffect(.clear, in: .circle)
-```
-
-### .identity（アイデンティティ）
-
-視覚効果を無効化するパススルー状態。
-
-```swift
-.glassEffect(isEnabled ? .regular : .identity)
-```
-
-## 3. 基本実装：.glassEffect()
-
-### 基本構文
-
-```swift
-// デフォルト：.regular バリアント, .capsule 形状
-Text("Hello, Liquid Glass!")
-    .padding()
-    .glassEffect()
-```
-
-### 形状とティントを指定
-
-```swift
-Button(action: { }) {
-    Label("Home", systemImage: "house")
-        .padding()
-}
-.glassEffect(
-    .regular.tint(.blue.opacity(0.8)),
-    in: RoundedRectangle(cornerRadius: 16)
-)
-```
+**注意**: 不透明度は0.3〜0.5程度を推奨。高すぎるとガラス質感が失われる。
 
 ### 推奨形状
 
-| 形状 | 推奨される用途 | 特記事項 |
-|------|---------------|---------|
-| Capsule | ボタン、入力フィールド、トグル | デフォルト形状。最も流体的な変形に適している |
-| Circle | アイコンのみのボタン、アバター | `frame(width:height:)`で正方形を確保 |
-| RoundedRectangle | カード、モーダル、リスト項目 | 角丸の半径は一貫性が重要 |
-| .rect(cornerRadius:.containerConcentric) | ネストされたコンテナ | 親コンテナの角丸と視覚的に調和 |
+| 形状 | 用途 |
+|------|------|
+| `Capsule` | ボタン、入力フィールド（デフォルト） |
+| `Circle` | アイコンボタン、アバター |
+| `RoundedRectangle` | カード、モーダル |
+| `.rect(cornerRadius:.containerConcentric)` | ネストコンテナ |
 
-### インタラクティブ効果
+---
 
-```swift
-Button("Submit") {
-    submitAction()
-}
-.glassEffect(.regular.interactive())
-```
-
-`.interactive()`を適用すると：
-- **スケーリング**: 押下時にわずかに縮小
-- **イルミネーション**: タッチ位置から光の波紋
-- **シマー**: 表面を斜めに走るスペキュラハイライト
-
-## 4. Glass Card の構築
-
-### 基本実装
-
-```swift
-struct GlassCard: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Liquid Glass UI")
-                .font(.headline)
-                .foregroundStyle(.primary)  // セマンティックカラー推奨
-            Text("Refraction & Depth Simulation")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .padding(20)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
-        .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
-    }
-}
-```
-
-**ポイント**: `.glassEffect()`だけで背景ブラー＋屈折＋リムライト（エッジの光沢）が自動適用される。追加で必要なのは影のみ。
-
-### シャドウ設計ガイドライン
-
-#### 色付きシャドウ（推奨）
-
-黒ではなく、背景色やボタン色を含んだ暗色を使用すると、濁りのないクリアな浮遊感が生まれる。
-
-```swift
-// ❌ 純粋な黒（濁って見える）
-.shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
-
-// ✅ 色付きシャドウ（クリアな浮遊感）
-.shadow(color: Color.blue.opacity(0.3), radius: 20, x: 0, y: 10)
-```
-
-#### 二重シャドウ（高品質）
-
-1つのシャドウで全てを表現せず、2つを組み合わせると自然な浮遊感が得られる。
-
-```swift
-.shadow(color: .black.opacity(0.08), radius: 30, x: 0, y: 15)  // Ambient: 広範囲の薄い影
-.shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)    // Key: 直下の濃く狭い影
-```
-
-#### 推奨値
-
-| パラメータ | 推奨値 | 備考 |
-|-----------|--------|------|
-| Radius | 10〜20pt | 大きく柔らかく |
-| Y Offset | 5〜10pt | 光源を上部に想定 |
-| Opacity | 明るい背景: 15%、暗い背景: 30% | 背景に応じて調整 |
-
-### リムライト（エッジの光沢）
-
-ネイティブAPIでは自動適用されるが、カスタム実装が必要な場合：
-
-```swift
-// iOS 25以前のフォールバック用
-.overlay(
-    RoundedRectangle(cornerRadius: 24, style: .continuous)
-        .stroke(
-            LinearGradient(
-                colors: [
-                    .white.opacity(0.6),  // 上部左：ハイライト
-                    .white.opacity(0.1)   // 下部右：シェードへフェード
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            lineWidth: 1
-        )
-)
-```
-
-**注意**: 背景にはリッチなグラデーションや写真を配置すること。単色背景ではLiquid Glassの効果が活きない。
-
-## 5. GlassEffectContainer とモーフィング
-
-複数のガラス要素が融合・分離するアニメーションを実現。
+## 第6章 GlassEffectContainer
 
 ### 基本的な融合
 
 ```swift
 GlassEffectContainer(spacing: 20) {
     HStack(spacing: 15) {
-        Image(systemName: "pencil")
-            .glassEffect()
-
-        Image(systemName: "eraser")
-            .glassEffect()
+        Image(systemName: "pencil").glassEffect()
+        Image(systemName: "eraser").glassEffect()
     }
 }
 ```
 
-- **Container Spacing (20)**: 融合の閾値。この距離以下で融合開始
+- **Container Spacing (20)**: 融合閾値
 - **Layout Spacing (15)**: 実際のView間距離
-
-上記例では実際の距離（15）が閾値（20）より小さいため、2つのアイコンは融合する。
+- 距離(15) < 閾値(20) → 融合する
 
 ### glassEffectID によるモーフィング
 
 ```swift
-struct MorphingMenu: View {
-    @Namespace private var namespace
+@Namespace private var ns
+
+if isExpanded {
+    MenuView()
+        .glassEffect()
+        .glassEffectID("menu", in: ns)
+} else {
+    ButtonView()
+        .glassEffect()
+        .glassEffectID("menu", in: ns)
+}
+```
+
+異なる形状・サイズ間でも滑らかに変形補間。
+
+### glassEffectUnion
+
+距離に関係なく同一のガラス形状として扱う：
+
+```swift
+.glassEffectUnion(id: "mediaPod", namespace: playerSpace)
+```
+
+---
+
+## 第7章 高度なアニメーション
+
+### 7.1 PhaseAnimatorによる有機的遷移
+
+```swift
+PhaseAnimator([false, true]) { morph in
+    HStack(spacing: morph ? 50.0 : -15.0) {
+        Circle().frame(width: 60, height: 60).glassEffect()
+        Circle().frame(width: 60, height: 60).glassEffect()
+    }
+} animation: { _ in
+    .easeInOut(duration: 1.5).repeatForever(autoreverses: true)
+}
+```
+
+### 7.2 推奨アニメーションカーブ
+
+| カーブ | 用途 |
+|--------|------|
+| `.bouncy` / `.spring` | 表面張力による揺らぎ |
+| `.easeInOut` | 粘性の高い液体の動き |
+| ❌ Linear | 機械的で不適切 |
+
+---
+
+## 第8章 実践的サンプルコード
+
+### 8.1 モーフィング・アクションバー
+
+```swift
+import SwiftUI
+
+struct LiquidActionBar: View {
     @State private var isExpanded = false
+    @Namespace private var animationSpace
 
     var body: some View {
-        GlassEffectContainer(spacing: 30) {
-            VStack {
-                Button {
-                    withAnimation(.bouncy) { isExpanded.toggle() }
-                } label: {
-                    Image(systemName: isExpanded ? "xmark" : "plus")
-                        .padding()
+        ZStack(alignment: .bottom) {
+            Image("NatureBackground")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .edgesIgnoringSafeArea(.all)
+
+            GlassEffectContainer(spacing: 15) {
+                HStack(alignment: .center, spacing: 10) {
+                    if isExpanded {
+                        actionButton(icon: "square.and.arrow.up", id: "share")
+                        actionButton(icon: "trash", id: "delete")
+                        actionButton(icon: "checkmark", id: "save")
+                    }
+
+                    Button {
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                            isExpanded.toggle()
+                        }
+                    } label: {
+                        Image(systemName: isExpanded ? "xmark" : "pencil")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .frame(width: 60, height: 60)
+                            .foregroundColor(.primary)
+                    }
+                    .glassEffect(.regular.interactive(), in: .circle)
+                    .glassEffectID("mainButton", in: animationSpace)
                 }
-                .glassEffect()
-                .glassEffectID("mainButton", in: namespace)
+            }
+            .padding(.bottom, 50)
+        }
+    }
 
-                if isExpanded {
-                    Button(action: {}) { Image(systemName: "doc") }
-                        .glassEffect()
-                        .glassEffectID("action1", in: namespace)
+    @ViewBuilder
+    func actionButton(icon: String, id: String) -> some View {
+        Button(action: { print("\(id) tapped") }) {
+            Image(systemName: icon)
+                .font(.headline)
+                .frame(width: 50, height: 50)
+                .foregroundColor(.primary)
+        }
+        .glassEffect(.regular.interactive(), in: .circle)
+        .transition(.scale.combined(with: .opacity))
+        .glassEffectID(id, in: animationSpace)
+    }
+}
+```
 
-                    Button(action: {}) { Image(systemName: "mic") }
-                        .glassEffect()
-                        .glassEffectID("action2", in: namespace)
+### 8.2 呼吸するローダー
+
+```swift
+struct LiquidBreathingLoader: View {
+    var body: some View {
+        ZStack {
+            Color.black.edgesIgnoringSafeArea(.all)
+
+            GlassEffectContainer(spacing: 50) {
+                PhaseAnimator([false, true]) { morph in
+                    HStack(spacing: morph ? 50.0 : -15.0) {
+                        Circle()
+                            .frame(width: 60, height: 60)
+                            .glassEffect(.regular.tint(.cyan), in: .circle)
+                        Circle()
+                            .frame(width: 60, height: 60)
+                            .glassEffect(.regular.tint(.mint), in: .circle)
+                    }
+                } animation: { _ in
+                    .easeInOut(duration: 1.5).repeatForever(autoreverses: true)
                 }
             }
         }
@@ -308,15 +311,107 @@ struct MorphingMenu: View {
 }
 ```
 
-### glassEffectUnion
-
-複数のViewを距離に関係なく一つのガラス形状として扱う場合に使用。
+### 8.3 統合メディアコントロール
 
 ```swift
-.glassEffectUnion(id: "control", namespace: namespace)
+struct UnifiedMediaControl: View {
+    @Namespace private var playerSpace
+
+    var body: some View {
+        ZStack {
+            LinearGradient(colors: [.purple, .blue], startPoint: .top, endPoint: .bottom)
+                .edgesIgnoringSafeArea(.all)
+
+            GlassEffectContainer(spacing: 0) {
+                HStack(spacing: 5) {
+                    controlButton(icon: "backward.fill", id: "rewind")
+
+                    Button(action: {}) {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 40))
+                            .frame(width: 80, height: 80)
+                    }
+                    .glassEffect(.regular.interactive(), in: .circle)
+                    .glassEffectUnion(id: "mediaPod", namespace: playerSpace)
+
+                    controlButton(icon: "forward.fill", id: "forward")
+                }
+            }
+        }
+    }
+
+    func controlButton(icon: String, id: String) -> some View {
+        Button(action: {}) {
+            Image(systemName: icon)
+                .font(.title2)
+                .frame(width: 60, height: 60)
+        }
+        .glassEffect(.regular.interactive(), in: .circle)
+        .glassEffectUnion(id: "mediaPod", namespace: playerSpace)
+    }
+}
 ```
 
-## 6. タブバーの実装
+---
+
+## 第9章 iOS 26.2の進化
+
+### 9.1 不透明度調整の標準化
+
+初期リリースの「視認性」批判に対応：
+
+```swift
+@Environment(\.glassOpacityPreference) var glassOpacity
+```
+
+**不透明度スライダー**: ユーザーが設定で調整可能
+- 左スライド：クリアで読みやすい
+- 右スライド：半透明で夢のような状態
+
+### 9.2 可読性の向上
+
+- テキストの下にLiquid Glassを敷く場合は**Vibrancy**エフェクトを併用
+- ロック画面の時計は完全な透明度制御が可能に
+
+### 9.3 ライブアクティビティへの影響
+
+ウィジェット背景がLiquid Glassの場合、不透明度変化でもデザインが破綻しないようテストが必要。
+
+---
+
+## 第10章 UIKit統合
+
+### UIGlassEffectの使用
+
+```swift
+let glassEffect = UIGlassEffect(style: .regular)
+glassEffect.isInteractive = true
+
+let visualEffectView = UIVisualEffectView(effect: glassEffect)
+visualEffectView.frame = button.bounds
+visualEffectView.layer.cornerRadius = 20
+visualEffectView.layer.cornerCurve = .continuous
+visualEffectView.clipsToBounds = true
+
+button.insertSubview(visualEffectView, at: 0)
+```
+
+### 制約
+
+- **UIKit**: 単体ビューへの効果のみ
+- **モーフィング融合**: サポートなし → SwiftUIを埋め込み推奨
+
+### UINavigationBarとの競合解消
+
+```swift
+if #available(iOS 26.0, *) {
+    barButtonItem.hidesSharedBackground = true
+}
+```
+
+---
+
+## 第11章 タブバーの実装
 
 ### 標準的な実装
 
@@ -338,42 +433,23 @@ Tab("Search", systemImage: "magnifyingglass", role: .search) {
 }
 ```
 
-`.search`ロールが適用されると：
-- 他のタブから視覚的に分離配置
-- より目立つガラススタイルが自動適用
+- 他タブから視覚的に分離
 - iPadでは独立した検索フィールドとして再配置
-
-### カスタムフローティングボタン
-
-```swift
-ZStack(alignment: .bottom) {
-    TabView { /* ... */ }
-
-    Button(action: { showAddSheet = true }) {
-        Image(systemName: "plus")
-            .font(.title2)
-            .padding()
-            .foregroundStyle(.white)
-    }
-    .glassEffect(.regular.tint(.blue).interactive(), in: .circle)
-    .padding(.bottom, 10)
-}
-```
 
 ### タブバーアクセサリビュー
 
 ```swift
 .tabViewBottomAccessory {
-    Button("New Post") { /* ... */ }
+    Button("New Post") { }
         .buttonStyle(.glass)
 }
 ```
 
-## 7. 検索モーフィングの完全実装
+---
+
+## 第12章 検索モーフィング完全実装
 
 ```swift
-import SwiftUI
-
 struct LiquidSearchContainer: View {
     @Namespace private var ns
     @State private var isSearching = false
@@ -381,29 +457,23 @@ struct LiquidSearchContainer: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // 背景：ガラス効果を際立たせるグラデーション
             LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
 
             VStack {
                 Spacer()
-
                 GlassEffectContainer(spacing: 20) {
                     if isSearching {
-                        // 展開された検索バー
                         HStack {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundStyle(.secondary)
-                            TextField("Search...", text: $searchText)
-                                .textFieldStyle(.plain)
+                            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                            TextField("Search...", text: $searchText).textFieldStyle(.plain)
                             Button {
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                                     isSearching = false
                                     searchText = ""
                                 }
                             } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.secondary)
+                                Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
                             }
                         }
                         .padding()
@@ -412,16 +482,13 @@ struct LiquidSearchContainer: View {
                         .glassEffect(.regular, in: .capsule)
                         .glassEffectID("search_interface", in: ns)
                         .padding(.horizontal)
-                        .transition(.scale(scale: 1.0))
                     } else {
-                        // タブバーとフローティング検索ボタン
                         HStack(spacing: 30) {
                             ForEach(0..<3) { idx in
                                 Image(systemName: ["house", "heart", "person"][idx])
                                     .frame(width: 50, height: 50)
                                     .glassEffect(.regular.interactive(), in: .circle)
                             }
-
                             Button {
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                                     isSearching = true
@@ -444,54 +511,58 @@ struct LiquidSearchContainer: View {
 }
 ```
 
-## 8. UIKit統合
+---
 
-### UINavigationBar との競合解消
+## 第13章 ベストプラクティス
+
+### 過剰使用の回避
+
+**「Liquid Glassはスパイスであり、主食ではない」**
+
+| 状況 | 推奨 |
+|------|------|
+| ❌ リストセル全てにLiquid Glass | GPU負荷増大、視覚的に「うるさい」 |
+| ✅ 浮遊する作成ボタンやツールバーのみ | 階層構造が明確に |
+
+### レイヤー数制限
+
+- 画面上のLiquid Glassレイヤーは**2層まで**
+- モーダル表示時は背面を`.identity`に
+
+### 背景の設計
 
 ```swift
-let hostingController = UIHostingController(rootView: MySwiftUIView())
-let barButtonItem = UIBarButtonItem(customView: hostingController.view)
+// ✅ グラデーション・画像
+LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
 
-if #available(iOS 26.0, *) {
-    barButtonItem.hidesSharedBackground = true
-}
+// ❌ 単色（ガラス効果が活きない）
+Color.black
 ```
 
-## 9. パフォーマンス最適化
+---
 
-### オーバードローの回避
+## 第14章 アクセシビリティ
 
-- 画面上のLiquid Glassレイヤーは原則2層まで
-- モーダル表示時は背面のガラス効果を `.identity` にする
-- `GlassEffectContainer` を使用してドローコールを削減
+### 透明度を下げる設定
 
-### GlassEffectContainer によるバッチ処理
+Liquid Glassは自動でフロスティング強度を上げ、不透明度を増加。
 
-コンテナ内の子要素を一つのメッシュとして計算。10個のボタンを個別に描画するよりも効率的。
-
-## 10. アクセシビリティ
-
-### 透明度を下げる設定への対応
-
-Liquid Glassマテリアルは自動的にフロスティングの強度を上げ、不透明度を増す。
-
-### テキスト色の推奨
+### テキスト色
 
 ```swift
 // ❌ 固定の白
 .foregroundStyle(.white)
 
 // ✅ セマンティックカラー
-.foregroundStyle(.label)
+.foregroundStyle(.primary)
 .foregroundStyle(.secondary)
 ```
 
-### reduceMotion への対応
+### reduceMotion対応
 
 ```swift
 @Environment(\.accessibilityReduceMotion) var reduceMotion
 
-// reduceMotion が true の場合は静的表示に切り替え
 if reduceMotion {
     // 静的なすりガラス表示
 } else {
@@ -499,231 +570,113 @@ if reduceMotion {
 }
 ```
 
-## 11. システム設定への適応
+---
 
-- **透明度を下げる**: 自動的に不透明度を増加
-- **着色モード (iOS 26.1+)**: 背景色を彩度低下させ、ユーザーのティントカラーを乗算合成
+## 第15章 Glass Card構築
+
+### 基本実装
+
+```swift
+struct GlassCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Liquid Glass UI")
+                .font(.headline)
+                .foregroundStyle(.primary)
+            Text("Refraction & Depth Simulation")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(20)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
+        .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 5)
+    }
+}
+```
+
+### シャドウ設計
+
+#### 色付きシャドウ（推奨）
+
+```swift
+// ✅ クリアな浮遊感
+.shadow(color: Color.blue.opacity(0.3), radius: 20, x: 0, y: 10)
+```
+
+#### 二重シャドウ（高品質）
+
+```swift
+.shadow(color: .black.opacity(0.08), radius: 30, x: 0, y: 15)  // Ambient
+.shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)    // Key
+```
 
 ---
 
-## 12. UI/UX設計の意思決定フレームワーク
+## 第16章 UI/UX設計フレームワーク
 
-Liquid Glassを効果的に活用するための設計判断基準。
+### Push vs Sheet
 
-### 12.1 画面遷移：Push vs Sheet
-
-| 判定要素 | Push遷移 (NavigationStack) | Sheet遷移 (Liquid Glass向き) |
-|---------|---------------------------|------------------------------|
-| コンテキスト | 継続的（リスト→詳細） | 一時的・独立的（新規作成、設定変更） |
-| フローの性質 | 線形（ステップ1→2→3） | 分岐・中断（サブタスク） |
+| 判定要素 | Push遷移 | Sheet遷移（Liquid Glass向き） |
+|---------|---------|------------------------------|
+| コンテキスト | 継続的（リスト→詳細） | 一時的（新規作成） |
 | メンタルモデル | 「奥に進む」 | 「上に乗せる」 |
-| 画面占有率 | 原則全画面 | ハーフモーダル〜全画面（可変） |
-| データ操作 | 自動保存・閲覧が主 | 明示的な「保存」「キャンセル」 |
 
-**Liquid GlassにはSheetが最適**: 背景が透けて見えるため、ユーザーは元のコンテキストを見失わない。
+**Liquid GlassにはSheetが最適**: 背景が透けてコンテキストを維持。
 
-```swift
-// Sheetの高さ（Detents）設定
-.sheet(isPresented: $showSheet) {
-    ContentView()
-        .presentationDetents([.medium, .large])
-}
-```
+### ボタン配置
 
-- **Medium**: 背景を参照しながら入力する場合
-- **Large**: コンテンツ量が多い、没入が必要な場合
+| 位置 | 用途 |
+|------|------|
+| 画面下部 | プライマリアクション（新規作成、再生） |
+| 画面右上 | セカンダリ/完了/破壊的操作 |
 
-### 12.2 ボタン配置
+### タブ項目数
 
-#### 画面下部（プライマリアクション）
-
-```swift
-// ✅ 推奨：ネイティブのタブバーアクセサリ
-.tabViewBottomAccessory {
-    Button("New Post") { }
-        .buttonStyle(.glass)
-}
-```
-
-適用ケース：
-- 最も頻繁に行うアクション（新規作成、再生、カートに追加）
-- 片手操作（親指で届く範囲）
-
-#### 画面右上（セカンダリアクション）
-
-```swift
-.toolbar {
-    ToolbarItem(placement: .topBarTrailing) {
-        Button("Done") { }
-    }
-}
-```
-
-適用ケース：
-- 頻度は低いが重要な操作（編集、共有、フィルタ）
-- 完了・キャンセル操作
-- 破壊的操作（誤タップ防止）
-
-### 12.3 タブバー項目数
-
-| デバイス | 推奨 | 最大 |
-|---------|------|------|
-| iPhone | 3〜5個 | 5個（6個以上は「その他」に集約され、UX低下） |
-| iPad | サイドバーに変形 | 制限なし |
-
-```swift
-TabView {
-    // 最大5つまで
-}
-.tabViewStyle(.sidebarAdaptable) // iPad対応
-```
-
-### 12.4 情報密度とコンポーネント数
-
-#### Miller's Law（7±2の法則）
-
-1画面の主要要素は **5〜7個以内** に抑える。
-
-#### プログレッシブ・ディスクロージャー
-
-最初から全情報を表示せず、段階的に開示。
-
-```swift
-// SheetのDetentsで段階的に情報を開示
-.presentationDetents([.medium, .large])
-```
-
-### 12.5 タイポグラフィ
-
-#### フォントウェイト
-
-```swift
-// ❌ 背景が複雑な場合、細いフォントは避ける
-.fontWeight(.ultraLight)
-.fontWeight(.thin)
-
-// ✅ 可読性を確保
-.fontWeight(.regular)
-.fontWeight(.medium)
-.fontWeight(.semibold)
-```
-
-#### 色の指定
-
-```swift
-// ❌ 固定色（背景変化に対応できない）
-.foregroundColor(Color(red: 0, green: 0, blue: 0))
-
-// ✅ セマンティックカラー（自動でコントラスト調整）
-.foregroundStyle(.primary)
-.foregroundStyle(.secondary)
-.foregroundStyle(.label)
-```
-
-#### 行間
-
-フォントサイズの **120〜145%** を確保。
-
-```swift
-Text("Long text content")
-    .lineSpacing(8)
-```
-
-### 12.6 判定基準チェックリスト
-
-| 検討項目 | 判定基準 | 推奨設定 |
-|---------|---------|---------|
-| 画面遷移 vs Sheet | コンテキスト維持の必要性 | 一時的タスク→Sheet、フロー切り替え→Push |
-| Sheetの高さ | コンテンツ量と参照性 | 入力中→Medium、閲覧中→Large |
-| ボタン配置 | 頻度と指の届きやすさ | プライマリ→下部、完了/破壊的→右上 |
-| タブ項目数 | 画面幅と重要度 | 3〜5個。それ以上はサイドバー検討 |
-| コンポーネント数 | 認知的負荷 | 1画面あたり主要要素5〜7個以内 |
-| 文字色 | 背景可変性への耐性 | セマンティックカラー使用 |
+- iPhone: 3〜5個（最大5）
+- iPad: サイドバーに変形
 
 ---
 
-## 13. 背景の設計
+## 付録A：APIリファレンス早見表
 
-Liquid Glassの視覚的魅力は背景に依存する。
+### 修飾子
 
-### 推奨される背景
+| 修飾子 | パラメータ | 説明 |
+|--------|-----------|------|
+| `.glassEffect` | `style: Glass` | マテリアル種類 |
+| | `in: Shape` | 形状（デフォルト: .capsule） |
+| | `isEnabled: Bool` | 条件付き無効化 |
+| `GlassEffectContainer` | `spacing: CGFloat` | 融合閾値 |
+| `.glassEffectID` | `id: Hashable` | モーフィング同一性追跡 |
+| `.glassEffectUnion` | `id: Hashable` | 強制的な一体化レンダリング |
+| `.interactive()` | なし | タッチ反応有効化 |
 
-```swift
-// ✅ グラデーション
-LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
+### デザインパターン比較
 
-// ✅ MeshGradient（iOS 18+）
-MeshGradient(...)
-
-// ✅ 写真・画像
-Image("background")
-    .resizable()
-    .scaledToFill()
-```
-
-### 避けるべき背景
-
-```swift
-// ❌ 単色（ガラス効果が活きない）
-Color.black
-Color.white
-Color.gray
-```
-
-### 背景とガラスの層構造
-
-```
-[最背面] グラデーション/画像
-    ↓
-[中間層] スクロールコンテンツ
-    ↓
-[前面層] Liquid Glass カード/タブバー（最大2層まで）
-```
-
-**重要**: ガラスの重ね合わせは2層までに抑える（GPU負荷軽減）
+| 特徴 | iOS 18 | iOS 26 |
+|------|--------|--------|
+| 素材感 | 静的ぼかし | 動的屈折・反射 |
+| ナビゲーション | 固定バー | 浮遊カプセル |
+| アイコン | 平面グリフ | 多層構造・視差 |
+| アニメーション | 線形・スプリング | 流体モーフィング |
+| 物理挙動 | なし | ジャイロ反射・流体シミュレーション |
 
 ---
 
-## 14. スクロールエッジ効果の制御
+## 付録B：Figmaハンドオフ設定値
 
-コンテンツが最上部/最下部にあるときのバーの透明度変化を制御。
-
-### 効果を有効化（コンテンツを裏に透かす）
-
-```swift
-.toolbar {
-    ToolbarItem(placement: .bottomBar) {
-        // バーの下までコンテンツが伸びる
-    }
-}
-```
-
-### 効果を無効化（コンテンツを避ける）
-
-```swift
-.safeAreaInset(edge: .bottom) {
-    // コンテンツの余白を確保し、バーの裏に入り込まない
-}
-```
-
----
-
-## 15. Figmaでのハンドオフ設定値
-
-デザイナーからエンジニアへの指示用。
-
-### Liquid Glass カードの設定
+### Liquid Glass カード
 
 | プロパティ | 値 |
 |-----------|-----|
 | Background Blur | 20〜40 |
-| Fill | Solid White (#FFFFFF), Opacity 10〜20% |
-| Inner Shadow (Top) | Y: +1, Blur: 0, Color: White 50%（上端の光） |
-| Inner Shadow (Bottom) | Y: -1, Blur: 0, Color: White 10%（下端の反射） |
-| Drop Shadow | Blur: 30, Y: 15, Color: Black (または背景の暗色) 15% |
-| Corner Radius | 16〜24（用途に応じて） |
+| Fill | #FFFFFF 10〜20% |
+| Inner Shadow (Top) | Y: +1, Blur: 0, White 50% |
+| Inner Shadow (Bottom) | Y: -1, Blur: 0, White 10% |
+| Drop Shadow | Blur: 30, Y: 15, Black 15% |
+| Corner Radius | 16〜24 |
 
-### グラデーションボーダー（リムライト）
+### グラデーションボーダー
 
 ```
 Linear Gradient Stroke:
@@ -732,12 +685,51 @@ Linear Gradient Stroke:
   - Width: 1px
 ```
 
-### 色付きシャドウの指定方法
+---
 
-```
-Drop Shadow:
-  - Color: 背景のメインカラーを暗くしたもの（例：青背景なら濃紺）
-  - Blur: 20-30
-  - Y: 10-15
-  - Opacity: 15-25%
+## 付録C：フォールバック実装（iOS 25以前）
+
+```swift
+struct CrystalGlassModifier: ViewModifier {
+    var cornerRadius: CGFloat = 24.0
+    var blurStyle: Material = .ultraThinMaterial
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                ZStack {
+                    Rectangle()
+                        .fill(blurStyle)
+                        .environment(\.colorScheme, .light)
+                        .opacity(0.6)
+                    Color.white.opacity(0.1)
+                        .blendMode(.overlay)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 8)
+
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            stops: [
+                                .init(color: .white.opacity(0.6), location: 0.0),
+                                .init(color: .white.opacity(0.2), location: 0.3),
+                                .init(color: .white.opacity(0.05), location: 0.5),
+                                .init(color: .white.opacity(0.3), location: 1.0)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.0
+                    )
+                    .blendMode(.screen)
+            }
+    }
+}
+
+extension View {
+    func liquidGlass(cornerRadius: CGFloat = 24) -> some View {
+        self.modifier(CrystalGlassModifier(cornerRadius: cornerRadius))
+    }
+}
 ```

@@ -58,6 +58,27 @@ let message = String(localized: "welcome_message", comment: "説明")
 
 複数形は`.stringsdict`を使用。
 
+## iOS 26 Liquid Glass（iOS 26+）
+
+動的マテリアリティを持つ新しいUIパラダイム。
+
+```swift
+// 基本
+Text("Hello").glassEffect()
+
+// モーフィング
+GlassEffectContainer(spacing: 20) {
+    Button { }.glassEffect().glassEffectID("btn", in: ns)
+}
+```
+
+**重要ポイント:**
+- ネイティブAPI（`.glassEffect()`）を優先
+- `GlassEffectContainer`で融合アニメーション
+- レイヤーは2層まで
+
+詳細は[LIQUID_GLASS.md](LIQUID_GLASS.md)を参照。
+
 ## Xcode以外での開発注意
 
 - 新規ファイルはXcodeで追加（またはBuildable Folder使用）
