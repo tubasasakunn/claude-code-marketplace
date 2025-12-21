@@ -24,6 +24,11 @@
       "name": "common-plugin",
       "source": "./common-plugin",
       "description": "汎用的な開発支援プラグイン"
+    },
+    {
+      "name": "hono-plugin",
+      "source": "./hono-plugin",
+      "description": "Cloudflare Workers + Hono + D1を用いたエッジAPI開発支援プラグイン"
     }
   ]
 }

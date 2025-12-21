@@ -1,0 +1,8 @@
+{
+  "name": "hono-plugin",
+  "description": "Cloudflare Workers + Hono + D1を用いたエッジAPI開発支援プラグイン",
+  "version": "1.0.0",
+  "author": {
+    "name": "tubasasakunn"
+  }
+}
