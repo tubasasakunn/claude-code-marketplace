@@ -171,3 +171,8 @@ Skill: hooks-guide
 4. **スキル間の連携を意識**
    - サブエージェントからスキルを読み込む設計
    - 例：`ios-implementer`エージェントが`ios-develop`スキルを読み込む
+
+5. **プラグイン更新後は必ずバージョンをアップデート**
+   - `plugin.json`の`version`フィールドを更新する
+   - セマンティックバージョニング（major.minor.patch）に従う
+   - 破壊的変更: major、機能追加: minor、バグ修正: patch
