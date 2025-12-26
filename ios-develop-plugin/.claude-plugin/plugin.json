@@ -1,7 +1,7 @@
 {
   "name": "ios-develop-plugin",
   "description": "iOS/Swift開発を支援するClaude Codeプラグイン",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "tubasasakun"
   },

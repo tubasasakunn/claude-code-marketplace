@@ -3,6 +3,10 @@
     "maestro": {
       "command": "maestro",
       "args": ["mcp"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
     }
   }
 }
