@@ -13,7 +13,7 @@ Claude Code プラグインのマーケットプレイスです。
 ### 2. プラグインをインストール
 
 ```bash
-/plugin install <plugin-name>@claude-code-marketplace
+/plugin install <plugin-name>@tubasasakunn-marketplace
 ```
 
 ### 3. Claude Code を再起動
@@ -73,7 +73,7 @@ Claude Code プラグインのマーケットプレイスです。
 ### iOS開発
 
 ```bash
-/plugin install ios-develop-plugin@claude-code-marketplace
+/plugin install ios-develop-plugin@tubasasakunn-marketplace
 ```
 
 ```
@@ -85,7 +85,7 @@ Claude Code プラグインのマーケットプレイスです。
 ### デザインレビュー
 
 ```bash
-/plugin install design-plugin@claude-code-marketplace
+/plugin install design-plugin@tubasasakunn-marketplace
 ```
 
 ```
@@ -96,7 +96,7 @@ Claude Code プラグインのマーケットプレイスです。
 ### Git操作
 
 ```bash
-/plugin install common-plugin@claude-code-marketplace
+/plugin install common-plugin@tubasasakunn-marketplace
 ```
 
 ```
@@ -111,7 +111,7 @@ Claude Code プラグインのマーケットプレイスです。
 新しいプラグインを作成する場合は、claude-code-pluginをインストールして`plugin-guide`と`skill-creator`スキルを活用してください。
 
 ```bash
-/plugin install claude-code-plugin@claude-code-marketplace
+/plugin install claude-code-plugin@tubasasakunn-marketplace
 ```
 
 ```

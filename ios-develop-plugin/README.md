@@ -5,7 +5,7 @@ iOS/Swift開発を支援するClaude Codeプラグイン。
 ## インストール
 
 ```bash
-/plugin install ios-develop-plugin@claude-code-marketplace
+/plugin install ios-develop-plugin@tubasasakunn-marketplace
 ```
 
 ## スキル一覧

@@ -5,7 +5,7 @@
 ## インストール
 
 ```bash
-/plugin install common-plugin@claude-code-marketplace
+/plugin install common-plugin@tubasasakunn-marketplace
 ```
 
 ## スキル一覧

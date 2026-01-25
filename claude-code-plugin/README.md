@@ -5,7 +5,7 @@ Claude Codeの機能拡張スキル集。プラグイン開発とスキル作成
 ## インストール
 
 ```bash
-/plugin install claude-code-plugin@claude-code-marketplace
+/plugin install claude-code-plugin@tubasasakunn-marketplace
 ```
 
 ## スキル一覧

@@ -22,13 +22,13 @@ Claude Code プラグインのマーケットプレイスです。
 ### 2. プラグインをインストール
 
 ```
-/plugin install <plugin-name>@claude-code-marketplace
+/plugin install <plugin-name>@tubasasakunn-marketplace
 ```
 
 例：
 ```
-/plugin install ios-develop-plugin@claude-code-marketplace
-/plugin install common-plugin@claude-code-marketplace
+/plugin install ios-develop-plugin@tubasasakunn-marketplace
+/plugin install common-plugin@tubasasakunn-marketplace
 ```
 
 ### 3. Claude Codeを再起動
