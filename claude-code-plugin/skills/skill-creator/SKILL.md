@@ -1,232 +1,248 @@
 ---
 name: skill-creator
-description: Claude Code用のエージェントスキルを作成します。スキルの作成、SKILL.mdの書き方、スキル構造の設計について質問された場合に使用してください。
+description: Claude Code用のエージェントスキルを作成します。スキルの作成、SKILL.mdの書き方、スキル構造の設計、フロントマター設定（context、hooks、allowed-toolsなど）について質問された場合に使用してください。
 ---
 
 # スキル作成ガイド
 
+> 最新のドキュメントインデックス: https://code.claude.com/docs/llms.txt
+
 ## スキルとは
 
-スキルはClaude Codeの機能を拡張するモジュール式機能です。`SKILL.md`ファイルとオプションのサポートファイルで構成されます。
+スキルはClaude Codeの機能を拡張するモジュールです。`SKILL.md`ファイルに指示を記述すると、Claudeがツールキットに追加します。関連する場合に自動的に使用されるか、`/skill-name`で直接呼び出せます。
 
 ## 保存場所
 
-- **個人用**: `~/.claude/skills/skill-name/SKILL.md`
-- **プロジェクト用**: `.claude/skills/skill-name/SKILL.md`
+| 場所 | パス | 適用対象 |
+|:-----|:-----|:---------|
+| 個人用 | `~/.claude/skills/<skill-name>/SKILL.md` | 全プロジェクト |
+| プロジェクト用 | `.claude/skills/<skill-name>/SKILL.md` | このプロジェクトのみ |
+| プラグイン | `<plugin>/skills/<skill-name>/SKILL.md` | プラグイン有効時 |
 
-## SKILL.md構造
+プロジェクトスキルは同名の個人スキルをオーバーライドします。
+
+## SKILL.md基本構造
 
 ```yaml
 ---
 name: skill-name
-description: スキルが何をするか、いつ使用するかを説明（最大1024文字）
+description: 何をするか。いつ使用するかを説明。
 ---
 
 # スキル名
 
-## Instructions
+## 指示
 Claudeへの明確な指示
 
-## Examples
+## 例
 具体的な使用例
 ```
 
-## フィールド要件
+## スキル作成の手順
 
-**name**:
-- 最大64文字
-- 小文字、数字、ハイフンのみ
-- 例: `pdf-processing`, `code-reviewer`
+### 1. ユーザー要件の確認
 
-**description**:
-- 何をするか + いつ使用するか を含める
-- 三人称で記述
-- 具体的なトリガー用語を含める
+**スキル作成時は、必ずAskUserQuestionツールで以下を確認する**：
 
-## ベストプラクティス
+#### 基本情報
+- スキルの目的と主要な機能
+- 対象ユーザー（個人用/プロジェクト共有）
+- 想定される使用シナリオ
 
-### 1. 簡潔に保つ
+#### フロントマター設定
+- `context: fork`が必要か（サブエージェントで実行するか）
+- `disable-model-invocation: true`が必要か（手動呼び出しのみか）
+- `allowed-tools`で制限するツールがあるか
+- `argument-hint`で引数のヒントが必要か
+- `hooks`でライフサイクルフックが必要か
 
-SKILL.mdボディは500行以下に。Claudeが既に知っていることは省略。
+#### コンテンツ範囲
+- スクリプトを含むか（コード付きスキル）
+- 別ファイルへの分離が必要か（500行を超えそうか）
+- テンプレートや出力形式の指定があるか
 
-**良い例**:
-```markdown
-## PDF抽出
-pdfplumberでテキスト抽出:
-\`\`\`python
-import pdfplumber
-with pdfplumber.open("file.pdf") as pdf:
-    text = pdf.pages[0].extract_text()
-\`\`\`
+### 2. フロントマター設定の決定
+
+詳細は[FRONTMATTER.md](FRONTMATTER.md)を参照。
+
+**主要フィールド**:
+
+| フィールド | 必須 | 説明 |
+|:-----------|:-----|:-----|
+| `name` | 推奨 | 小文字、数字、ハイフンのみ（最大64文字） |
+| `description` | 推奨 | 何をするか＋いつ使用するか |
+| `argument-hint` | 任意 | 引数ヒント（例：`[filename]`） |
+| `disable-model-invocation` | 任意 | `true`でClaude自動呼び出しを無効化 |
+| `user-invocable` | 任意 | `false`で`/`メニューから非表示 |
+| `allowed-tools` | 任意 | 使用可能なツールを制限 |
+| `context` | 任意 | `fork`でサブエージェント実行 |
+| `agent` | 任意 | `context: fork`時のエージェントタイプ |
+| `hooks` | 任意 | ライフサイクルフック設定 |
+
+### 3. コンテンツタイプの選択
+
+**リファレンスコンテンツ**（知識を追加）:
+```yaml
+---
+name: api-conventions
+description: このコードベースのAPI設計パターン
+---
+
+APIエンドポイント作成時:
+- RESTful命名規則を使用
+- 一貫したエラー形式を返す
+- リクエストバリデーションを含める
 ```
 
-### 2. 段階的開示を活用
+**タスクコンテンツ**（アクションを実行）:
+```yaml
+---
+name: deploy
+description: アプリケーションを本番環境にデプロイ
+context: fork
+disable-model-invocation: true
+---
 
-詳細は別ファイルに分離し、必要時のみ参照:
-
+デプロイ手順:
+1. テストスイートを実行
+2. アプリケーションをビルド
+3. デプロイターゲットにプッシュ
 ```
-my-skill/
-├── SKILL.md (メイン指示)
-├── REFERENCE.md (詳細リファレンス)
-├── EXAMPLES.md (追加例)
-└── scripts/
-    └── helper.py (ユーティリティ)
+
+### 4. ディレクトリ作成
+
+```bash
+# 個人用
+mkdir -p ~/.claude/skills/skill-name
+
+# プロジェクト用
+mkdir -p .claude/skills/skill-name
 ```
 
-SKILL.mdから参照:
+### 5. SKILL.md作成
+
+**簡潔さを保つ**: 500行以下に。Claudeが既に知っていることは省略。
+
+**段階的開示を活用**: 詳細は別ファイルに分離。
 ```markdown
 詳細は[REFERENCE.md](REFERENCE.md)を参照。
 ```
 
-### 3. 具体的な説明を書く
+### 6. テストと反復
 
-**悪い例**:
-```yaml
-description: ドキュメントを処理します
+1. 実際のタスクでスキルをテスト
+2. 使用予定のモデル（Haiku/Sonnet/Opus）で確認
+3. フィードバックに基づき改善
+
+## 確認すべき質問リスト
+
+スキル作成時にAskUserQuestionで確認：
+
+```
+1. 基本情報
+   - スキルの名前は？（小文字、数字、ハイフンのみ）
+   - 主な目的・機能は？
+   - いつ使用されるべき？（トリガー条件）
+
+2. 呼び出し制御
+   - Claude自動呼び出し: 許可 / 手動のみ
+   - /メニュー表示: 表示 / 非表示
+
+3. 実行環境
+   - 実行方式: インライン / サブエージェント（fork）
+   - サブエージェントの場合: Explore / Plan / general-purpose / カスタム
+
+4. ツール制限
+   - 使用ツール: 全て / 制限あり
+   - 制限する場合: どのツールを許可？
+
+5. 引数
+   - 引数を受け取る: はい / いいえ
+   - 引数ヒント: 例）[filename] [format]
+
+6. Hooks
+   - ライフサイクルフック: 不要 / 必要
+   - 必要な場合: PreToolUse / PostToolUse / Stop
+
+7. コンテンツ
+   - スクリプトを含む: はい / いいえ
+   - 別ファイル分離: 必要 / 不要
 ```
 
-**良い例**:
-```yaml
-description: PDFファイルからテキストと表を抽出し、フォームに入力します。PDF、フォーム、ドキュメント抽出について言及された場合に使用してください。
-```
+## 参照ドキュメント
 
-### 4. ワークフローを明確に
+- [FRONTMATTER.md](FRONTMATTER.md) - フロントマター詳細リファレンス
+- [ADVANCED-PATTERNS.md](ADVANCED-PATTERNS.md) - 高度なパターン（動的コンテキスト、サブエージェント）
+- [HOOKS-REFERENCE.md](HOOKS-REFERENCE.md) - Hooksリファレンス
+- [BEST-PRACTICES.md](BEST-PRACTICES.md) - ベストプラクティス
+- [EXAMPLES.md](EXAMPLES.md) - 具体例集
+- [DIRECTORY-PATTERNS.md](DIRECTORY-PATTERNS.md) - ディレクトリ構造パターン
+- [VALIDATION-CHECKLIST.md](VALIDATION-CHECKLIST.md) - 検証チェックリスト
 
-複雑なタスクはステップに分解:
-
-```markdown
-## ワークフロー
-
-1. 入力ファイルを分析
-2. 処理計画を作成
-3. 計画を検証
-4. 処理を実行
-5. 結果を確認
-```
-
-### 5. 一貫した用語を使用
-
-スキル全体で同じ用語を使用。混在させない。
-
-## 具体例
+## クイックスタート例
 
 ### シンプルなスキル
 
 ```yaml
 ---
-name: commit-message-generator
-description: git diffから明確なコミットメッセージを生成します。コミットメッセージの作成やステージされた変更のレビュー時に使用してください。
+name: commit-message
+description: git diffから明確なコミットメッセージを生成。コミットメッセージ作成時に使用。
 ---
 
 # コミットメッセージ生成
 
-## 手順
-
-1. `git diff --staged`で変更を確認
-2. 以下の形式でメッセージを提案:
-   - 50文字以下の要約
-   - 詳細説明
-   - 影響コンポーネント
-
-## 形式
+1. `git diff --staged`で変更確認
+2. 以下の形式で提案:
 
 type(scope): 簡潔な説明
 
 詳細説明（任意）
 
 ## 例
-
 feat(auth): JWTベースの認証を実装
-
-ログインエンドポイントとトークン検証ミドルウェアを追加
 ```
 
-### ツール制限付きスキル
+### 手動呼び出しスキル
 
 ```yaml
 ---
-name: code-reviewer
-description: コードのベストプラクティスと問題をレビューします。コードレビュー、PR確認、コード品質分析時に使用してください。
-allowed-tools: Read, Grep, Glob
+name: deploy
+description: 本番環境にデプロイ
+disable-model-invocation: true
+argument-hint: [environment]
 ---
 
-# コードレビュー
+# デプロイ
 
-## チェックリスト
-
-1. コード構造と組織
-2. エラー処理
-3. パフォーマンス
-4. セキュリティ
-5. テストカバレッジ
-
-## 手順
-
-1. Readでファイル内容を確認
-2. Grepでパターンを検索
-3. Globで関連ファイルを発見
-4. 詳細なフィードバックを提供
+$ARGUMENTS環境にデプロイ:
+1. テスト実行
+2. ビルド
+3. デプロイ
+4. 確認
 ```
 
-### マルチファイルスキル
+### サブエージェント実行スキル
 
-```
-data-analysis/
-├── SKILL.md
-├── SCHEMAS.md
-└── scripts/
-    └── validate.py
-```
-
-**SKILL.md**:
 ```yaml
 ---
-name: data-analysis
-description: データセットを分析してレポートを生成します。データ分析、統計、可視化について質問された場合に使用してください。
+name: deep-research
+description: トピックを徹底的にリサーチ
+context: fork
+agent: Explore
 ---
 
-# データ分析
+# リサーチ
 
-## クイックスタート
-
-pandasでデータを読み込み:
-\`\`\`python
-import pandas as pd
-df = pd.read_csv("data.csv")
-\`\`\`
-
-スキーマ定義は[SCHEMAS.md](SCHEMAS.md)を参照。
-
-## 検証
-
-データ検証:
-\`\`\`bash
-python scripts/validate.py data.csv
-\`\`\`
+$ARGUMENTSを徹底調査:
+1. Glob/Grepで関連ファイル検索
+2. コードを分析
+3. ファイル参照付きで要約
 ```
 
 ## 避けるべきパターン
 
 1. **冗長な説明**: Claudeが既に知っていることを説明しない
-2. **時間に敏感な情報**: 「2025年8月以降は...」のような記述を避ける
+2. **時間依存情報**: 「2025年8月以降は...」を避ける
 3. **深いネスト**: 参照は1レベルまで
-4. **Windowsパス**: 常に`/`を使用（`\`は使用しない）
-5. **選択肢の過剰提示**: デフォルトを1つ提供し、代替案は必要時のみ
-
-## スキル作成の流れ
-
-1. **目的を明確化**: 何を解決するか
-2. **ディレクトリ作成**: `mkdir -p .claude/skills/skill-name`
-3. **SKILL.md作成**: 上記構造に従う
-4. **テスト**: 実際のタスクで動作確認
-5. **反復**: フィードバックに基づき改善
-
-## チェックリスト
-
-- [ ] nameは小文字、数字、ハイフンのみ
-- [ ] descriptionは具体的で三人称
-- [ ] SKILL.mdは500行以下
-- [ ] 段階的開示を適切に使用
-- [ ] 一貫した用語
-- [ ] 具体的な例を含む
-- [ ] Windowsパスなし
+4. **Windowsパス**: 常に`/`を使用
+5. **過剰な選択肢**: デフォルトを1つ提供
