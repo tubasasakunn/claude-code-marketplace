@@ -1,6 +1,6 @@
 ---
 name: ios-design
-description: iOS/SwiftUIのデザインレビューを実行します。画像（スクリーンショット）やSwiftUIコードを入力として受け取り、HIG準拠・アクセシビリティ・Liquid Glass実装を総合レビューします。UIデザインのレビュー、デザイン改善提案を求められた場合に使用。
+description: iOS/SwiftUIのデザインレビューを実行します。画像（スクリーンショット）やSwiftUIコードを入力として受け取り、HIG準拠・アクセシビリティ・Liquid Glass実装を総合レビューします。UIデザインのレビュー、iOS 26 Liquid Glass、HIG準拠チェック、デザイン改善提案について質問された場合に使用してください。
 argument-hint: [画像パス または ファイルパス]
 context: fork
 agent: general-purpose
@@ -8,9 +8,40 @@ agent: general-purpose
 
 # iOS Design Review
 
-$ARGUMENTS をレビュー:
+$ARGUMENTS をレビュー
 
-## 進捗チェックリスト
+## 終了条件
+
+以下のいずれかで終了:
+1. **すべて✅**: 問題なし、レビュー完了
+2. **改善提案を提示**: ユーザーが内容を確認し、追加質問なし
+3. **ユーザーが終了を指示**: 明示的に終了
+
+**⚠️/❌がある場合**: 改善提案を必ず含め、ユーザーの確認を待つ
+
+---
+
+## クイックリファレンス
+
+### Liquid Glass適用ルール
+
+| 適用すべき場所 | 禁止 |
+|---------------|------|
+| NavigationBar, TabBar, Sidebar | リストセル・カード背景 |
+| Modal, FloatingControl | カスタム背景色との併用 |
+
+### API対応表
+
+| 確認項目 | Good | Bad |
+|---------|------|-----|
+| 素材 | `.glassEffect(.regular)` | `.background(.ultraThinMaterial)` |
+| グループ | `GlassEffectContainer` | `HStack`/`ZStack` |
+| アニメーション | `.glassEffectID()` | `.matchedGeometryEffect()` |
+| 色 | `.primary`, `.secondary` | `Color.white`, `Color.black` |
+
+---
+
+## ワークフロー
 
 ```
 - [ ] ステップ1: 入力読み取り
@@ -19,7 +50,7 @@ $ARGUMENTS をレビュー:
 - [ ] ステップ4: 確認
 ```
 
-## ステップ1: 入力読み取り
+### ステップ1: 入力読み取り
 
 Readツールで入力を読み取る:
 - 画像パス → 画像として読み取り
@@ -27,16 +58,16 @@ Readツールで入力を読み取る:
 
 **読み取り成功時のみ続行**
 
-## ステップ2: レビュー実行
+### ステップ2: レビュー実行
 
 [CHECKLIST.md](CHECKLIST.md)に従ってチェック:
 1. HIG準拠
 2. アクセシビリティ
 3. 実装品質
 
-必要に応じて[REFERENCE.md](REFERENCE.md)を参照。
+Liquid Glass詳細は[REFERENCE.md](REFERENCE.md)を参照。
 
-## ステップ3: 結果出力
+### ステップ3: 結果出力
 
 以下のフォーマットで報告:
 
@@ -63,17 +94,8 @@ Readツールで入力を読み取る:
 [改善後のコード]
 ```
 
-## ステップ4: 確認
+### ステップ4: 確認
 
 ユーザーに確認:
 - 追加でレビューしたい箇所があるか
 - 改善提案についての質問があるか
-
-## 終了条件
-
-以下のいずれかで終了:
-1. **すべて✅**: 問題なし、レビュー完了
-2. **改善提案を提示**: ユーザーが内容を確認し、追加質問なし
-3. **ユーザーが終了を指示**: 明示的に終了を伝えられた
-
-**⚠️/❌がある場合**: 改善提案を必ず含め、ユーザーの確認を待つ

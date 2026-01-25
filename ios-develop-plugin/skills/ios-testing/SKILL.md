@@ -1,6 +1,6 @@
 ---
 name: ios-testing
-description: Maestroを使用してiOSアプリのUIテストを作成・実行し、成功するまで繰り返します。テスト要件を受け取り、YAMLフロー作成、テスト実行、スクリーンショット撮影を自動化します。UIテスト、スクリーンショット撮影、画面自動化について言及された場合に使用してください。
+description: Maestroを使用したiOSアプリのUIテストとスクリーンショット撮影を支援します。テスト作成、画面撮影、UI自動化について質問された場合に使用してください。
 context: fork
 agent: general-purpose
 argument-hint: <テスト要件>
@@ -195,24 +195,6 @@ mcp__plugin_ios-develop-plugin_maestro__take_screenshot
 
 ---
 
-## コマンドリファレンス
-
-| コマンド | 説明 | 例 |
-|----------|------|-----|
-| `launchApp` | アプリ起動 | `- launchApp` |
-| `launchApp: clearState: true` | 状態クリアして起動 | |
-| `tapOn: "テキスト"` | テキストでタップ | `- tapOn: "検索"` |
-| `tapOn: id: "id"` | IDでタップ | |
-| `tapOn: point: "x,y"` | 座標でタップ | `- tapOn: point: "100,200"` |
-| `inputText` | テキスト入力 | `- inputText: "文字列"` |
-| `swipe` | スワイプ | `start: "80%, 50%"` `end: "20%, 50%"` |
-| `scroll` | スクロール | `- scroll` |
-| `extendedWaitUntil: visible` | 要素待機 | `timeout: 5000` |
-| `takeScreenshot` | スクショ撮影 | `- takeScreenshot: screenshots/name` |
-| `runFlow` | サブフロー実行 | `- runFlow: _common/setup.yaml` |
-
----
-
 ## ルール
 
 ### 必須
@@ -222,10 +204,16 @@ mcp__plugin_ios-develop-plugin_maestro__take_screenshot
 
 ### ファイル命名
 - フロー: `maestro/flows/[XX]_[画面名].yaml`
-- スクショ: `maestro/screenshots/[XX]_[画面名].png`
+- スクリーンショット: `maestro/screenshots/[XX]_[画面名].png`
 
 ### トラブルシューティング優先順位
 1. `inspect_view_hierarchy`で要素確認
 2. `take_screenshot`で画面確認
 3. 待機時間を調整
 4. 座標指定にフォールバック
+
+---
+
+## 詳細リファレンス
+
+コマンド詳細やプロジェクト構成については[REFERENCE.md](REFERENCE.md)を参照。
