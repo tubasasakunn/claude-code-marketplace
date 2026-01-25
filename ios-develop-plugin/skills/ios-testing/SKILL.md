@@ -1,302 +1,231 @@
 ---
 name: ios-testing
-description: Maestroを使用したiOSアプリのUIテストとスクリーンショット撮影を支援します。テストフロー作成、画面撮影、UI自動化について質問された場合に使用してください。
+description: Maestroを使用してiOSアプリのUIテストを作成・実行し、成功するまで繰り返します。テスト要件を受け取り、YAMLフロー作成、テスト実行、スクリーンショット撮影を自動化します。UIテスト、スクリーンショット撮影、画面自動化について言及された場合に使用してください。
+context: fork
+agent: general-purpose
+argument-hint: <テスト要件>
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
+  - mcp__plugin_ios-develop-plugin_maestro__*
 ---
 
-# iOS Testing with Maestro
+# iOS UIテスト実行エージェント
 
-MaestroによるiOSアプリのUIテスト自動化ガイドです。
+$ARGUMENTS を実行するサブエージェントです。
 
-## 概要
-
-**Maestro** はモバイルアプリのUIテスト自動化ツールです。
-YAMLでテストフローを記述し、シミュレータ/実機でUIを操作します。
-
-### 用途
-
-- 各画面のスクリーンショット自動撮影
-- UI操作の自動テスト
-- 画面遷移の検証
-- リグレッションテスト
-
----
-
-## セットアップ
-
-### 1. maestroディレクトリを作成
-
-**プロジェクトのルートディレクトリ（カレント）に`maestro/`を作成します。**
-
-```bash
-mkdir -p maestro/flows/_common
-mkdir -p maestro/screenshots
-```
-
-### 2. 必要なファイルを配置
+## 進捗チェックリスト
 
 ```
-maestro/
-├── DOCUMENT.md        # 画面一覧とファイル対応表（必須）
-├── run.sh             # 単一フロー実行
-├── run_all.sh         # 全フロー実行
-├── reinstall.sh       # アプリ再インストール
-├── flows/
-│   ├── _common/       # 共通サブフロー
-│   └── *.yaml         # 画面ごとのフロー
-└── screenshots/       # 出力先（自動生成）
-```
-
-### 3. DOCUMENT.mdを作成
-
-**`maestro/DOCUMENT.md`は必須です。** 画面一覧とフローの対応を管理します。
-
-```markdown
-# DOCUMENT.md - Maestro UIテスト ドキュメント
-
-## 画面一覧
-
-| No | 画面名 | フローファイル | スクリーンショット |
-|----|--------|---------------|-------------------|
-| 01 | ホーム | flows/01_home.yaml | screenshots/01_home.png |
-| 02 | 検索 | flows/02_search.yaml | screenshots/02_search.png |
-
-## 実行方法
-
-./run.sh flows/01_home.yaml
-```
-
-### 4. シェルスクリプトを配置
-
-このスキルの`scripts/`ディレクトリから以下をコピー:
-- `run.sh` - 単一フロー実行
-- `run_all.sh` - 全フロー実行
-- `reinstall.sh` - アプリ再インストール
-
-```bash
-cp <skill-path>/scripts/*.sh maestro/
-chmod +x maestro/*.sh
+- [ ] 1. 要件分析
+- [ ] 2. デバイス準備
+- [ ] 3. プロジェクト情報確認
+- [ ] 4. テストコード作成
+- [ ] 5. テスト実行
+- [ ] 6. 結果報告
 ```
 
 ---
 
-## クイックスタート
+## 1. 要件分析
 
-### 単一フローの実行
+$ARGUMENTSから以下を特定:
+- テスト対象の画面・機能
+- 必要な操作手順
+- 撮影するスクリーンショット
+- 期待する結果
 
-```bash
-cd maestro
-./run.sh flows/01_home.yaml
+---
+
+## 2. デバイス準備
+
+```
+mcp__plugin_ios-develop-plugin_maestro__list_devices
 ```
 
-### 全フローの実行
-
-```bash
-cd maestro
-./run_all.sh
+デバイスが起動していない場合:
 ```
-
-### Maestro直接実行
-
-```bash
-maestro test flows/01_home.yaml
-maestro studio  # GUI で操作確認
-maestro record  # 操作を記録してYAML生成
+mcp__plugin_ios-develop-plugin_maestro__start_device (platform: ios)
 ```
 
 ---
 
-## YAMLフローの基本構造
+## 3. プロジェクト情報確認
 
+- `maestro/DOCUMENT.md`があれば読み込み、画面構成を把握
+- 既存のフローがあれば参考にする
+- アプリのBundle IDを確認
+
+```bash
+mkdir -p maestro/flows maestro/screenshots
+```
+
+---
+
+## 4. テストコード作成
+
+**基本構造:**
 ```yaml
-# 画面名のスクリーンショット
-# 使用方法: ./run.sh flows/01_home.yaml
-appId: com.example.myapp
-name: "ホーム画面"
+# [画面名]のテスト
+# 要件: [ユーザー要件の要約]
+appId: [Bundle ID]
+name: "[テスト名]"
 ---
 - launchApp:
     clearState: true
 
-# 画面への遷移操作
-- tapOn: "ボタン名"
+# 画面への遷移
+- [操作コマンド]
 
-# 画面表示待機
+# 待機
 - extendedWaitUntil:
-    visible: "表示される要素"
+    visible: "[対象要素]"
     timeout: 5000
 
 # スクリーンショット
-- takeScreenshot: screenshots/01_home
+- takeScreenshot: screenshots/[ファイル名]
 ```
 
 ---
 
-## 主要コマンド
+## 5. テスト実行（反復ループ）
+
+**最大試行回数: 5回**
+
+```
+試行 = 1
+while 試行 <= 5:
+    テスト実行
+    if 成功:
+        → 6. 結果報告（成功）へ
+    else:
+        問題分析 → 修正 → 試行++
+
+if 試行 > 5:
+    → 6. 結果報告（失敗）へ
+```
+
+### 各試行のフロー
+
+**Step A: テスト実行**
+```
+mcp__plugin_ios-develop-plugin_maestro__run_flow
+  device_id: [device_id]
+  flow_yaml: [YAMLコンテンツ]
+```
+
+**Step B: 結果判定**
+- 成功 → ループ終了、結果報告へ
+- 失敗 → Step Cへ
+
+**Step C: 問題分析**
+```
+mcp__plugin_ios-develop-plugin_maestro__inspect_view_hierarchy
+mcp__plugin_ios-develop-plugin_maestro__take_screenshot
+```
+
+**Step D: 修正適用**
+
+| エラー種別 | 修正アクション |
+|-----------|---------------|
+| 要素が見つからない | ID/テキストを修正、または座標指定 |
+| タイムアウト | `extendedWaitUntil`のtimeoutを増加 |
+| 遷移失敗 | 操作手順を見直し、待機を追加 |
+| アプリクラッシュ | `clearState: true`で再起動 |
+
+**Step E: 次の試行へ**
+
+---
+
+## 6. 結果報告
+
+### 終了条件
+
+| 条件 | ステータス | 次のアクション |
+|------|-----------|---------------|
+| テスト成功 | 成功 | YAMLをファイル保存、パスを報告 |
+| 5回試行後も失敗 | 失敗 | 最後のエラーと試行履歴を報告 |
+
+### 成功時の報告
+
+成功したYAMLをファイルに保存し、以下の形式で報告:
+
+```
+## 実行結果
+
+### ステータス
+成功
+
+### テストコード
+- パス: `maestro/flows/[ファイル名].yaml`
+
+### スクリーンショット
+- パス: `maestro/screenshots/[ファイル名].png`
+
+### 試行回数
+[N]/5回
+```
+
+### 失敗時の報告
+
+```
+## 実行結果
+
+### ステータス
+失敗（5回試行後）
+
+### 最後のエラー
+[エラーメッセージ]
+
+### 試行履歴
+1. [エラー内容] → [修正内容]
+2. [エラー内容] → [修正内容]
+...
+
+### 最終テストコード
+- パス: `maestro/flows/[ファイル名].yaml`
+
+### 推奨アクション
+[手動確認が必要な項目]
+```
+
+---
+
+## コマンドリファレンス
 
 | コマンド | 説明 | 例 |
 |----------|------|-----|
 | `launchApp` | アプリ起動 | `- launchApp` |
-| `launchApp: clearState: true` | 状態クリアして起動 | オンボーディング用 |
-| `tapOn` | 要素をタップ | `- tapOn: "検索"` |
-| `tapOn: id` | IDでタップ | `- tapOn: id: "button_id"` |
-| `tapOn: point` | 座標でタップ | `- tapOn: point: "100,200"` |
-| `swipe` | スワイプ | 下記参照 |
-| `inputText` | テキスト入力 | `- inputText: "検索ワード"` |
+| `launchApp: clearState: true` | 状態クリアして起動 | |
+| `tapOn: "テキスト"` | テキストでタップ | `- tapOn: "検索"` |
+| `tapOn: id: "id"` | IDでタップ | |
+| `tapOn: point: "x,y"` | 座標でタップ | `- tapOn: point: "100,200"` |
+| `inputText` | テキスト入力 | `- inputText: "文字列"` |
+| `swipe` | スワイプ | `start: "80%, 50%"` `end: "20%, 50%"` |
 | `scroll` | スクロール | `- scroll` |
-| `back` | 戻る | `- back` |
-| `takeScreenshot` | スクショ撮影 | `- takeScreenshot: path/name` |
-| `extendedWaitUntil` | 要素を待機 | 下記参照 |
+| `extendedWaitUntil: visible` | 要素待機 | `timeout: 5000` |
+| `takeScreenshot` | スクショ撮影 | `- takeScreenshot: screenshots/name` |
 | `runFlow` | サブフロー実行 | `- runFlow: _common/setup.yaml` |
-
-### tapOnの詳細
-
-```yaml
-# テキストで検索（部分一致）
-- tapOn: "検索"
-
-# IDで検索（accessibilityIdentifier）
-- tapOn:
-    id: "magnifyingglass"
-
-# 座標指定（x, y）
-- tapOn:
-    point: "100,200"
-
-# パーセント指定
-- tapOn:
-    point: "50%, 50%"
-```
-
-### swipeの書き方
-
-```yaml
-# 右から左へスワイプ（次ページ）
-- swipe:
-    start: "80%, 50%"
-    end: "20%, 50%"
-
-# 下から上へスワイプ（スクロール）
-- swipe:
-    start: "50%, 80%"
-    end: "50%, 20%"
-```
-
-### 待機の書き方
-
-```yaml
-# 要素が表示されるまで待機
-- extendedWaitUntil:
-    visible: "本棚"
-    timeout: 10000  # ミリ秒
-
-# 固定時間待機
-- extendedWaitUntil:
-    timeout: 2000
-```
-
----
-
-## 新しい画面のフロー追加手順
-
-1. **YAMLファイル作成**
-   ```bash
-   touch maestro/flows/07_new_screen.yaml
-   ```
-
-2. **基本構造を記述**
-   ```yaml
-   # 新画面のスクリーンショット
-   # 使用方法: ./run.sh flows/07_new_screen.yaml
-   appId: com.example.myapp
-   name: "新画面"
-   ---
-   - launchApp:
-       clearState: true
-
-   # 共通セットアップ（必要な場合）
-   - runFlow: _common/setup.yaml
-
-   # 画面への遷移操作
-   - tapOn: "ボタン名"
-
-   # 画面表示待機
-   - extendedWaitUntil:
-       visible: "画面の特徴的なテキスト"
-       timeout: 5000
-
-   # スクリーンショット
-   - takeScreenshot: screenshots/07_new_screen
-   ```
-
-3. **動作確認**
-   ```bash
-   ./run.sh flows/07_new_screen.yaml
-   ```
-
-4. **DOCUMENT.md更新**
-   - 画面一覧に追加
-
----
-
-## 共通サブフローの作成
-
-複数のフローで使う処理は`flows/_common/`に切り出す:
-
-```yaml
-# flows/_common/setup_with_sample_data.yaml
-appId: com.example.myapp
----
-# オンボーディング完了まで待機
-- extendedWaitUntil:
-    visible: ".*"
-    timeout: 5000
-
-# オンボーディングをスキップ
-- swipe:
-    start: "80%, 50%"
-    end: "20%, 50%"
-
-# 「開始」ボタンをタップ
-- tapOn: "開始"
-
-# ホーム画面表示待機
-- extendedWaitUntil:
-    visible: "ホーム"
-    timeout: 10000
-```
-
-使用方法:
-```yaml
-- runFlow: _common/setup_with_sample_data.yaml
-```
-
----
-
-## 詳細リファレンス
-
-詳細なコマンドやトラブルシューティングは[REFERENCE.md](REFERENCE.md)を参照。
 
 ---
 
 ## ルール
 
-### 1. ファイル命名規則
+### 必須
+- テストが成功するまで修正・再実行を繰り返す
+- 成功したテストコードをファイルに保存
+- パスを正確に報告
 
-- メイン画面: `XX_screen_name.yaml`（XX = 01-99）
-- オンボーディング: `onboarding_XX.yaml`
+### ファイル命名
+- フロー: `maestro/flows/[XX]_[画面名].yaml`
+- スクショ: `maestro/screenshots/[XX]_[画面名].png`
 
-### 2. スクリーンショット命名
-
-- フロー名と一致させる
-- 例: `flows/01_home.yaml` → `screenshots/01_home.png`
-
-### 3. コメント必須
-
-各YAMLの先頭に以下を記載:
-- 画面名
-- 使用方法
-- 注意事項（あれば）
-
-### 4. 更新時の対応
-
-- 新しいフローを追加したら DOCUMENT.md を更新
-- `run_all.sh` への追加が必要か確認
+### トラブルシューティング優先順位
+1. `inspect_view_hierarchy`で要素確認
+2. `take_screenshot`で画面確認
+3. 待機時間を調整
+4. 座標指定にフォールバック
