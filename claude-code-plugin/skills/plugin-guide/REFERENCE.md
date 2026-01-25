@@ -185,22 +185,13 @@ allowed-tools: Read, Grep, Glob, Bash
 
 ## フック（hooks/）
 
-### hooks.json形式
+イベントに応じてコマンドやプロンプトを自動実行する仕組みです。
+
+### 基本形式
 
 ```json
 {
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check.sh"
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
@@ -216,42 +207,31 @@ allowed-tools: Read, Grep, Glob, Bash
 }
 ```
 
-### フックイベント
+### 主要イベント
 
 | イベント | タイミング | 用途 |
 |:---------|:-----------|:-----|
-| `PreToolUse` | ツール実行前 | 検証、確認 |
-| `PostToolUse` | ツール実行後 | 後処理、通知 |
-| `PostToolUseFailure` | ツール失敗後 | エラー処理 |
-| `PermissionRequest` | 許可ダイアログ表示時 | カスタム確認 |
-| `UserPromptSubmit` | ユーザー入力時 | 入力処理 |
-| `Notification` | 通知発生時 | カスタム通知 |
-| `Stop` | 停止時 | クリーンアップ |
-| `SubagentStart` | サブエージェント開始時 | 初期化 |
-| `SubagentStop` | サブエージェント停止時 | 終了処理 |
-| `SessionStart` | セッション開始時 | 初期化 |
-| `SessionEnd` | セッション終了時 | 終了処理 |
-| `PreCompact` | 履歴圧縮前 | 保存処理 |
+| `PreToolUse` | ツール実行前 | 検証、ブロック |
+| `PostToolUse` | ツール成功後 | lint、フォーマット |
+| `SessionStart` | セッション開始時 | 環境変数設定 |
+| `Notification` | 通知発生時 | ログ、外部通知 |
 
 ### フックタイプ
 
 | タイプ | 説明 |
 |:-------|:-----|
-| `command` | シェルコマンド/スクリプト実行 |
-| `prompt` | LLMでプロンプト評価（`$ARGUMENTS`でコンテキスト） |
-| `agent` | 複雑な検証タスク用のエージェント実行 |
+| `command` | シェルコマンド実行 |
+| `prompt` | LLMでプロンプト評価 |
 
-### 環境変数
+### 戻り値
 
-| 変数 | 説明 |
-|:-----|:-----|
-| `CLAUDE_FILE_PATH` | 対象ファイルパス |
-| `CLAUDE_FILE_CONTENT` | ファイル内容 |
-| `CLAUDE_NOTIFICATION` | 通知メッセージ |
-| `CLAUDE_TOOL_NAME` | ツール名 |
-| `CLAUDE_TOOL_INPUT` | ツール入力（JSON） |
-| `CLAUDE_TOOL_OUTPUT` | ツール出力（JSON） |
-| `CLAUDE_PLUGIN_ROOT` | プラグインルートパス |
+| Exit Code | 意味 |
+|:----------|:-----|
+| `0` | 成功 |
+| `2` | ブロッキングエラー（処理を停止） |
+| その他 | 非ブロッキングエラー |
+
+> **詳細**: [HOOKS-REFERENCE.md](HOOKS-REFERENCE.md) を参照
 
 ---
 

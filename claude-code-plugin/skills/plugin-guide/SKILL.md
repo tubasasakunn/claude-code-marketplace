@@ -120,6 +120,7 @@ claude --plugin-dir ./my-plugin
 ## 詳細ドキュメント
 
 - コンポーネント詳細: [REFERENCE.md](REFERENCE.md)
+- **Hooks詳細**: [HOOKS-REFERENCE.md](HOOKS-REFERENCE.md)
 - 実践的な例: [EXAMPLES.md](EXAMPLES.md)
 - 検証チェックリスト: [VALIDATION-CHECKLIST.md](VALIDATION-CHECKLIST.md)
 - ベストプラクティス: [BEST-PRACTICES.md](BEST-PRACTICES.md)

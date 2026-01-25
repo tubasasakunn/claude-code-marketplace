@@ -1,0 +1,17 @@
+{
+  "description": "Claude Code通知をSlackに転送",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/notify-slack.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

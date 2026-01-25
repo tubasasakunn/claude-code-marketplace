@@ -126,3 +126,9 @@ Skill: plugin-guide
    - `plugin.json`の`version`フィールドを更新する
    - セマンティックバージョニング（major.minor.patch）に従う
    - 破壊的変更: major、機能追加: minor、バグ修正: patch
+
+5. **READMEを作成・更新する**
+   - スキル追加・更新時は`skills/<skill-name>/README.md`を作成・更新
+   - プラグイン変更時は`<plugin-name>/README.md`を更新
+   - 大きな変更時は`./README.md`（ルート）も更新
+   - READMEには概要、使用方法、関連ドキュメントを含める
