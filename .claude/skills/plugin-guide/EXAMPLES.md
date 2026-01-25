@@ -1,8 +1,8 @@
 # プラグイン実践例
 
-## 例1: シンプルなコマンドプラグイン
+## 例1: シンプルなスキルプラグイン
 
-コードレビューコマンドを提供するプラグイン。
+コードレビュースキルを提供するプラグイン。
 
 ### ディレクトリ構造
 
@@ -10,9 +10,11 @@
 code-reviewer/
 ├── .claude-plugin/
 │   └── plugin.json
-└── commands/
-    ├── review.md
-    └── review-pr.md
+└── skills/
+    ├── review/
+    │   └── SKILL.md
+    └── review-pr/
+        └── SKILL.md
 ```
 
 ### .claude-plugin/plugin.json
@@ -20,7 +22,7 @@ code-reviewer/
 ```json
 {
   "name": "code-reviewer",
-  "description": "コードレビュー用コマンドを提供",
+  "description": "コードレビュー用スキルを提供",
   "version": "1.0.0",
   "author": {
     "name": "Your Team"
@@ -28,12 +30,15 @@ code-reviewer/
 }
 ```
 
-### commands/review.md
+### skills/review/SKILL.md
 
-```markdown
+```yaml
 ---
-description: 指定ファイルのコードレビューを実行
+name: review
+description: 指定ファイルのコードレビューを実行。コード品質チェック、セキュリティ分析時に使用。
+disable-model-invocation: true
 allowed-tools: Read, Grep, Glob
+argument-hint: [filepath]
 ---
 
 # コードレビュー
@@ -56,12 +61,14 @@ allowed-tools: Read, Grep, Glob
 - 提案: 改善案
 ```
 
-### commands/review-pr.md
+### skills/review-pr/SKILL.md
 
-```markdown
+```yaml
 ---
-description: PRの変更をレビュー
-allowed-tools: Read, Grep, Glob, Bash
+name: review-pr
+description: PRの変更をレビュー。プルリクエストレビュー時に使用。
+disable-model-invocation: true
+allowed-tools: Read, Grep, Glob, Bash(git:*)
 ---
 
 # PRレビュー
@@ -91,8 +98,9 @@ allowed-tools: Read, Grep, Glob, Bash
 db-tools/
 ├── .claude-plugin/
 │   └── plugin.json
-├── commands/
-│   └── migrate.md
+├── skills/
+│   └── migrate/
+│       └── SKILL.md
 └── agents/
     └── migration-planner.md
 ```
@@ -103,6 +111,7 @@ db-tools/
 ---
 name: migration-planner
 description: データベースマイグレーションを計画・実行します。スキーマ変更、マイグレーション作成、データベース構造の変更について質問された場合に使用してください。
+capabilities: ["schema-analysis", "migration-planning", "rollback-design"]
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
@@ -170,7 +179,7 @@ quality-guard/
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/lint.sh $CLAUDE_FILE_PATH"
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/lint.sh $CLAUDE_FILE_PATH"
           }
         ]
       },
@@ -179,7 +188,7 @@ quality-guard/
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/format-check.sh $CLAUDE_FILE_PATH"
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/format-check.sh $CLAUDE_FILE_PATH"
           }
         ]
       }
@@ -221,71 +230,7 @@ esac
 
 ---
 
-## 例4: スキル付きプラグイン
-
-API開発スキルを含むプラグイン。
-
-### ディレクトリ構造
-
-```
-api-toolkit/
-├── .claude-plugin/
-│   └── plugin.json
-├── commands/
-│   └── api-test.md
-└── skills/
-    └── api-design/
-        ├── SKILL.md
-        └── PATTERNS.md
-```
-
-### skills/api-design/SKILL.md
-
-```markdown
----
-name: api-design
-description: RESTful APIの設計とドキュメント作成を支援します。API設計、エンドポイント定義、OpenAPI仕様について質問された場合に使用してください。
----
-
-# API設計スキル
-
-## 設計原則
-
-1. リソース指向URL
-2. 適切なHTTPメソッド使用
-3. 一貫したレスポンス形式
-4. バージョニング戦略
-
-## エンドポイント設計
-
-```
-GET    /api/v1/users          # 一覧取得
-GET    /api/v1/users/:id      # 詳細取得
-POST   /api/v1/users          # 作成
-PUT    /api/v1/users/:id      # 更新
-DELETE /api/v1/users/:id      # 削除
-```
-
-## レスポンス形式
-
-```json
-{
-  "data": {},
-  "meta": {
-    "page": 1,
-    "per_page": 20,
-    "total": 100
-  },
-  "errors": []
-}
-```
-
-詳細なパターンは[PATTERNS.md](PATTERNS.md)を参照。
-```
-
----
-
-## 例5: MCPサーバー統合プラグイン
+## 例4: MCPサーバー統合プラグイン
 
 外部サービス連携用MCPサーバーを含むプラグイン。
 
@@ -296,8 +241,9 @@ external-services/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── .mcp.json
-└── commands/
-    └── fetch-data.md
+└── skills/
+    └── fetch-data/
+        └── SKILL.md
 ```
 
 ### .mcp.json
@@ -332,6 +278,50 @@ external-services/
 
 ---
 
+## 例5: LSPサーバープラグイン
+
+言語サーバーを設定するプラグイン。
+
+### ディレクトリ構造
+
+```
+go-lsp/
+├── .claude-plugin/
+│   └── plugin.json
+└── .lsp.json
+```
+
+### .claude-plugin/plugin.json
+
+```json
+{
+  "name": "go-lsp",
+  "description": "Go言語のコードインテリジェンスを提供",
+  "version": "1.0.0",
+  "author": {
+    "name": "Your Team"
+  }
+}
+```
+
+### .lsp.json
+
+```json
+{
+  "go": {
+    "command": "gopls",
+    "args": ["serve"],
+    "extensionToLanguage": {
+      ".go": "go"
+    }
+  }
+}
+```
+
+> **注意**: `gopls`は別途インストールが必要：`go install golang.org/x/tools/gopls@latest`
+
+---
+
 ## 例6: フルスタックプラグイン
 
 すべてのコンポーネントを含む包括的なプラグイン。
@@ -343,20 +333,22 @@ full-stack-toolkit/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── .mcp.json
-├── commands/
-│   ├── scaffold.md
-│   ├── deploy.md
-│   └── test.md
+├── .lsp.json
+├── skills/
+│   ├── scaffold/
+│   │   └── SKILL.md
+│   ├── deploy/
+│   │   └── SKILL.md
+│   └── test/
+│       └── SKILL.md
 ├── agents/
 │   ├── architect.md
 │   └── debugger.md
-├── skills/
-│   ├── testing/
-│   │   └── SKILL.md
-│   └── deployment/
-│       └── SKILL.md
-└── hooks/
-    └── hooks.json
+├── hooks/
+│   └── hooks.json
+└── scripts/
+    ├── pre-deploy.sh
+    └── post-test.sh
 ```
 
 ### .claude-plugin/plugin.json
@@ -370,10 +362,38 @@ full-stack-toolkit/
     "name": "DevTeam",
     "email": "dev@example.com"
   },
+  "homepage": "https://docs.example.com/full-stack-toolkit",
   "repository": "https://github.com/example/full-stack-toolkit",
   "license": "MIT",
   "keywords": ["fullstack", "scaffold", "deploy", "testing"]
 }
+```
+
+---
+
+## 例7: Exploreエージェントを使ったリサーチスキル
+
+サブエージェントでコードベース探索を行うスキル。
+
+### skills/code-explorer/SKILL.md
+
+```yaml
+---
+name: code-explorer
+description: コードベースを探索して構造を理解。コードベースの構造、アーキテクチャ、ファイル配置について質問された場合に使用。
+context: fork
+agent: Explore
+allowed-tools: Read, Grep, Glob
+---
+
+$ARGUMENTSについてコードベースを探索:
+
+1. Globで関連ファイルパターンを検索
+2. Grepでキーワードを検索
+3. Readで重要ファイルを分析
+4. ファイル参照付きで要約
+
+ファイルの変更は行わない。
 ```
 
 ---
@@ -411,13 +431,20 @@ full-stack-toolkit/
   "plugins": [
     {
       "name": "quality-guard",
-      "source": "https://github.com/team/quality-guard.git",
+      "source": {
+        "source": "github",
+        "repo": "team/quality-guard"
+      },
       "description": "品質チェックツール",
       "version": "1.2.0"
     },
     {
       "name": "api-toolkit",
-      "source": "https://github.com/team/api-toolkit.git#v2.0.0",
+      "source": {
+        "source": "github",
+        "repo": "team/api-toolkit",
+        "ref": "v2.0.0"
+      },
       "description": "API開発ツール",
       "version": "2.0.0"
     }
@@ -429,14 +456,17 @@ full-stack-toolkit/
 
 ```json
 {
-  "plugin_marketplaces": [
-    "team/internal-marketplace",
-    "https://github.com/company/claude-plugins.git"
-  ],
-  "plugins": [
-    "quality-guard@team",
-    "api-toolkit@team",
-    "code-reviewer@company"
-  ]
+  "extraKnownMarketplaces": {
+    "team-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "company/claude-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "quality-guard@team-marketplace": true,
+    "api-toolkit@team-marketplace": true
+  }
 }
 ```
