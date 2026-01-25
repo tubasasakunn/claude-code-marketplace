@@ -2,102 +2,246 @@
 
 ## 目次
 
-- コードなしスキル（指示のみ）
-- コード付きスキル（スクリプト含む）
+- 基本スキル
+- フロントマター設定別の例
+- コード付きスキル
 - ドメイン特化スキル
 - ワークフロースキル
+- Hooks付きスキル
+- テンプレート
 
 ---
 
-## コードなしスキル
+## 基本スキル
 
-### 1. ドキュメントレビュースキル
+### シンプルなリファレンススキル
 
 ```yaml
 ---
-name: doc-reviewer
-description: 技術ドキュメントの品質をレビューします。ドキュメントのレビュー、改善提案、スタイルチェック時に使用してください。
+name: api-conventions
+description: このコードベースのAPI設計パターン。API作成、エンドポイント設計時に使用。
 ---
 
-# ドキュメントレビュー
+# API規約
 
-## レビュー観点
+## エンドポイント設計
 
-1. **明確さ**: 対象読者が理解できるか
-2. **完全性**: 必要な情報がすべて含まれているか
-3. **正確性**: 技術的に正しいか
-4. **構造**: 論理的に整理されているか
-5. **一貫性**: 用語とスタイルが統一されているか
+- RESTful命名規則を使用
+- 一貫したエラー形式を返す
+- リクエストバリデーションを含める
 
-## チェックリスト
+## レスポンス形式
 
-- [ ] タイトルが内容を正確に反映
-- [ ] 目的が冒頭で明示
-- [ ] ステップが順序立てて説明
-- [ ] コード例が動作確認済み
-- [ ] リンクが有効
-
-## フィードバック形式
-
-## 総評
-[全体的な印象と主要な改善点]
-
-## 良い点
-- ポイント1
-- ポイント2
-
-## 改善提案
-1. [具体的な改善案と理由]
-2. [具体的な改善案と理由]
+```json
+{
+  "data": {},
+  "meta": {
+    "timestamp": "2024-01-01T00:00:00Z"
+  }
+}
 ```
 
-### 2. コミュニケーションスキル
+## エラー形式
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "入力が無効です"
+  }
+}
+```
+```
+
+### コミットメッセージ生成スキル
 
 ```yaml
 ---
-name: meeting-summarizer
-description: 会議メモから構造化された要約を作成します。会議の要約、議事録作成、アクションアイテム抽出時に使用してください。
+name: commit-message
+description: git diffから明確なコミットメッセージを生成。コミットメッセージ作成時に使用。
 ---
 
-# 会議要約
+# コミットメッセージ生成
+
+1. `git diff --staged`で変更確認
+2. 以下の形式で提案:
+
+## 形式
+
+type(scope): 簡潔な説明
+
+詳細説明（任意）
+
+## タイプ
+
+- `feat`: 新機能
+- `fix`: バグ修正
+- `refactor`: リファクタリング
+- `docs`: ドキュメント
+- `test`: テスト
+- `chore`: その他
+
+## 例
+
+feat(auth): JWTベースの認証を実装
+
+ログインエンドポイントとトークン検証ミドルウェアを追加
+```
+
+---
+
+## フロントマター設定別の例
+
+### disable-model-invocation: 手動呼び出しのみ
+
+```yaml
+---
+name: deploy-production
+description: 本番環境へのデプロイを実行
+disable-model-invocation: true
+argument-hint: [version]
+---
+
+# 本番デプロイ
+
+バージョン $ARGUMENTS を本番環境にデプロイ:
+
+進捗チェックリスト:
+- [ ] テスト実行
+- [ ] ビルド作成
+- [ ] ステージングデプロイ
+- [ ] 本番デプロイ
+- [ ] 確認
+
+## 1. テスト実行
+
+```bash
+npm run test
+npm run lint
+```
+
+## 2. ビルド
+
+```bash
+npm run build
+```
+
+## 3. デプロイ
+
+```bash
+./scripts/deploy.sh production $ARGUMENTS
+```
+```
+
+### user-invocable: false（バックグラウンド知識）
+
+```yaml
+---
+name: legacy-db-context
+description: レガシーデータベースの構造と制約。データベース操作時に参照。
+user-invocable: false
+---
+
+# レガシーデータベースコンテキスト
+
+## 注意事項
+
+- `users`テーブルは`user_id`ではなく`id`を使用
+- タイムスタンプはUTCで保存
+- ソフトデリート（`deleted_at`カラム）を使用
+
+## スキーマ
+
+### users
+- id (INT, PK)
+- email (VARCHAR)
+- created_at (TIMESTAMP)
+- deleted_at (TIMESTAMP, nullable)
+
+### orders
+- order_id (INT, PK)
+- user_id (INT, FK -> users.id)
+- status (ENUM)
+```
+
+### context: fork（サブエージェント実行）
+
+```yaml
+---
+name: architecture-review
+description: コードベースのアーキテクチャをレビュー
+context: fork
+agent: Explore
+---
+
+# アーキテクチャレビュー
+
+$ARGUMENTSについてアーキテクチャレビューを実行:
+
+1. **プロジェクト構造を分析**
+   - Globでディレクトリ構造を確認
+   - 主要なエントリポイントを特定
+
+2. **依存関係を調査**
+   - package.json / requirements.txt を確認
+   - 内部モジュール間の依存関係を分析
+
+3. **パターンを特定**
+   - デザインパターンの使用
+   - コード構成の一貫性
+
+4. **レポート作成**
+   - 強み
+   - 改善点
+   - 推奨事項
 
 ## 出力形式
 
-# [会議タイトル] - [日付]
+## アーキテクチャレビューレポート
 
-## 参加者
-- 名前1（役割）
-- 名前2（役割）
+### 概要
+[1-2文の概要]
 
-## 決定事項
-1. [決定内容]
-2. [決定内容]
+### 構造
+[ディレクトリ構造の説明]
 
-## アクションアイテム
-| 担当者 | タスク | 期限 |
-|--------|--------|------|
-| 名前   | 内容   | 日付 |
+### 強み
+- ポイント1
+- ポイント2
 
-## 議論のポイント
-- トピック1: [要約]
-- トピック2: [要約]
+### 改善点
+1. [具体的な改善案]
+2. [具体的な改善案]
+```
 
-## 次回予定
-- 日時:
-- 議題:
+### allowed-tools（ツール制限）
 
-## ガイドライン
+```yaml
+---
+name: code-explorer
+description: コードベースを読み取り専用で探索
+context: fork
+agent: Explore
+allowed-tools: Read, Grep, Glob
+---
 
-- 決定事項は明確に記述
-- アクションアイテムには必ず担当者と期限を含める
-- 議論は要点のみ、詳細は省略
+# コードエクスプローラー
+
+$ARGUMENTSについてコードベースを探索:
+
+1. Globで関連ファイルパターンを検索
+2. Grepでキーワードを検索
+3. Readで重要ファイルを分析
+4. ファイル参照付きで要約
+
+**ファイルの変更は行わない**
 ```
 
 ---
 
 ## コード付きスキル
 
-### 1. API テストスキル
+### APIテストスキル
 
 ```
 api-tester/
@@ -112,7 +256,7 @@ api-tester/
 ```yaml
 ---
 name: api-tester
-description: REST APIエンドポイントをテストし、レスポンスを検証します。API テスト、エンドポイント検証、レスポンス確認時に使用してください。
+description: REST APIエンドポイントをテスト。APIテスト、レスポンス検証時に使用。
 ---
 
 # APIテスト
@@ -120,14 +264,14 @@ description: REST APIエンドポイントをテストし、レスポンスを�
 ## クイックスタート
 
 エンドポイントテスト:
-\`\`\`bash
+```bash
 python scripts/test_endpoint.py GET https://api.example.com/users
-\`\`\`
+```
 
 レスポンス検証:
-\`\`\`bash
+```bash
 python scripts/validate_response.py response.json schema.json
-\`\`\`
+```
 
 ## ワークフロー
 
@@ -137,14 +281,6 @@ python scripts/validate_response.py response.json schema.json
 4. 結果をレポート
 
 スキーマ定義は[SCHEMAS.md](SCHEMAS.md)を参照。
-
-## 検証項目
-
-- ステータスコード
-- レスポンス形式（JSON/XML）
-- 必須フィールドの存在
-- データ型の一致
-- レスポンス時間
 ```
 
 **scripts/test_endpoint.py**:
@@ -161,7 +297,6 @@ from datetime import datetime
 def test_endpoint(method, url, data=None, headers=None):
     """エンドポイントをテストして結果を返す"""
     headers = headers or {"Content-Type": "application/json"}
-
     start_time = datetime.now()
 
     try:
@@ -211,75 +346,16 @@ if __name__ == "__main__":
     test_endpoint(method, url, data)
 ```
 
-### 2. ログ分析スキル
-
-```
-log-analyzer/
-├── SKILL.md
-└── scripts/
-    ├── parse_logs.py
-    └── find_patterns.py
-```
-
-**SKILL.md**:
-```yaml
----
-name: log-analyzer
-description: ログファイルを分析してエラーパターンや異常を検出します。ログ分析、エラー調査、パターン検出時に使用してください。
----
-
-# ログ分析
-
-## 基本分析
-
-ログ解析:
-\`\`\`bash
-python scripts/parse_logs.py app.log
-\`\`\`
-
-パターン検索:
-\`\`\`bash
-python scripts/find_patterns.py app.log "ERROR|WARN"
-\`\`\`
-
-## 分析ステップ
-
-1. ログファイルを読み込み
-2. タイムスタンプとレベルを抽出
-3. エラーパターンを特定
-4. 時系列で集計
-5. レポートを生成
-
-## 出力形式
-
-## ログ分析レポート
-
-### サマリー
-- 総行数: X
-- エラー数: X
-- 警告数: X
-- 期間: YYYY-MM-DD HH:MM ~ YYYY-MM-DD HH:MM
-
-### エラー頻度
-| 時間帯 | エラー数 |
-|--------|----------|
-| 00:00  | X        |
-
-### 主要エラー
-1. [エラーメッセージ] - X回
-2. [エラーメッセージ] - X回
-```
-
 ---
 
 ## ドメイン特化スキル
 
-### データベーススキル
+### SQLクエリヘルパー
 
 ```yaml
 ---
 name: sql-query-helper
-description: SQLクエリの作成と最適化を支援します。SQL作成、クエリ最適化、データベース操作時に使用してください。
+description: SQLクエリの作成と最適化を支援。SQL作成、クエリ最適化時に使用。
 ---
 
 # SQLクエリヘルパー
@@ -306,109 +382,168 @@ description: SQLクエリの作成と最適化を支援します。SQL作成、�
 ## よくあるパターン
 
 ### ページネーション
-\`\`\`sql
+
+```sql
 SELECT * FROM users
 ORDER BY created_at DESC
 LIMIT 20 OFFSET 40;
-\`\`\`
+```
 
 ### 集計
-\`\`\`sql
+
+```sql
 SELECT
     DATE(created_at) as date,
     COUNT(*) as count
 FROM orders
 GROUP BY DATE(created_at)
 ORDER BY date DESC;
-\`\`\`
+```
 ```
 
 ---
 
 ## ワークフロースキル
 
-### デプロイメントスキル
+### PRレビューワークフロー
 
 ```yaml
 ---
-name: deployment-workflow
-description: アプリケーションのデプロイメントプロセスをガイドします。デプロイ、リリース、本番環境への反映時に使用してください。
+name: pr-review
+description: PRの包括的なレビューを実行
+context: fork
+agent: Explore
+allowed-tools: Read, Grep, Glob, Bash(gh:*)
 ---
 
-# デプロイメントワークフロー
+# PRレビュー
 
-## プロセス
+## コンテキスト
 
-進捗チェックリスト:
-\`\`\`
-デプロイ進捗:
-- [ ] 1. プリフライトチェック
-- [ ] 2. テスト実行
-- [ ] 3. ビルド作成
-- [ ] 4. ステージングデプロイ
-- [ ] 5. ステージング確認
-- [ ] 6. 本番デプロイ
-- [ ] 7. 本番確認
-- [ ] 8. ロールバック準備確認
-\`\`\`
+- PR diff: !`gh pr diff`
+- PRコメント: !`gh pr view --comments`
+- 変更ファイル: !`gh pr diff --name-only`
 
-## 1. プリフライトチェック
+## レビュー手順
 
-- [ ] 全テストがパス
-- [ ] コードレビュー完了
-- [ ] CHANGELOGを更新
-- [ ] バージョン番号を更新
+1. **変更の概要を把握**
+   - 変更ファイル一覧を確認
+   - 変更の目的を理解
 
-## 2. テスト実行
+2. **コード品質をチェック**
+   - 命名規則
+   - エラー処理
+   - テストカバレッジ
 
-\`\`\`bash
-npm run test
-npm run lint
-npm run build
-\`\`\`
+3. **潜在的な問題を特定**
+   - パフォーマンス影響
+   - セキュリティリスク
+   - 後方互換性
 
-## 3. ステージングデプロイ
+4. **フィードバックを作成**
 
-\`\`\`bash
-./scripts/deploy.sh staging
-\`\`\`
+## 出力形式
 
-確認項目:
-- [ ] アプリケーションが起動
-- [ ] 主要機能が動作
-- [ ] エラーログなし
+## PRレビュー結果
 
-## 4. 本番デプロイ
+### 概要
+[変更の要約]
 
-\`\`\`bash
-./scripts/deploy.sh production
-\`\`\`
+### 良い点
+- ポイント1
+- ポイント2
 
-## 5. ロールバック手順
+### 懸念事項
+1. [具体的な懸念と提案]
+2. [具体的な懸念と提案]
 
-問題発生時:
-\`\`\`bash
-./scripts/rollback.sh production
-\`\`\`
+### 推奨事項
+- [ ] 修正すべき項目
+```
+
+---
+
+## Hooks付きスキル
+
+### セキュリティチェック付き操作
+
+```yaml
+---
+name: secure-file-ops
+description: セキュリティチェック付きでファイル操作を実行
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "./scripts/security-check.sh"
+          timeout: 10
+  PostToolUse:
+    - matcher: "Edit|Write"
+      hooks:
+        - type: command
+          command: "./scripts/lint-check.sh"
+---
+
+# セキュアファイル操作
+
+ファイル操作時は自動的にセキュリティチェックが実行されます。
+
+## セキュリティポリシー
+
+- 機密ファイル（.env, credentials等）への書き込みは禁止
+- sudoコマンドは禁止
+- rm -rfは禁止
+
+## 編集後の自動チェック
+
+- 構文エラーチェック
+- リントチェック
+- フォーマット確認
+```
+
+**scripts/security-check.sh**:
+```bash
+#!/bin/bash
+input=$(cat)
+command=$(echo "$input" | jq -r '.tool_input.command // empty')
+
+if [ -z "$command" ]; then
+    exit 0
+fi
+
+# 危険なコマンドをチェック
+if echo "$command" | grep -qE '(rm -rf|sudo|chmod 777)'; then
+    echo "危険なコマンドが検出されました: $command" >&2
+    exit 2
+fi
+
+# 機密ファイルへのアクセスをチェック
+if echo "$command" | grep -qE '\.(env|key|pem|credentials)'; then
+    echo "機密ファイルへのアクセスは許可されていません" >&2
+    exit 2
+fi
+
+exit 0
 ```
 
 ---
 
 ## テンプレート
 
-新しいスキル作成時のテンプレート:
+### 基本スキルテンプレート
 
 ```yaml
 ---
 name: [skill-name]
-description: [何をするか]。[いつ使用するか]に使用してください。
+description: [何をするか]。[いつ使用するか]に使用。
 ---
 
 # [スキル名]
 
 ## 概要
 
-[スキルの目的を1-2文で説明]
+[1-2文で説明]
 
 ## 使い方
 
@@ -428,4 +563,59 @@ description: [何をするか]。[いつ使用するか]に使用してくださ
 
 - [重要な注意点1]
 - [重要な注意点2]
+```
+
+### サブエージェントスキルテンプレート
+
+```yaml
+---
+name: [skill-name]
+description: [何をするか]。[いつ使用するか]に使用。
+context: fork
+agent: [Explore|Plan|general-purpose]
+allowed-tools: [ツールリスト]
+---
+
+# [スキル名]
+
+$ARGUMENTSについて実行:
+
+1. [ステップ1]
+2. [ステップ2]
+3. [ステップ3]
+
+## 出力形式
+
+[期待される出力形式]
+```
+
+### Hooks付きスキルテンプレート
+
+```yaml
+---
+name: [skill-name]
+description: [何をするか]。[いつ使用するか]に使用。
+hooks:
+  PreToolUse:
+    - matcher: "[ツールパターン]"
+      hooks:
+        - type: command
+          command: "[コマンド]"
+  PostToolUse:
+    - matcher: "[ツールパターン]"
+      hooks:
+        - type: command
+          command: "[コマンド]"
+---
+
+# [スキル名]
+
+## 概要
+
+[説明]
+
+## 自動チェック
+
+- PreToolUse: [何をチェックするか]
+- PostToolUse: [何をチェックするか]
 ```
