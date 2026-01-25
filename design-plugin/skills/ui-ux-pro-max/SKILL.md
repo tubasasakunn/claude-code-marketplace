@@ -1,228 +1,269 @@
 ---
 name: ui-ux-pro-max
-description: "UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 8 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app, .html, .tsx, .vue, .svelte. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient."
+description: "UI/UX評価サブエージェント。100点満点でデザイン品質を評価し、問題点を全て指摘する。スクリーンショット、コード、URLを受け取り、50以上の評価項目で採点。デザインレビュー、品質チェック、UI改善時に使用。"
+context: fork
+agent: general-purpose
+argument-hint: "[screenshot/code/url] 評価対象"
+disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Bash
+  - WebFetch
 ---
 
-# UI/UX Pro Max - Design Intelligence
+# UI/UX Pro Max - デザイン評価エージェント
 
-Searchable database of UI styles, color palettes, font pairings, chart types, product recommendations, UX guidelines, and stack-specific best practices.
+100点満点でUI/UXデザインを評価し、すべての問題点を具体的に指摘するサブエージェントです。
 
-## Prerequisites
+---
 
-Check if Python is installed:
+## 評価ワークフロー
+
+### Step 1: 入力の受け取り
+
+評価対象として以下のいずれかを受け取る：
+- スクリーンショット画像
+- HTMLコード / CSSコード
+- UIコンポーネントコード（React/Vue/Swift等）
+- URL（WebFetchで取得）
+
+### Step 2: 評価基準データの読み込み
+
+評価前に必ず以下のデータを読み込む：
 
 ```bash
-python3 --version || python --version
+# UXガイドライン（ベストプラクティス・アンチパターン）
+cat design-plugin/skills/ui-ux-pro-max/data/ux-guidelines.csv
+
+# スタイル基準
+cat design-plugin/skills/ui-ux-pro-max/data/styles.csv
 ```
 
-If Python is not installed, install it based on user's OS:
+### Step 3: 10カテゴリ×10点で評価
 
-**macOS:**
-```bash
-brew install python3
-```
+以下の10カテゴリについて、各10点満点で評価する：
 
-**Ubuntu/Debian:**
-```bash
-sudo apt update && sudo apt install python3
-```
+| カテゴリ | 評価観点 | 配点 |
+|----------|----------|------|
+| **1. ビジュアル階層** | 情報の優先度が視覚的に明確か、読み取り順序が自然か | 10点 |
+| **2. タイポグラフィ** | フォント選択、サイズ階層、可読性、行間 | 10点 |
+| **3. カラー設計** | 配色の調和、コントラスト比、ブランド一貫性 | 10点 |
+| **4. スペーシング** | 余白の一貫性、呼吸感、グリッドの整合性 | 10点 |
+| **5. インタラクション** | ホバー/フォーカス状態、フィードバック、cursor設定 | 10点 |
+| **6. アクセシビリティ** | WCAG準拠、色以外の識別、キーボードナビ | 10点 |
+| **7. レスポンシブ** | モバイル対応、ブレークポイント、タッチターゲット | 10点 |
+| **8. パフォーマンス** | 重いアニメーション、不要なエフェクト、最適化 | 10点 |
+| **9. 一貫性** | デザインシステム遵守、パターンの統一 | 10点 |
+| **10. UXベストプラクティス** | ux-guidelines.csvに基づく問題の有無 | 10点 |
 
-**Windows:**
-```powershell
-winget install Python.Python.3.12
+---
+
+## 評価項目詳細チェックリスト
+
+### 1. ビジュアル階層 (10点)
+
+- [ ] 見出しと本文のサイズ差が明確（最低1.25倍）
+- [ ] CTAボタンが最も目立つ
+- [ ] 視線誘導が自然（F型/Z型パターン）
+- [ ] 重要度に応じたウェイト使い分け
+- [ ] グループ化が論理的
+
+**減点パターン：**
+- 全要素同サイズ: -3点
+- CTAが目立たない: -2点
+- 情報の優先度不明: -2点
+
+### 2. タイポグラフィ (10点)
+
+- [ ] フォントは2-3種類まで
+- [ ] 行間は1.4-1.6
+- [ ] 段落幅は65-75文字
+- [ ] フォントサイズ16px以上（本文）
+- [ ] 見出しの階層が明確
+
+**減点パターン：**
+- 4種類以上のフォント: -3点
+- 行間1.2未満: -2点
+- 本文14px未満: -2点
+- 階層不明: -2点
+
+### 3. カラー設計 (10点)
+
+- [ ] コントラスト比4.5:1以上（本文）
+- [ ] 3:1以上（大きいテキスト）
+- [ ] 色数は5-7色
+- [ ] 意味のある色使い（赤=エラー等）
+- [ ] ダークモード対応（あれば）
+
+**減点パターン：**
+- コントラスト不足: -4点
+- 配色に意味がない: -2点
+- 色が多すぎる: -2点
+- 絵文字をアイコン代わりに使用: -3点
+
+### 4. スペーシング (10点)
+
+- [ ] 8pxグリッド基準
+- [ ] 要素間の余白が一定
+- [ ] セクション間に十分な余白
+- [ ] パディングの一貫性
+- [ ] 密集しすぎていない
+
+**減点パターン：**
+- 余白がバラバラ: -3点
+- 詰まりすぎ: -2点
+- 広すぎ: -2点
+
+### 5. インタラクション (10点)
+
+- [ ] hover時の視覚フィードバック
+- [ ] focus状態が見える
+- [ ] active状態がある
+- [ ] cursor: pointer設定
+- [ ] disabled状態の区別
+
+**減点パターン：**
+- hover状態なし: -2点
+- cursor未設定: -2点
+- focus不可視: -3点（アクセシビリティ）
+- レイアウトシフトするhover: -2点
+
+### 6. アクセシビリティ (10点)
+
+- [ ] alt属性あり
+- [ ] セマンティックHTML
+- [ ] キーボードナビ可能
+- [ ] 色以外の識別手段
+- [ ] prefers-reduced-motion対応
+
+**減点パターン：**
+- alt欠落: -2点
+- div/spanのみ: -2点
+- キーボード不可: -3点
+- 色のみで識別: -3点
+
+### 7. レスポンシブ (10点)
+
+- [ ] モバイルファースト
+- [ ] タッチターゲット44px以上
+- [ ] 横スクロールなし
+- [ ] 適切なブレークポイント
+- [ ] 画像のアスペクト比維持
+
+**減点パターン：**
+- モバイル未対応: -5点
+- タッチターゲット小: -2点
+- 横スクロール発生: -3点
+
+### 8. パフォーマンス (10点)
+
+- [ ] 重いアニメーションなし
+- [ ] backdrop-filter最小限
+- [ ] 不要な影・ぼかしなし
+- [ ] 適切なアニメーション時間（150-300ms）
+- [ ] 画像最適化
+
+**減点パターン：**
+- 1秒以上のアニメーション: -2点
+- 過剰なblur/shadow: -2点
+- 未最適化画像: -3点
+
+### 9. 一貫性 (10点)
+
+- [ ] ボタンスタイル統一
+- [ ] 色使いが統一
+- [ ] 間隔が統一
+- [ ] コンポーネント再利用
+- [ ] 命名規則統一
+
+**減点パターン：**
+- ボタンスタイル不統一: -3点
+- 色使いが場当たり的: -2点
+- 余白がバラバラ: -2点
+
+### 10. UXベストプラクティス (10点)
+
+ux-guidelines.csvの項目をチェック：
+
+- [ ] スムーズスクロール
+- [ ] ローディング状態
+- [ ] エラーフィードバック
+- [ ] 成功フィードバック
+- [ ] 確認ダイアログ（破壊的操作）
+
+**減点パターン：**
+- ローディングなし: -2点
+- エラー表示なし: -3点
+- 確認なし削除: -2点
+
+---
+
+## 出力フォーマット
+
+評価結果は以下の形式で出力する：
+
+```markdown
+# UI/UX評価レポート
+
+## 総合スコア: XX/100点
+
+### カテゴリ別スコア
+
+| カテゴリ | スコア | 評価 |
+|----------|--------|------|
+| ビジュアル階層 | X/10 | ◯/△/✕ |
+| タイポグラフィ | X/10 | ◯/△/✕ |
+| カラー設計 | X/10 | ◯/△/✕ |
+| スペーシング | X/10 | ◯/△/✕ |
+| インタラクション | X/10 | ◯/△/✕ |
+| アクセシビリティ | X/10 | ◯/△/✕ |
+| レスポンシブ | X/10 | ◯/△/✕ |
+| パフォーマンス | X/10 | ◯/△/✕ |
+| 一貫性 | X/10 | ◯/△/✕ |
+| UXベストプラクティス | X/10 | ◯/△/✕ |
+
+### 検出された問題点
+
+#### 致命的 (Critical) - 要即時対応
+1. [問題の具体的な説明]
+   - 場所: [特定の場所]
+   - 影響: [ユーザーへの影響]
+   - 修正案: [具体的な修正方法]
+
+#### 重要 (Major) - 優先的に対応
+1. ...
+
+#### 軽微 (Minor) - 改善推奨
+1. ...
+
+### 良い点
+- [評価できる点を列挙]
+
+### 改善の優先順位
+1. [最優先の改善項目]
+2. [次の優先項目]
+3. ...
 ```
 
 ---
 
-## How to Use This Skill
+## 評価基準（スコア解釈）
 
-When user requests UI/UX work (design, build, create, implement, review, fix, improve), follow this workflow:
-
-### Step 1: Analyze User Requirements
-
-Extract key information from user request:
-- **Product type**: SaaS, e-commerce, portfolio, dashboard, landing page, etc.
-- **Style keywords**: minimal, playful, professional, elegant, dark mode, etc.
-- **Industry**: healthcare, fintech, gaming, education, etc.
-- **Stack**: React, Vue, Next.js, or default to `html-tailwind`
-
-### Step 2: Search Relevant Domains
-
-Use `search.py` multiple times to gather comprehensive information. Search until you have enough context.
-
-```bash
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
-```
-
-**Recommended search order:**
-
-1. **Product** - Get style recommendations for product type
-2. **Style** - Get detailed style guide (colors, effects, frameworks)
-3. **Typography** - Get font pairings with Google Fonts imports
-4. **Color** - Get color palette (Primary, Secondary, CTA, Background, Text, Border)
-5. **Landing** - Get page structure (if landing page)
-6. **Chart** - Get chart recommendations (if dashboard/analytics)
-7. **UX** - Get best practices and anti-patterns
-8. **Stack** - Get stack-specific guidelines (default: html-tailwind)
-
-### Step 3: Stack Guidelines (Default: html-tailwind)
-
-If user doesn't specify a stack, **default to `html-tailwind`**.
-
-```bash
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
-```
-
-Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`
+| 総合スコア | 評価 | 説明 |
+|------------|------|------|
+| 90-100 | 優秀 | プロダクション品質、ほぼ問題なし |
+| 80-89 | 良好 | 細かい改善で優秀レベルに |
+| 70-79 | 普通 | 基本は問題なし、改善点あり |
+| 60-69 | 要改善 | 複数の問題あり、リリース前に修正必要 |
+| 50-59 | 問題あり | 重大な問題あり、大幅な改善必要 |
+| 50未満 | 不合格 | 根本的な見直しが必要 |
 
 ---
 
-## Search Reference
+## 注意事項
 
-### Available Domains
-
-| Domain | Use For | Example Keywords |
-|--------|---------|------------------|
-| `product` | Product type recommendations | SaaS, e-commerce, portfolio, healthcare, beauty, service |
-| `style` | UI styles, colors, effects | glassmorphism, minimalism, dark mode, brutalism |
-| `typography` | Font pairings, Google Fonts | elegant, playful, professional, modern |
-| `color` | Color palettes by product type | saas, ecommerce, healthcare, beauty, fintech, service |
-| `landing` | Page structure, CTA strategies | hero, hero-centric, testimonial, pricing, social-proof |
-| `chart` | Chart types, library recommendations | trend, comparison, timeline, funnel, pie |
-| `ux` | Best practices, anti-patterns | animation, accessibility, z-index, loading |
-| `prompt` | AI prompts, CSS keywords | (style name) |
-
-### Available Stacks
-
-| Stack | Focus |
-|-------|-------|
-| `html-tailwind` | Tailwind utilities, responsive, a11y (DEFAULT) |
-| `react` | State, hooks, performance, patterns |
-| `nextjs` | SSR, routing, images, API routes |
-| `vue` | Composition API, Pinia, Vue Router |
-| `svelte` | Runes, stores, SvelteKit |
-| `swiftui` | Views, State, Navigation, Animation |
-| `react-native` | Components, Navigation, Lists |
-| `flutter` | Widgets, State, Layout, Theming |
-
----
-
-## Example Workflow
-
-**User request:** "Làm landing page cho dịch vụ chăm sóc da chuyên nghiệp"
-
-**AI should:**
-
-```bash
-# 1. Search product type
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --domain product
-
-# 2. Search style (based on industry: beauty, elegant)
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "elegant minimal soft" --domain style
-
-# 3. Search typography
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "elegant luxury" --domain typography
-
-# 4. Search color palette
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness" --domain color
-
-# 5. Search landing page structure
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "hero-centric social-proof" --domain landing
-
-# 6. Search UX guidelines
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "animation" --domain ux
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "accessibility" --domain ux
-
-# 7. Search stack guidelines (default: html-tailwind)
-python3 .claude/skills/ui-ux-pro-max/scripts/search.py "layout responsive" --stack html-tailwind
-```
-
-**Then:** Synthesize all search results and implement the design.
-
----
-
-## Tips for Better Results
-
-1. **Be specific with keywords** - "healthcare SaaS dashboard" > "app"
-2. **Search multiple times** - Different keywords reveal different insights
-3. **Combine domains** - Style + Typography + Color = Complete design system
-4. **Always check UX** - Search "animation", "z-index", "accessibility" for common issues
-5. **Use stack flag** - Get implementation-specific best practices
-6. **Iterate** - If first search doesn't match, try different keywords
-
----
-
-## Common Rules for Professional UI
-
-These are frequently overlooked issues that make UI look unprofessional:
-
-### Icons & Visual Elements
-
-| Rule | Do | Don't |
-|------|----|----- |
-| **No emoji icons** | Use SVG icons (Heroicons, Lucide, Simple Icons) | Use emojis like 🎨 🚀 ⚙️ as UI icons |
-| **Stable hover states** | Use color/opacity transitions on hover | Use scale transforms that shift layout |
-| **Correct brand logos** | Research official SVG from Simple Icons | Guess or use incorrect logo paths |
-| **Consistent icon sizing** | Use fixed viewBox (24x24) with w-6 h-6 | Mix different icon sizes randomly |
-
-### Interaction & Cursor
-
-| Rule | Do | Don't |
-|------|----|----- |
-| **Cursor pointer** | Add `cursor-pointer` to all clickable/hoverable cards | Leave default cursor on interactive elements |
-| **Hover feedback** | Provide visual feedback (color, shadow, border) | No indication element is interactive |
-| **Smooth transitions** | Use `transition-colors duration-200` | Instant state changes or too slow (>500ms) |
-
-### Light/Dark Mode Contrast
-
-| Rule | Do | Don't |
-|------|----|----- |
-| **Glass card light mode** | Use `bg-white/80` or higher opacity | Use `bg-white/10` (too transparent) |
-| **Text contrast light** | Use `#0F172A` (slate-900) for text | Use `#94A3B8` (slate-400) for body text |
-| **Muted text light** | Use `#475569` (slate-600) minimum | Use gray-400 or lighter |
-| **Border visibility** | Use `border-gray-200` in light mode | Use `border-white/10` (invisible) |
-
-### Layout & Spacing
-
-| Rule | Do | Don't |
-|------|----|----- |
-| **Floating navbar** | Add `top-4 left-4 right-4` spacing | Stick navbar to `top-0 left-0 right-0` |
-| **Content padding** | Account for fixed navbar height | Let content hide behind fixed elements |
-| **Consistent max-width** | Use same `max-w-6xl` or `max-w-7xl` | Mix different container widths |
-
----
-
-## Pre-Delivery Checklist
-
-Before delivering UI code, verify these items:
-
-### Visual Quality
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] Brand logos are correct (verified from Simple Icons)
-- [ ] Hover states don't cause layout shift
-- [ ] Use theme colors directly (bg-primary) not var() wrapper
-
-### Interaction
-- [ ] All clickable elements have `cursor-pointer`
-- [ ] Hover states provide clear visual feedback
-- [ ] Transitions are smooth (150-300ms)
-- [ ] Focus states visible for keyboard navigation
-
-### Light/Dark Mode
-- [ ] Light mode text has sufficient contrast (4.5:1 minimum)
-- [ ] Glass/transparent elements visible in light mode
-- [ ] Borders visible in both modes
-- [ ] Test both modes before delivery
-
-### Layout
-- [ ] Floating elements have proper spacing from edges
-- [ ] No content hidden behind fixed navbars
-- [ ] Responsive at 320px, 768px, 1024px, 1440px
-- [ ] No horizontal scroll on mobile
-
-### Accessibility
-- [ ] All images have alt text
-- [ ] Form inputs have labels
-- [ ] Color is not the only indicator
-- [ ] `prefers-reduced-motion` respected
+1. **厳格に評価する** - 甘い評価は意味がない
+2. **具体的に指摘する** - 「なんとなくダサい」ではなく根拠を示す
+3. **修正方法を提示する** - 問題だけでなく解決策も
+4. **良い点も伝える** - モチベーション維持のため
+5. **優先順位をつける** - 何から直すべきか明確に
