@@ -15,6 +15,7 @@ iOS/Swift開発を支援するClaude Codeプラグイン。
 | [ios-coding-rules](skills/ios-coding-rules/) | mylibraryプロジェクトのコーディング規約 | `/ios-coding-rules <タスク>` |
 | [ios-design](skills/ios-design/) | iOS/SwiftUIデザインレビュー | `/ios-design <画像/コード>` |
 | [ios-testing](skills/ios-testing/) | MaestroによるUIテスト・スクリーンショット | `/ios-testing <要件>` |
+| [ios-app-guide](skills/ios-app-guide/) | iOSアプリ開発手順・アーキテクチャガイド | `/ios-app-guide <質問>` |
 
 ## 使用例
 
@@ -39,6 +40,14 @@ iOS/Swift開発を支援するClaude Codeプラグイン。
 /ios-testing 設定画面への遷移をテスト
 ```
 
+### アプリ開発ガイド
+
+```
+/ios-app-guide 新しいiOSアプリの開発手順を教えて
+/ios-app-guide SwiftDataのマイグレーション注意点
+/ios-app-guide ナビバーの透過設定方法
+```
+
 ## 機能詳細
 
 ### ios-coding-rules
@@ -61,6 +70,16 @@ iOS/Swift開発を支援するClaude Codeプラグイン。
 - スクリーンショット撮影
 - 最大5回リトライによる自動修正
 
+### ios-app-guide
+
+- 8フェーズの開発手順と教訓（Filmi実績ベース）
+- MVVM + @Observable アーキテクチャパターン
+- SwiftUI / SwiftData の注意点（マイグレーション、@Query等）
+- デザインシステム構築（DesignTokens、セマンティックカラー、テーマ）
+- ナビバー・タブバー透過の正解パターン
+- Hono + Cloudflare Workers でのAPI連携
+- Maestroテスト自動化
+
 ## MCPサーバー
 
 このプラグインには以下のMCPサーバーが含まれます：
@@ -70,4 +89,4 @@ iOS/Swift開発を支援するClaude Codeプラグイン。
 
 ## バージョン
 
-- v1.3.0
+- v1.4.0
