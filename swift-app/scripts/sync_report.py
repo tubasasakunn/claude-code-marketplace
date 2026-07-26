@@ -44,8 +44,15 @@ def collect_assets(base: Path) -> list[str]:
     return out
 
 
+# アプリではないもの（正本・ライブラリ・バックエンド）
+NOT_APPS = {"swift-base", "ResultKit", "commonzukan-api", "marketing"}
+
+
 def app_dirs(apps: Path) -> list[Path]:
-    return [d for d in sorted(apps.iterdir()) if d.is_dir() and not d.name.startswith(".")]
+    return [
+        d for d in sorted(apps.iterdir())
+        if d.is_dir() and not d.name.startswith(".") and d.name not in NOT_APPS
+    ]
 
 
 def dir_state(base_dir: Path, app_dir: Path) -> str:
