@@ -21,7 +21,7 @@ allowed-tools: Bash, Read, Write, Edit, Grep, Glob, WebSearch
 1. 変更対象を編集する。フィールドと上限：
    app_name 30 / subtitle 30 / promotional_text 170 / description 4000 /
    keywords 100（半角カンマ区切り・空白なし）/ whats_new 4000。
-2. ASO の原則（要点のみ。調査からの文言・画像設計は `/aso` スキルが正本）：
+2. ASO の原則（要点のみ。調査からの文言・画像設計は `/app-store-optimize:aso` スキルが正本）：
    - **同じ語をタイトル・サブタイトル・キーワード欄で重複させない**
      （Apple はフィールド横断で語を組み合わせて索引する）。
    - 競合ブランド名・価格表現（「無料」等）をアプリ名・サブタイトルに入れない

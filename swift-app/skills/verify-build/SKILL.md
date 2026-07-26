@@ -34,7 +34,7 @@ allowed-tools: Bash, Read, Grep
 4. **Linux 等（xcodebuild が無い場合）**：ビルドできないことを明言した上で、代替として
    - 変更 diff（`git diff`）の全ファイルを読み、未定義シンボル・引数ラベル不一致・
      import 漏れ・actor 隔離違反（`@MainActor` API を nonisolated から呼んでいないか）を精査する。
-   - `/audit-conventions` を実行して規約違反が増えていないか確認する。
+   - `/swift-app:audit-conventions` を実行して規約違反が増えていないか確認する。
    - 結果報告に「ビルド未検証（Linux 環境）。マージ前に macOS で /swift-app:verify-build を要実行」と必ず書く。
 
 ## 補足

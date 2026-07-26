@@ -8,7 +8,7 @@ allowed-tools: Read, Edit, Bash, Grep, Glob
 # リリース手順（バージョンアップ → 審査提出 → 自動公開）
 
 新バージョンを App Store に出すまでの運用ランブック。ストア文言・画像の作成は
-`/release-assets`、文字数上限や Secrets の詳細は `release/README.md` が正本。
+`/swift-app:release-assets`、文字数上限や Secrets の詳細は `release/README.md` が正本。
 ここは「どのブランチに何をマージすると何が自動で起きるか」を一望するための入口。
 アプリ固有値（xcodeproj 名・bundle id・連絡先）は `appstore.config.json` を参照。
 
@@ -57,7 +57,7 @@ grep -n "MARKETING_VERSION" <xcodeproj>/project.pbxproj
 
 ## 2. リリース素材（release/<version>/）
 
-`/release-assets` を使う。骨子だけ再掲：
+`/swift-app:release-assets` を使う。骨子だけ再掲：
 
 - 前バージョンを丸ごとコピーして始める：`cp -r release/<prev> release/<new>`。
   **`sync_fastlane_metadata.py` は必要なテキスト＋スクショが全部揃っていないと止まる**

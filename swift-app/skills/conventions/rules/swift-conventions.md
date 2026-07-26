@@ -7,7 +7,7 @@ paths:
 
 新しい Swift / SwiftUI アプリで一貫した品質を保つための骨子。
 コードを書く・直すときはこの規約に揃える。新しいパターンを導入したくなったら、
-まず既存コードに前例がないか探すこと。違反の全走査は `/audit-conventions`。
+まず既存コードに前例がないか探すこと。違反の全走査は `/swift-app:audit-conventions`。
 
 関連規約（同ディレクトリ・Swift を触ると自動読み込み）：
 命名と API 設計は `swift-api-design.md`、並行性は `swift-concurrency.md`、
@@ -109,8 +109,8 @@ SwiftUI は `swiftui-patterns.md`、構造と DI は `swift-architecture.md`、
 
 ## 変更を確定する前に
 
-1. macOS 環境なら `/verify-build` でビルド検証（`.swift` 由来 warning/error = 0 を維持）。
+1. macOS 環境なら `/swift-app:verify-build` でビルド検証（`.swift` 由来 warning/error = 0 を維持）。
    ビルドできない環境では diff 全体のコンパイル整合性レビューで代替し、その旨を明記する。
-2. `/bug-check` で diff を挙動バグ観点（並行性・状態管理・境界値・リソース）で精査する。
-3. `/audit-conventions` で規約違反の混入をチェック。
-4. アーキテクチャ・データモデル・依存・並行性の判断をしたら `/adr` で記録する。
+2. `/swift-app:bug-check` で diff を挙動バグ観点（並行性・状態管理・境界値・リソース）で精査する。
+3. `/swift-app:audit-conventions` で規約違反の混入をチェック。
+4. アーキテクチャ・データモデル・依存・並行性の判断をしたら `/swift-app:adr` で記録する。

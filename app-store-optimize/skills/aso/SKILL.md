@@ -6,9 +6,9 @@ allowed-tools: Bash, Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 
 # ASO プレイブック（調査 → 文言 → 画像 → 計測）
 
-`/release-assets` が「素材をどう作るか（手順）」なら、このスキルは
+`/swift-app:release-assets` が「素材をどう作るか（手順）」なら、このスキルは
 「何を書き・何を見せるか（中身）」を決める。フィールドの文字数上限・
-ファイル配置・CI 反映は `release/README.md` と `/release-assets` が正本。
+ファイル配置・CI 反映は `release/README.md` と `/swift-app:release-assets` が正本。
 アプリ固有値は `appstore.config.json`。
 
 作業は必ず **Phase 1（調査）→ Phase 2（文言）→ Phase 3（画像）→ Phase 4（計測）**
@@ -119,7 +119,7 @@ Phase 1 で選んだ語の割り付け表を調査メモに残し、以下を機
 ## Phase 3：画像（スクショ・アイコン）
 
 生成の実務（`material/` → `scripts/make_store_images.py` → `img/`、サイズ厳守）は
-`/release-assets`。ここでは**構成とコピーの決め方**。構成は `scripts/store_slides.json`。
+`/swift-app:release-assets`。ここでは**構成とコピーの決め方**。構成は `scripts/store_slides.json`。
 
 ### スクショの設計原則
 

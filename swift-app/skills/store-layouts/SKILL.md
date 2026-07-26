@@ -11,7 +11,7 @@ Apple が保証しているのは「プレビュー動画が無ければ最初�
 **最悪ケースは1枚しか見えない**。だから 1 枚目が単独で完結していることが最優先になる。
 
 このスキルは、その 1 枚をどう組むか（構図）に絞って、型・指針・部品・落とし穴を提供する。
-文言そのものの型は `/aso`、提出パイプラインは `/release-assets` の担当。
+文言そのものの型は `/app-store-optimize:aso`、提出パイプラインは `/swift-app:release-assets` の担当。
 
 ## 使いどころ
 
@@ -110,8 +110,8 @@ cp .claude/skills/store-layouts/store_layout_kit.py scripts/
 
 ### 5. 昇格
 
-選んだ型を `release/<version>/img/` の本番画像へ。以降は `/release-assets` と
-`/release-version` の担当。
+選んだ型を `release/<version>/img/` の本番画像へ。以降は `/swift-app:release-assets` と
+`/swift-app:release-version` の担当。
 
 ---
 
@@ -149,8 +149,8 @@ cp .claude/skills/store-layouts/store_layout_kit.py scripts/
 | `store_layout_kit.py` | 描画部品。`scripts/` にコピーして使う |
 | `examples/make_pattern_samples.py` | 44 型すべての組み方の実例（参考実装） |
 
-関連スキル: `/aso`（キーワードと文言）・`/release-assets`（提出素材の用意）・
-`/release-version`（提出と公開の運用）
+関連スキル: `/app-store-optimize:aso`（キーワードと文言）・`/swift-app:release-assets`（提出素材の用意）・
+`/swift-app:release-version`（提出と公開の運用）
 
 ---
 

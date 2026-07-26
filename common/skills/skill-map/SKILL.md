@@ -103,7 +103,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | `/swift-app:release-assets` | App Store 提出用のリリース素材一式（メタデータ .txt とストア画像）を release/<version>/ に用意・更新する。 |
 | `/swift-app:release-version` | 新バージョンとして App Store に出すための一連の手順（バージョン番号上げ → メタデータ → main マージで自動反映＆審査PR → Xcode Cloud ビルド → production マージで審査自動提出 → 通過後に自動公開）をまとめた運用ランブック。 |
 | `/swift-app:store-layouts` | App Store のストア画像を「構図」から設計・制作する。 |
-| `/swift-app:submit-for-review` | ユーザーが「審査提出して」「リリースして」「ship して」と言ったら、この一連を最後まで自動で回す ── 作業ブランチ→main へ PR 作成＆マージ→Xcode Cloud ビルド完成を harness API で待つ→失敗なら修正して最初へ戻る→main→production の審査PRを… |
+| `/swift-app:submit-for-review` | 「審査提出して」「リリースして」「ship して」と言われたら、この一連を最後まで自動で回す ── 作業ブランチ→main へ PR 作成＆マージ→Xcode Cloud ビルド完成を harness API で待つ→失敗なら修正して最初へ戻る→main→production の審査PRをマージ→… |
 | `/swift-app:sync-base` | swift-base の雛形資産（.claude/rules・GitHub Actions・fastlane・ci_scripts・scripts・post・ResultKit）が各アプリでどれだけ古いかを表にし、逆流と配布を判断する。 |
 | `/swift-app:verify-build` | xcodebuild でビルド検証し、.swift 由来の warning / error をベースライン（0 / 0）と比較する。 |
 
@@ -121,7 +121,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | `/ios-app-build:07_watch_review` | App Store の審査結果を監視し、リジェクトに対応し、リリース後のユーザレビューを読んで返信します。 |
 | `/ios-app-build:08_run_pipeline` | アイデア一言を受け取り、コンセプト出しから App Store の審査提出までを一気に走らせる指揮役です。 |
 | `/ios-app-build:concept-crafting` | 漠然としたアイデアを、新しい価値をひとつの言葉で言い当てる「コンセプト」へと磨き上げるためのワークフロー(問いを立てる→ストーリーを設計する→1行に凝縮する→用途に最適化する)とチェックリストを提供します。 |
-| `/ios-app-build:design-crafting` | コンセプト文書(CONCEPT.md)とデザインの基礎嗜好(DESIGN_BASE.md)から、そのアプリ固有のビジュアルデザイン仕様書(DESIGN.md)を作り上げるワークフロー(コンセプトを色・形・動きへ翻訳する→カラー/タイポ/モチーフ/モーション/画面ムード/AppIconを決める→アー… |
+| `/ios-app-build:design-crafting` | コンセプト文書(CONCEPT.md)とデザインの基礎嗜好(${CLAUDE_PLUGIN_ROOT}/skills/design-crafting/DESIGN_BASE.md)から、そのアプリ固有のビジュアルデザイン仕様書(DESIGN.md)を作り上げるワークフロー(コンセプトを色・形・動き… |
 
 ### `app-store-optimize`（4本） — app-store-optimize-workspaceで有効化
 

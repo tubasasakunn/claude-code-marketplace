@@ -94,7 +94,7 @@ paths:
   限定ケースのみ（必ずコメントで理由を説明する）。
 - **新規の `nonisolated(unsafe)` / `@unchecked Sendable` は理由コメント必須**。
   「直列キューで保護」「生成後イミュータブル」など安全性の根拠を書く。
-  既存の意図的な使用箇所を一覧化しておき、`/audit-conventions` で増分を検知する。
+  既存の意図的な使用箇所を一覧化しておき、`/swift-app:audit-conventions` で増分を検知する。
 - **セマフォで async を待たない**。橋渡しは `withCheckedContinuation`
   （continuation は必ず一度だけ resume。タイムアウトを付けるなら id 方式）。
 - Sendable にできない型を「とりあえず `@unchecked Sendable`」で通さない。

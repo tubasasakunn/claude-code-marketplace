@@ -8,8 +8,8 @@ allowed-tools: Grep, Glob, Read, Bash
 # バグ精査（コミット直前）
 
 対象 diff を「コンパイルは通るが挙動が壊れる」バグの観点で精査する。
-スタイル・規約違反は扱わない（それは `/audit-conventions`）。ビルド可否も扱わない
-（それは `/verify-build`）。ここで探すのは**実行時に牙をむくもの**だけ。
+スタイル・規約違反は扱わない（それは `/swift-app:audit-conventions`）。ビルド可否も扱わない
+（それは `/swift-app:verify-build`）。ここで探すのは**実行時に牙をむくもの**だけ。
 
 引数: $ARGUMENTS
 - 無指定: `git diff HEAD`（未コミットの全変更）+ untracked の `.swift`
@@ -151,7 +151,7 @@ allowed-tools: Grep, Glob, Read, Bash
 
 - 変更行だけ見て指摘しない。**呼び出し元と既存の前提を読んでから**言う。
   偽陽性の指摘はレビュー全体の信頼を毀損する。
-- 「規約違反だが挙動は正しい」は報告しない（`/audit-conventions` の領分）。
+- 「規約違反だが挙動は正しい」は報告しない（`/swift-app:audit-conventions` の領分）。
 - 修正まで頼まれていない限り、報告で止める（判断は人間に返す）。
 - 修正まで行った場合は、修正箇所に**バグ台帳コメント**（症状・発火条件・理由）を
   残し、可能なら回帰テストを足す（`.claude/rules/ai-era-coding.md`）。
