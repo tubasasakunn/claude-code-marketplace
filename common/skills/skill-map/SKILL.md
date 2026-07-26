@@ -36,6 +36,32 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 
 スキルが見えないときは、そのリポジトリの `.claude/settings.json` の `enabledPlugins` を疑う。
 
+## 外部プラグイン（この marketplace が参照しているだけ・中身は他人のリポジトリ）
+
+下の自動生成一覧には出ない（`skills/` の実体がここに無いため）。**中身の更新は相手側で行われ、
+`claude plugin marketplace update` で追従する。**
+
+| プラグイン | 出所 | 中身 |
+|---|---|---|
+| `ui-ux-pro-max` | `nextlevelbuilder/ui-ux-pro-max-skill` | UI/UX の大規模リファレンス（7スキル。84スタイル・192配色・22スタック） |
+| `RevenueCat` | `RevenueCat/ai-toolkit` の `revenuecat` | 課金実装一式（16スキル。ペイウォール・購入フロー・テスト） |
+| `revenuecat-play-billing` | 同上の `revenuecat-play-billing` | Google Play Billing 固有 |
+| `frontend-design` | `anthropics/claude-plugins-official` の `plugins/frontend-design` | 視覚デザインの方向づけ |
+| `gopls-lsp` | 同上の `plugins/gopls-lsp` | Go の LSP 連携 |
+| `using-cmux` | `hummer98/using-cmux` | cmux 内での操作 |
+
+他人のプラグインを足すときは `.claude-plugin/marketplace.json` に参照を書くだけでよい
+（コピーしない）:
+
+```json
+{ "name": "x", "source": { "source": "github", "repo": "owner/repo" } }
+{ "name": "y", "source": { "source": "git-subdir", "url": "https://github.com/owner/repo.git",
+                           "path": "plugins/y", "ref": "main" } }
+```
+
+相手の破壊的変更を避けたいときは `"sha": "..."` でピン留めする（今は `ref: main` で追従）。
+新しいプラグインを探すときは `claude-plugins-official`（273本のカタログ）を見る。
+
 ## 場面別の引き方
 
 **新しいアプリを1本作る** → `/ios-app-build:08_run_pipeline` を呼ぶだけ。中で 00〜07 と
