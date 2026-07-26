@@ -108,7 +108,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 59 スキル / 8 プラグイン**
+**全 60 スキル / 8 プラグイン**
 
 ### `common`（10本） — 全リポジトリで有効化
 
@@ -125,7 +125,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | `/common:skill-map` | この marketplace の全スキルの索引と使い分け。 |
 | `/common:talk_to_user` | LINE 越しにユーザへ報告し、質問し、返信を待ちます。 |
 
-### `swift-app`（14本） — 各アプリリポジトリで有効化
+### `swift-app`（15本） — 各アプリリポジトリで有効化
 
 | スキル | 何をするか |
 |---|---|
@@ -134,6 +134,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | `/swift-app:audit-conventions` | コーディング規約（Tokens / Strings / DisplayDate / 強制アンラップ禁止など）への違反をリポジトリ全体から走査して報告する。 |
 | `/swift-app:bug-check` | コミット直前に diff をバグ観点で精査する。 |
 | `/swift-app:capture-screens` | アプリの全画面スクリーンショットを material/screens/ に撮り揃える。 |
+| `/swift-app:codex-app-server-swift` | Codex CLI の app-server（JSON-RPC 2.0 サーバー）を、ChatGPTアカウントのOAuthログイン経由でSwift(iOS/macOS)アプリから使うための知識リファレンス。 |
 | `/swift-app:conventions` | Swift / SwiftUI のコーディング規約の正本（7領域・628行）。 |
 | `/swift-app:icon-crafting` | Icon Composer の `.icon` バンドル（Liquid Glass アプリアイコン）を、GUIアプリを一切開かずスクリプトで生成し、actool でコンパイル検証し、Xcodeプロジェクトへ組み込みます。 |
 | `/swift-app:ios-capabilities` | 最新iOS（現在はiOS 26世代）でサードパーティアプリができること（新API・制約・最低OSバージョン・エンタイトルメント要否・審査上の注意）の調査知識を提供します。 |
