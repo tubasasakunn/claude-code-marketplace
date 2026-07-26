@@ -39,6 +39,62 @@
       "name": "canva",
       "source": "./canva",
       "description": "Canva の AI 画像生成（Dream Lab）をログイン済み Chrome の CDP 操作で CLI から回す。ストア画像・SNS 画像の素材生成に使う。"
+    },
+    {
+      "name": "frontend-design",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/claude-plugins-official.git",
+        "path": "plugins/frontend-design",
+        "ref": "main"
+      },
+      "description": "（外部・Anthropic公式）UI を新規に作る/作り直すときの視覚デザイン指針。テンプレ然としない選択をするための美的方向性とタイポグラフィ。"
+    },
+    {
+      "name": "gopls-lsp",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/claude-plugins-official.git",
+        "path": "plugins/gopls-lsp",
+        "ref": "main"
+      },
+      "description": "（外部・Anthropic公式）Go の LSP（gopls）連携。"
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      },
+      "description": "（外部）UI/UX 設計の大規模リファレンス。50+スタイル・161配色・57フォントペア・99の UX 指針・25種のチャートを10スタックで。"
+    },
+    {
+      "name": "using-cmux",
+      "source": {
+        "source": "github",
+        "repo": "hummer98/using-cmux"
+      },
+      "description": "（外部）cmux ターミナル内での操作。ペイン分割・サブエージェント起動と監視・画面読み取り。"
+    },
+    {
+      "name": "RevenueCat",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/RevenueCat/ai-toolkit.git",
+        "path": "revenuecat",
+        "ref": "main"
+      },
+      "description": "（外部・RevenueCat公式）課金の実装一式。プロジェクト作成・SDK 導入・ペイウォール・エンタイトルメント・購入フロー・テスト・トラブルシュート。"
+    },
+    {
+      "name": "revenuecat-play-billing",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/RevenueCat/ai-toolkit.git",
+        "path": "revenuecat-play-billing",
+        "ref": "main"
+      },
+      "description": "（外部・RevenueCat公式）Google Play Billing 固有の話。プラン変更・価格改定・支払い回復・Webhook。"
     }
   ]
 }
