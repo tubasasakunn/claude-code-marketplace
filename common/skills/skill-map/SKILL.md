@@ -28,7 +28,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | ios-app-build-workspace | `common` + `ios-app-build` |
 | app-store-optimize-workspace | `common` + `app-store-optimize` |
 | sns-marketing-workspace / marketing | `common` + `sns-marketing` |
-| どこでも（user スコープで導入） | `cloudflare` + `canva` |
+| どこでも（user スコープで導入） | `cloudflare` + `canva` + `writing` |
 
 `cloudflare`（Workers / Wrangler / D1 / Durable Objects / Email / Turnstile / web-perf）と
 `canva`（AI 画像生成）は、以前 `~/.claude/skills/` に直接置いていたものを marketplace へ
@@ -86,6 +86,10 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 
 **iOS で何ができるか調べる** → `/swift-app:ios-capabilities`（iOS 26 の能力カタログ）。
 
+**日本語の文章を書く・推敲する** → `/writing:japanese-tech-writing`（技術文書の規範）。
+平坦でおもしろくないと感じたら `/writing:cognitive-rhythm-writing`（緩急の設計）。
+ストア文言・SNS 本文・ADR・README のどれにも効く。
+
 **判断に確信が持てない** → `/common:adversarial-panel`（多モデルで殴り合わせる）。
 **ユーザに聞く・報告する** → `/common:talk_to_user`（LINE）。
 
@@ -104,7 +108,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 57 スキル / 7 プラグイン**
+**全 59 スキル / 8 プラグイン**
 
 ### `common`（10本） — 全リポジトリで有効化
 
@@ -197,6 +201,13 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | スキル | 何をするか |
 |---|---|
 | `/canva:canva-image-gen` | Canva の AI 画像生成（Dream Lab / 旧 Magic Media）を、ログイン済みの普段使い Chrome をブラウザ操作（CDP）して CLI から実行し、画像をダウンロードします。 |
+
+### `writing`（2本） — 全リポジトリ（user スコープ）で有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/writing:cognitive-rhythm-writing` | 説明的な文章に緩急を設計するための規範。 |
+| `/writing:japanese-tech-writing` | 日本語の技術文書・書籍原稿の文章規範。 |
 
 <!-- END GENERATED -->
 

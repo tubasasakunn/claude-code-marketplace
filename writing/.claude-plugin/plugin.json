@@ -1,0 +1,7 @@
+{
+  "name": "writing",
+  "description": "日本語の説明的文章の規範。技術文書・書籍原稿の書き方と、読ませるための緩急（認知モードの切替）の設計。",
+  "version": "1.0.0",
+  "author": { "name": "tubasasakunn" },
+  "homepage": "https://gist.github.com/k16shikano"
+}

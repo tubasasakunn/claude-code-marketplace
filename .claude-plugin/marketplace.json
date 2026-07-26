@@ -41,6 +41,11 @@
       "description": "Canva の AI 画像生成（Dream Lab）をログイン済み Chrome の CDP 操作で CLI から回す。ストア画像・SNS 画像の素材生成に使う。"
     },
     {
+      "name": "writing",
+      "source": "./writing",
+      "description": "日本語の説明的文章の規範。技術文書・書籍原稿の書き方と、読ませるための緩急（認知モードの切替）の設計。k16shikano さんの gist から取り込み。"
+    },
+    {
       "name": "frontend-design",
       "source": {
         "source": "git-subdir",
