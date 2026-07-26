@@ -128,7 +128,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | `/ios-app-build:07_watch_review` | App Store の審査結果を監視し、リジェクトに対応し、リリース後のユーザレビューを読んで返信します。 |
 | `/ios-app-build:08_run_pipeline` | アイデア一言を受け取り、コンセプト出しから App Store の審査提出までを一気に走らせる指揮役です。 |
 | `/ios-app-build:concept-crafting` | 漠然としたアイデアを、新しい価値をひとつの言葉で言い当てる「コンセプト」へと磨き上げるためのワークフロー(問いを立てる→ストーリーを設計する→1行に凝縮する→用途に最適化する)とチェックリストを提供します。 |
-| `/ios-app-build:design-crafting` | コンセプト文書(CONCEPT.md)とデザインの基礎嗜好(${CLAUDE_PLUGIN_ROOT}/skills/design-crafting/DESIGN_BASE.md)から、そのアプリ固有のビジュアルデザイン仕様書(DESIGN.md)を作り上げるワークフロー(コンセプトを色・形・動き… |
+| `/ios-app-build:design-crafting` | コンセプト文書(CONCEPT.md)とデザインの基礎嗜好(DESIGN_BASE.md)から、そのアプリ固有のビジュアルデザイン仕様書(DESIGN.md)を作り上げるワークフロー(コンセプトを色・形・動きへ翻訳する→カラー/タイポ/モチーフ/モーション/画面ムード/AppIconを決める→アー… |
 
 ### `app-store-optimize`（4本） — app-store-optimize-workspaceで有効化
 
