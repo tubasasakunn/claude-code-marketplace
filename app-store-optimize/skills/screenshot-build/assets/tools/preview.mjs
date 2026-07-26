@@ -27,6 +27,7 @@ const USAGE = `usage: node tools/preview.mjs <out ディレクトリ> [オプシ
   --app   <名前>   アプリ名
   --sub   <文言>   サブタイトル
   --icon  <パス>   アプリアイコン
+  --note  <文言>   そのセットの狙い（案を比べるときに書く）
   -o      <パス>   出力先（既定: preview.html）
 
 セットは複数渡せる。オプションは直前のセットに効く。
@@ -53,6 +54,7 @@ for (let i = 0; i < args.length; i++) {
   if (args[i] === '--app') { opt('app', args[++i]); continue; }
   if (args[i] === '--sub') { opt('sub', args[++i]); continue; }
   if (args[i] === '--icon') { opt('icon', args[++i]); continue; }
+  if (args[i] === '--note') { opt('note', args[++i]); continue; }
   if (args[i].startsWith('-')) { console.error(`知らないオプション: ${args[i]}\n\n${USAGE}`); process.exit(1); }
   const dir = args[i];
   if (!fs.existsSync(dir)) { console.error(`ディレクトリが無い: ${dir}`); process.exit(1); }
@@ -92,7 +94,10 @@ for (const set of sets) {
   const h = Number(probe.match(/pixelHeight:\s*(\d+)/)[1]);
   set.landscape = w > h;
   set.size = `${w}×${h}`;
-  set.shots = files.map((f) => shrink(path.join(dir, f), set.landscape ? 720 : 520));
+  // 案を並べるほど 1 枚を小さくする。3 案 × 4 枚を 520px で埋めると 2.7MB になり、
+  // Artifact として重すぎた。
+  const px = set.landscape ? (sets.length > 2 ? 560 : 720) : (sets.length > 2 ? 420 : 520);
+  set.shots = files.map((f) => shrink(path.join(dir, f), px));
   set.icon = set.icon ? pngB64(set.icon, 160) : null;
   console.log(`${set.label}  ${files.length} 枚  ${set.size}${set.landscape ? '（横向き）' : ''}`);
 }
@@ -121,6 +126,7 @@ const section = (s) => `
       <h2>${s.label}</h2>
       <span class="meta">${s.shots.length} 枚 ・ ${s.size}${s.landscape ? ' ・ 横向き' : ''}</span>
     </div>
+    ${s.note ? `<p class="aim">${s.note}</p>` : ''}
 
     <div class="stalls">
       <div class="stall">
@@ -220,6 +226,7 @@ const html = `<title>ストア画像プレビュー</title>
               padding-bottom:12px; border-bottom:1px solid var(--rule); }
   .set-head h2 { margin:0; font-size:21px; font-weight:800; letter-spacing:-.03em; }
   .set-head .meta { font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:12px; color:var(--muted); }
+  .aim { margin:-6px 0 0; max-width:70ch; font-size:14px; color:var(--muted); }
 
   .stalls { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:44px 36px; justify-items:center; }
   .stall { display:flex; flex-direction:column; gap:12px; max-width:412px; }

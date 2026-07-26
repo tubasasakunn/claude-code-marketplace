@@ -285,6 +285,16 @@ def main():
     png = outdir / f'{args.name}.png'
     Image.fromarray(frame, 'RGBA').save(png, optimize=True)
 
+    # 端末本体（不透明な部分）の外接矩形。画面ではなく**本体**をキャンバスに
+    # 合わせたいときに要る（中央に置く、下端を揃える、など）。
+    ys, xs = np.where(alpha > 8)
+    body = [int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())]
+
+    # 四隅から測った画面の寸法。表示幅から w を逆算するのに使う。
+    #   w = 欲しい画面幅 / (screen.w / size[0])
+    sw = float(np.hypot(corners[1][0] - corners[0][0], corners[1][1] - corners[0][1]))
+    sh = float(np.hypot(corners[2][0] - corners[1][0], corners[2][1] - corners[1][1]))
+
     meta = {
         'name': args.name,
         'src': str(pathlib.Path(args.src).name),
@@ -292,6 +302,10 @@ def main():
         'key': '#%02X%02X%02X' % tuple(int(v) for v in key),
         # 左上 → 右上 → 右下 → 左下。size の座標系。
         'corners': corners,
+        # 画面の幅・高さ（四隅の実測）。表示幅から w を逆算するとき使う。
+        'screen': [round(sw, 1), round(sh, 1)],
+        # 端末本体の外接矩形 [x0, y0, x1, y1]
+        'body': body,
     }
     (outdir / f'{args.name}.json').write_text(
         json.dumps(meta, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
