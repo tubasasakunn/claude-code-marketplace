@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "tubasasakunn-marketplace": {
+      "source": { "source": "github", "repo": "tubasasakunn/claude-code-marketplace" }
+    }
+  },
+  "enabledPlugins": {
+    "common@tubasasakunn-marketplace": true
+  }
+}
