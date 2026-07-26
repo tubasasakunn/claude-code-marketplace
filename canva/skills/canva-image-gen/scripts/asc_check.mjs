@@ -1,0 +1,10 @@
+import { chromium } from 'playwright-core';
+const b = await chromium.connectOverCDP('http://localhost:9222');
+const ctx = b.contexts()[0];
+let page = ctx.pages().find(p=>/appstoreconnect\.apple\.com/.test(p.url())) || await ctx.newPage();
+await page.goto('https://appstoreconnect.apple.com/apps',{waitUntil:'domcontentloaded',timeout:30000}).catch(e=>console.log('nav',e.message));
+await page.waitForTimeout(4000);
+const url=page.url();
+console.log('ASC url:', url.slice(0,80));
+console.log('logged in:', !/idmsa|signin|auth/.test(url));
+await b.close().catch(()=>{});

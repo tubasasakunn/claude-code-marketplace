@@ -27,7 +27,12 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | アプリリポジトリ（hioto / hanasu / mamezukan …） | `common` + `swift-app` |
 | ios-app-build-workspace | `common` + `ios-app-build` |
 | app-store-optimize-workspace | `common` + `app-store-optimize` |
-| sns-marketing-workspace | `common` + `sns-marketing` |
+| sns-marketing-workspace / marketing | `common` + `sns-marketing` |
+| どこでも（user スコープで導入） | `cloudflare` + `canva` |
+
+`cloudflare`（Workers / Wrangler / D1 / Durable Objects / Email / Turnstile / web-perf）と
+`canva`（AI 画像生成）は、以前 `~/.claude/skills/` に直接置いていたものを marketplace へ
+移した。リポジトリを問わず使うので user スコープで入れてある。
 
 スキルが見えないときは、そのリポジトリの `.claude/settings.json` の `enabledPlugins` を疑う。
 
@@ -73,15 +78,17 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 45 スキル / 5 プラグイン**
+**全 57 スキル / 7 プラグイン**
 
-### `common`（8本） — 全リポジトリで有効化
+### `common`（10本） — 全リポジトリで有効化
 
 | スキル | 何をするか |
 |---|---|
 | `/common:adversarial-panel` | Run a multi-model adversarial mutual review with facilitator synthesis — the "Fable 5-style" metacognition pattern, reproducible on Opus or any Claud… |
 | `/common:cloud-routines` | Claude Code の Routines（クラウド上でスケジュール/API/GitHub イベントにより自動実行されるエージェント）の作成・管理・設計を支援します。 |
 | `/common:commit` | 現在の変更を確認し、全てステージングして日本語のConventional Commitsでコミット。 |
+| `/common:find-skills` | Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or … |
+| `/common:new-routine-site` | ~/workspace/routine 配下に、Claude Code Routine が定期実行でコンテンツを追加する新しいサイトを 0 から立ち上げます（Hono+Vite+bun+Cloudflare Workers、xxx.basaapp.com、記事台帳による重複防止、cloud rou… |
 | `/common:plugin-guide` | Claude Codeプラグインの作成、インストール、管理について説明します。 |
 | `/common:push` | 現在のブランチをリモートにpush。 |
 | `/common:skill-creator` | Claude Code用のスキルを作成・修正します。 |
@@ -144,6 +151,26 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | `/sns-marketing:sns-post` | TikTok / Lemon8 向けの「複数画像（カルーセル）投稿」を新規に1本作る。 |
 | `/sns-marketing:tiktok-post` | Post a photo carousel (multiple images) + caption + hashtags to TikTok on a USB-debugging Android phone via adb UI automation. Use when the user want… |
 | `/sns-marketing:tone-post` | Tone（メンズメイク診断アプリ / target/mensmakeupadvisor）の TikTok・Lemon8 向けカルーセル画像投稿を1本作って実際に公開する。 |
+
+### `cloudflare`（9本） — 全リポジトリ（user スコープ）で有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/cloudflare:agents-sdk` | Build AI agents on Cloudflare Workers using the Agents SDK. Load when creating stateful agents, durable workflows, real-time WebSocket apps, schedule… |
+| `/cloudflare:cloudflare` | Comprehensive Cloudflare platform skill covering Workers, Pages, storage (KV, D1, R2), AI (Workers AI, Vectorize, Agents SDK), feature flags (Flagshi… |
+| `/cloudflare:cloudflare-email-service` | Send and receive transactional emails with Cloudflare Email Service (Email Sending + Email Routing). Use when building email sending (Workers binding… |
+| `/cloudflare:durable-objects` | Create and review Cloudflare Durable Objects. Use when building stateful coordination (chat rooms, multiplayer games, booking systems), implementing … |
+| `/cloudflare:sandbox-sdk` | Build sandboxed applications for secure code execution. Load when building AI code execution, code interpreters, CI/CD systems, interactive dev envir… |
+| `/cloudflare:turnstile-spin` | Set up Cloudflare Turnstile end-to-end in a project — scan the codebase, create the widget via the Cloudflare API, deploy the managed siteverify Work… |
+| `/cloudflare:web-perf` | Analyzes web performance using Chrome DevTools MCP. Measures Core Web Vitals (LCP, INP, CLS) and supplementary metrics (FCP, TBT, Speed Index), ident… |
+| `/cloudflare:workers-best-practices` | Reviews and authors Cloudflare Workers code against production best practices. Load when writing new Workers, reviewing Worker code, configuring wran… |
+| `/cloudflare:wrangler` | Cloudflare Workers CLI for deploying, developing, and managing Workers, KV, R2, D1, Vectorize, Hyperdrive, Workers AI, Containers, Queues, Workflows,… |
+
+### `canva`（1本） — 全リポジトリ（user スコープ）で有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/canva:canva-image-gen` | Canva の AI 画像生成（Dream Lab / 旧 Magic Media）を、ログイン済みの普段使い Chrome をブラウザ操作（CDP）して CLI から実行し、画像をダウンロードします。 |
 
 <!-- END GENERATED -->
 

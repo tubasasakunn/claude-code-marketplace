@@ -1,0 +1,6 @@
+{
+  "name": "cloudflare",
+  "description": "Cloudflare 開発の公式スキル群。Workers / Wrangler / D1 / KV / R2 / Durable Objects / Agents SDK / Sandbox SDK / Email / Turnstile / Web パフォーマンス。",
+  "version": "2.0.0",
+  "author": { "name": "tubasasakunn" }
+}

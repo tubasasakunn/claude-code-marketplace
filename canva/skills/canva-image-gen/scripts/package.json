@@ -1,0 +1,16 @@
+{
+  "name": "mcp",
+  "version": "1.0.0",
+  "description": "普段ログインしている Chrome プロファイルをそのまま使って自動操作するための最小構成。 Chrome をリモートデバッグ付きで起動し、Playwright を CDP で接続する方式。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "glob": "^13.0.6",
+    "playwright-core": "^1.60.0"
+  }
+}

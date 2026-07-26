@@ -29,6 +29,16 @@
       "name": "sns-marketing",
       "source": "./sns-marketing",
       "description": "TikTok / Lemon8 のカルーセル投稿と宣伝動画。デザイン正本・素材生成テクニック・実投稿・日次運用パイプライン。"
+    },
+    {
+      "name": "cloudflare",
+      "source": "./cloudflare",
+      "description": "Cloudflare 開発の公式スキル群。Workers / Wrangler / D1 / KV / R2 / Durable Objects / Agents SDK / Sandbox SDK / Email / Turnstile / Web パフォーマンス。"
+    },
+    {
+      "name": "canva",
+      "source": "./canva",
+      "description": "Canva の AI 画像生成（Dream Lab）をログイン済み Chrome の CDP 操作で CLI から回す。ストア画像・SNS 画像の素材生成に使う。"
     }
   ]
 }

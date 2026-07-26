@@ -16,7 +16,8 @@ BEGIN = "<!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で�
 END = "<!-- END GENERATED -->"
 
 # 表示順（プラグインの意味的な順序。marketplace.json の順と揃える）
-ORDER = ["common", "swift-app", "ios-app-build", "app-store-optimize", "sns-marketing"]
+ORDER = ["common", "swift-app", "ios-app-build", "app-store-optimize", "sns-marketing",
+         "cloudflare", "canva"]
 
 WHERE = {
     "common": "全リポジトリ",
@@ -24,6 +25,8 @@ WHERE = {
     "ios-app-build": "ios-app-build-workspace",
     "app-store-optimize": "app-store-optimize-workspace",
     "sns-marketing": "sns-marketing-workspace",
+    "cloudflare": "全リポジトリ（user スコープ）",
+    "canva": "全リポジトリ（user スコープ）",
 }
 
 

@@ -1,0 +1,11 @@
+import { chromium } from 'playwright-core';
+import fs from 'fs';
+const b = await chromium.connectOverCDP('http://localhost:9222');
+const ctx = b.contexts()[0];
+let page = ctx.pages().find(p=>/appstoreconnect\.apple\.com/.test(p.url())) || await ctx.newPage();
+await page.goto('https://appstoreconnect.apple.com/apps/6790113283/ci',{waitUntil:'networkidle',timeout:35000}).catch(()=>{});
+await page.waitForTimeout(8000);
+fs.writeFileSync('/tmp/asc_seiza_ci.png', await page.screenshot({fullPage:false}));
+const txt = await page.evaluate(()=>(document.body.innerText||'').replace(/\s+/g,' ').slice(0,500));
+console.log('body text:', txt);
+await b.close().catch(()=>{});
