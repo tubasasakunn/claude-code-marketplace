@@ -108,7 +108,7 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 60 スキル / 8 プラグイン**
+**全 61 スキル / 8 プラグイン**
 
 ### `common`（10本） — 全リポジトリで有効化
 
@@ -161,13 +161,14 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | `/ios-app-build:concept-crafting` | 漠然としたアイデアを、新しい価値をひとつの言葉で言い当てる「コンセプト」へと磨き上げるためのワークフロー(問いを立てる→ストーリーを設計する→1行に凝縮する→用途に最適化する)とチェックリストを提供します。 |
 | `/ios-app-build:design-crafting` | コンセプト文書(CONCEPT.md)とデザインの基礎嗜好(DESIGN_BASE.md)から、そのアプリ固有のビジュアルデザイン仕様書(DESIGN.md)を作り上げるワークフロー(コンセプトを色・形・動きへ翻訳する→カラー/タイポ/モチーフ/モーション/画面ムード/AppIconを決める→アー… |
 
-### `app-store-optimize`（4本） — app-store-optimize-workspaceで有効化
+### `app-store-optimize`（5本） — app-store-optimize-workspaceで有効化
 
 | スキル | 何をするか |
 |---|---|
 | `/app-store-optimize:aso` | ASO（App Store 最適化）の観点で「何を調査し、どんな文言・画像にするか」を決めるプレイブック。 |
 | `/app-store-optimize:aso-appstore-screenshots` | Generate high-converting App Store screenshots by analyzing your app's codebase, discovering core benefits, and creating ASO-optimized screenshot ima… |
 | `/app-store-optimize:review-reply` | リリース後のユーザレビューを読み、返信し、そこから ASO を直す。 |
+| `/app-store-optimize:screenshot-build` | App Store のストアスクリーンショットを HTML+CSS で組み、Playwright で PNG に書き出すための道具一式とサンプル。 |
 | `/app-store-optimize:screenshot-crafting` | App Storeのストアスクリーンショット一式（画像セット）を設計・制作するためのワークフローと知識（Apple公式仕様、ストーリーボード3幕構成、レイアウトパターン、押させる日本語コピーの型、審査リジェクト回避、ASC API/fastlane自動化）を提供します。 |
 
 ### `sns-marketing`（8本） — sns-marketing-workspaceで有効化

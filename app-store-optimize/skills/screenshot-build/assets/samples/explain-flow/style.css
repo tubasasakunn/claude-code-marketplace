@@ -1,0 +1,108 @@
+/*
+ * explain-flow — 横向き。2 台の端末を矢印でつなぎ、右に見出しと ☑ を置く。
+ *
+ * ★ この型だけキャンバスが横向き（2868×1320）。
+ *
+ * 横向きにすると **App Store の検索結果には 1 枚しか出ない**（縦なら 3 枚）。
+ * しかも縦横の混在はできないので、採用するとそのアプリの全枚が横向きになる。
+ * 「検索結果での露出を捨てて、1 枚あたりの説明力を取る」判断になる。
+ * 説明が要らないアプリなら縦の型を選ぶ方がよい。
+ *
+ * 骨は _lib/base.css。ここは色と大きさ、そして横向き用の位置。
+ */
+
+:root {
+  --paper: #F4F2EE;
+  --ink: #221E1A;
+  --sub: #6F655C;
+  --marker: #A8C5A0;       /* 蛍光ペン。manifest の afternoon */
+  --accent: #C25A33;
+  --badge-bg: #221E1A;
+  --badge-ink: #F4F2EE;
+}
+
+.shot {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* ── 右半分がテキスト ─────────────────────────── */
+/* 縦向きの型と違い、左右で役割を分ける。左＝端末、右＝言葉。 */
+
+.head {
+  left: 1980px;
+  right: 110px;
+  top: 300px;
+}
+
+.head h1 {
+  font-size: 88px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -.04em;
+}
+
+/* 蛍光ペン。下 4 割だけ塗ると、上からなぞった感じになる。 */
+.head h1 mark {
+  background: linear-gradient(transparent 56%, var(--marker) 56%);
+  color: inherit;
+  padding: 0 .04em;
+}
+
+.head .sub {
+  margin-top: 22px;
+  font-size: 40px;
+  font-weight: 500;
+  color: var(--sub);
+}
+
+.checklist {
+  left: 1980px;
+  right: 110px;
+  top: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checklist li {
+  gap: 22px;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+}
+
+.checklist li::before {
+  width: 54px;
+  height: 54px;
+  border-width: 5px;
+  border-radius: 10px;
+}
+
+/* ── 端末と矢印 ───────────────────────────────── */
+
+.mock { filter: drop-shadow(0 36px 64px rgba(60, 40, 25, .26)); }
+
+.arrow .line { stroke: var(--ink); }
+.arrow .tip  { fill: var(--ink); }
+
+.badge {
+  width: 300px;
+  height: 300px;
+  background: var(--badge-bg);
+  color: var(--badge-ink);
+  font-size: 50px;
+  font-weight: 800;
+  line-height: 1.26;
+  letter-spacing: -.03em;
+  box-shadow: 0 20px 40px rgba(60, 40, 25, .3);
+}
+
+/* ── プレビュー ───────────────────────────────── */
+/* 横長を横に並べると 1 画面に入らないので、この型だけ縦に積む。 */
+
+body.preview #sheet {
+  flex-direction: column;
+  gap: 28px;
+  zoom: .3;
+}

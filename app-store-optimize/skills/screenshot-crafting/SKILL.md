@@ -23,6 +23,11 @@ description: App Storeのストアスクリーンショット一式（画像セ�
 6. **[05-review-safety.md](chapters/05-review-safety.md)** — 審査リジェクト回避。Guideline 2.3系の地雷と個人開発者が踏む罠。
 7. **[06-automation.md](chapters/06-automation.md)** — 自動化。撮影→合成→ASC API/fastlaneでの提出パイプライン。
 
+**設計が固まったら実際の画像にする工程は `/app-store-optimize:screenshot-build` が受け持つ。**
+HTML+CSS で組んで Playwright で書き出す道具一式（端末モックへの射影変換、UI の切り出し、
+複数枚にまたがる構成、画面上で位置を合わせるエディタ）とサンプルがそちらにある。
+AI 生成で作るなら `/app-store-optimize:aso-appstore-screenshots`。
+
 補助ドキュメント:
 - **[CHECKLIST.md](CHECKLIST.md)** — 提出前の最終検証チェックリスト（仕様・デザイン・審査）
 - **[FAQ.md](FAQ.md)** — 頻出の判断（横向き？何枚？フレーム有無？差し替え方法？）

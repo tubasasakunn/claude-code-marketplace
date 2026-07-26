@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>flat-spread — App Store screenshots</title>
+<link rel="stylesheet" href="../_lib/base.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!--
+  そのまま開くと実寸（1320×2868 ×枚数）で縦に並ぶ。
+  ?preview=1 で縮小して横並び、?edit=1 で位置合わせのエディタが出る。
+-->
+<main id="sheet"></main>
+<script src="../mockup/index.js"></script>
+<script src="../_lib/mockup.js"></script>
+<script src="../_lib/breakout.js"></script>
+<script src="content.js"></script>
+<!-- エディタが書き出す位置の上書き。無ければ 404 になるだけで content.js の値が使われる。 -->
+<script src="layout.js" onerror="void 0"></script>
+<script src="../_lib/compose.js"></script>
+<script src="../_lib/editor.js"></script>
+</body>
+</html>

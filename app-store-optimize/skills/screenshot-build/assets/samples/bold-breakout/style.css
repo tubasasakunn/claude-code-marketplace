@@ -1,0 +1,73 @@
+/*
+ * bold-breakout — 濃いベタ背景 ＋ 極太見出し ＋ パースのついた端末 ＋ 飛び出す UI
+ *
+ * 骨は _lib/base.css。ここは色と大きさだけ。
+ */
+
+:root {
+  --bg-from: #E4794A;
+  --bg-via: #C8542C;
+  --bg-to: #8E3418;
+  --ink: #FFFFFF;
+  --sub: rgba(255, 255, 255, .82);
+  --badge-bg: #2F6B5C;
+  --badge-ink: #FFFFFF;
+}
+
+.shot {
+  color: var(--ink);
+  background: linear-gradient(158deg, var(--bg-from) 0%, var(--bg-via) 44%, var(--bg-to) 100%);
+}
+
+.shot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(110% 52% at 16% -6%, rgba(255, 255, 255, .26), transparent 60%);
+}
+
+.head h1 {
+  font-size: 118px;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -.045em;
+  text-shadow: 0 6px 30px rgba(60, 18, 4, .22);
+}
+
+.head .sub {
+  margin-top: 32px;
+  font-size: 50px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -.01em;
+  color: var(--sub);
+}
+
+.v-hero .head h1 { font-size: 142px; line-height: 1.12; }
+
+.wordmark { top: 690px; gap: 30px; }
+.wordmark .mark {
+  width: 134px; height: 134px; border-radius: 30px;
+  box-shadow: 0 18px 36px rgba(60, 18, 4, .28);
+}
+.wordmark span { font-size: 80px; font-weight: 700; letter-spacing: .01em; }
+
+.mock { filter: drop-shadow(0 60px 80px rgba(50, 14, 2, .42)); }
+
+.breakout {
+  border-radius: 26px;
+  box-shadow: 0 40px 70px rgba(50, 14, 2, .34), 0 8px 20px rgba(50, 14, 2, .2);
+}
+
+.badge {
+  width: 384px;
+  height: 384px;
+  background: var(--badge-bg);
+  color: var(--badge-ink);
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1.24;
+  letter-spacing: -.03em;
+  box-shadow: 0 28px 56px rgba(50, 14, 2, .36);
+}

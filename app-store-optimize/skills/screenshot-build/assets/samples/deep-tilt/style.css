@@ -1,0 +1,77 @@
+/*
+ * deep-tilt — 寝かせた端末を目一杯。暗い地に置いて画面だけを光らせる。
+ *
+ * iphone-lay（横倒し）を主役にした型。画面の中身は端末の向きに沿って寝るので
+ * 細かい UI は読めない。読ませるのではなく「映像・写真が主役」だと一目で伝える枚に使う。
+ * 逆に、文字や表が主眼のアプリには向かない。
+ *
+ * 骨は _lib/base.css。ここは色と大きさだけ。
+ */
+
+:root {
+  --bg: #17161C;
+  --bg-lift: #2A2733;
+  --ink: #FFFFFF;
+  --sub: rgba(255, 255, 255, .68);
+  --accent: #E07B54;
+  --badge-bg: #E07B54;
+  --badge-ink: #17161C;
+}
+
+.shot {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+/* 端末の背後だけ地を持ち上げる。暗い地に暗い端末だと輪郭が消えるため。 */
+.shot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(80% 42% at 50% 58%, var(--bg-lift), transparent 70%);
+}
+
+.head h1 {
+  font-size: 118px;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -.045em;
+}
+
+.head h1 em { font-style: normal; color: var(--accent); }
+
+.head .sub {
+  margin-top: 30px;
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--sub);
+}
+
+.wordmark { top: 700px; gap: 28px; }
+.wordmark .mark {
+  width: 130px; height: 130px; border-radius: 29px;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, .5);
+}
+.wordmark span { font-size: 78px; font-weight: 700; }
+
+/* 暗い地では影が効かないので、代わりに縁が光るように強めの影で浮かせる。 */
+.mock { filter: drop-shadow(0 50px 100px rgba(0, 0, 0, .7)); }
+
+.breakout {
+  border-radius: 26px;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, .6), 0 8px 20px rgba(0, 0, 0, .4);
+}
+
+.badge {
+  width: 376px;
+  height: 376px;
+  background: var(--badge-bg);
+  color: var(--badge-ink);
+  font-size: 62px;
+  font-weight: 800;
+  line-height: 1.24;
+  letter-spacing: -.03em;
+  box-shadow: 0 26px 52px rgba(0, 0, 0, .55);
+}

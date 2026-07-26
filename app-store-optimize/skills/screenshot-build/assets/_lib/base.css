@@ -1,0 +1,153 @@
+/*
+ * 全テンプレート共通の骨。
+ *
+ * ここには「どう置くか」の仕組みだけを書く。色・書体・大きさ・位置は各テンプレートの
+ * style.css と content.js が決める。新しい型を足すときは、このファイルを読んでから
+ * 差分だけ書けばよい。
+ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --w: 1320px;
+  --h: 2868px;
+  --pad: 96px;
+}
+
+body {
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+  font-feature-settings: "palt" 1;      /* 日本語の約物アキを詰める */
+  -webkit-font-smoothing: antialiased;
+  background: #E9E6E2;
+}
+
+#sheet { display: flex; flex-direction: column; align-items: flex-start; }
+
+/* ── キャンバス ───────────────────────────────── */
+
+.shot {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;                     /* またぎのはみ出しはここで切れる */
+}
+
+/* ── 見出し ───────────────────────────────────── */
+
+.head {
+  position: absolute;
+  z-index: 4;                           /* 端末より手前。文字が隠れるのが一番まずい */
+  left: var(--pad);
+  right: var(--pad);
+  top: 170px;
+}
+
+.head h1 span { display: block; }       /* 改行位置は content.js の配列で決める */
+
+/* ── ワードマーク ─────────────────────────────── */
+
+.wordmark {
+  position: absolute;
+  z-index: 4;
+  left: var(--pad);
+  display: flex;
+  align-items: center;
+}
+
+/* ── 端末モックアップ ─────────────────────────── */
+/* .mock-shot は matrix3d で画面の四隅へ射影される（_lib/mockup.js）。
+   フレームを手前に重ねるので、変形が数 px ずれてもベゼルの内側で吸収される。 */
+
+.mock { position: absolute; z-index: 2; }
+
+.mock-shot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  backface-visibility: hidden;          /* 変形時のエッジのちらつきを抑える */
+  /* 実機の画面と同じだけ角を丸める。矩形のままだと四隅がモックの角丸からはみ出し、
+     明るいスクリーンショットのときに白い三角が覗く。縦横比 1:2.17 なので水平/垂直
+     別指定（14% of width ≒ 6.4% of height）。 */
+  border-radius: 14% / 6.4%;
+}
+
+.mock-frame { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* ── 飛び出す UI 片 ───────────────────────────── */
+
+.breakout {
+  position: absolute;
+  z-index: 3;
+  background-repeat: no-repeat;
+}
+
+/* ── ☑ の箇条書き ─────────────────────────────── */
+
+.checklist {
+  position: absolute;
+  z-index: 4;
+  left: var(--pad);
+  right: var(--pad);
+  list-style: none;
+}
+
+.checklist li { display: flex; align-items: center; }
+
+/* チェック枠は CSS で描く。絵文字の ☑ は環境で字形が変わるうえ、
+   線の太さを見出しに合わせられない。 */
+.checklist li::before {
+  content: '';
+  flex: none;
+  border: solid currentColor;
+  background: no-repeat center / 62% auto;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12.5l6 6 12-13'/%3E%3C/svg%3E");
+}
+
+/* ── 手描き風の矢印 ───────────────────────────── */
+/* SVG は枚の全面に敷いてある。座標はキャンバスそのままで書ける。 */
+
+.arrow {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* 線は塗らない。曲線に fill が入ると弦との間が塗り潰される。 */
+.arrow .line { fill: none; }
+.arrow .tip { stroke: none; }
+
+/* ── 円形バッジ ───────────────────────────────── */
+
+.badge {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  place-content: center;
+  border-radius: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+}
+
+.badge span { display: block; }
+
+/* ── プレビュー（?preview=1）──────────────────── */
+/* 検索結果の並びを確認するための縮小表示。zoom はレイアウトごと縮むので
+   実寸のまま組んだ CSS を触らずに済む。書き出しには影響しない。 */
+
+body.preview { padding: 40px; }
+
+body.preview #sheet {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 44px;
+  zoom: .22;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

@@ -1,0 +1,81 @@
+/*
+ * flat-spread — 正面フレームを斜めに傾け、2 枚にまたがらせる（Reflectly 型）
+ *
+ * bold-breakout との違いは端末の作り方。あちらは奥へ倒れるパース付きのモックを使うが、
+ * こちらは**正面のモックを単純に回転させる**だけなので、画面の中身が歪まない。
+ * 傾けても UI が読めるので、見せたい画面がある枚に向く。
+ *
+ * 骨は _lib/base.css。ここは色と大きさだけ。
+ */
+
+:root {
+  --bg: #6E62C6;
+  --bg-deep: #4B3F9E;
+  --ink: #FFFFFF;
+  --sub: rgba(255, 255, 255, .8);
+  --badge-bg: #FFFFFF;
+  --badge-ink: #4B3F9E;
+}
+
+.shot {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+/* 背景に大きな円弧を 1 枚だけ入れる。ベタ塗りのままだと平板に見えるが、
+   グラデーションを重ねると量産テンプレの顔になるので、形で変化をつける。 */
+.shot::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: -30%;
+  top: -46%;
+  width: 160%;
+  height: 108%;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  opacity: .55;
+}
+
+.head h1 {
+  font-size: 116px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -.04em;
+}
+
+.head .sub {
+  margin-top: 30px;
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--sub);
+}
+
+.wordmark { top: 800px; gap: 28px; }
+.wordmark .mark {
+  width: 128px; height: 128px; border-radius: 29px;
+  box-shadow: 0 18px 36px rgba(30, 20, 70, .34);
+}
+.wordmark span { font-size: 76px; font-weight: 700; }
+
+/* 傾けた端末は影も一緒に回る。drop-shadow なら形に沿うので box-shadow は使わない。 */
+.mock { filter: drop-shadow(0 50px 90px rgba(28, 18, 66, .45)); }
+
+.breakout {
+  border-radius: 28px;
+  box-shadow: 0 40px 70px rgba(28, 18, 66, .34), 0 8px 20px rgba(28, 18, 66, .2);
+}
+
+/* 白抜きのバッジ。背景が濃い紫なので、反転させた方が締まる。 */
+.badge {
+  width: 372px;
+  height: 372px;
+  background: var(--badge-bg);
+  color: var(--badge-ink);
+  font-size: 60px;
+  font-weight: 800;
+  line-height: 1.24;
+  letter-spacing: -.03em;
+  box-shadow: 0 26px 52px rgba(28, 18, 66, .38);
+}

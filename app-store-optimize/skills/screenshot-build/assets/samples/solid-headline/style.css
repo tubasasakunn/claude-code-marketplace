@@ -1,0 +1,78 @@
+/*
+ * solid-headline — 淡い地に濃い文字。静かな型。
+ *
+ * bold-breakout の裏返しで、背景を明るくし、端末を素直に正面から見せる。
+ * 飛び出しもまたぎも使わず、画面そのものを読ませたいアプリ向け。
+ * 端末は CSS で描かず、他と同じく実写モックへ流し込む。
+ *
+ * 骨は _lib/base.css。ここは色と大きさだけ。
+ */
+
+:root {
+  --paper: #F7F4F0;
+  --paper-deep: #EFE8E0;
+  --ink: #2A2520;
+  --sub: #7C6F65;
+  --accent: #C25A33;
+  --badge-bg: #2A2520;
+  --badge-ink: #F7F4F0;
+}
+
+.shot {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* 下半分だけわずかに沈ませて端末を浮かせる。全面グラデにすると安く見える。 */
+.shot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, transparent 42%, var(--paper-deep) 100%);
+}
+
+.head h1 {
+  font-size: 116px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -.045em;
+}
+
+/* 見出しの一部だけ色を差す。濃い地の型と違い、白抜きが使えないぶんここで締める。 */
+.head h1 em { font-style: normal; color: var(--accent); }
+
+.head .sub {
+  margin-top: 30px;
+  font-size: 46px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--sub);
+}
+
+.wordmark { top: 780px; gap: 28px; }
+.wordmark .mark {
+  width: 126px; height: 126px; border-radius: 28px;
+  box-shadow: 0 14px 30px rgba(70, 45, 30, .16);
+}
+.wordmark span { font-size: 74px; font-weight: 700; }
+
+/* 明るい地なので影は浅く。濃くすると汚れて見える。 */
+.mock { filter: drop-shadow(0 40px 64px rgba(70, 45, 30, .22)); }
+
+.breakout {
+  border-radius: 26px;
+  box-shadow: 0 30px 56px rgba(70, 45, 30, .2), 0 6px 16px rgba(70, 45, 30, .12);
+}
+
+.badge {
+  width: 348px;
+  height: 348px;
+  background: var(--badge-bg);
+  color: var(--badge-ink);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.26;
+  letter-spacing: -.03em;
+  box-shadow: 0 22px 44px rgba(70, 45, 30, .28);
+}
