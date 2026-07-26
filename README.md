@@ -1,138 +1,53 @@
-# Claude Code Marketplace
+# claude-code-marketplace
 
-Claude Code プラグインのマーケットプレイスです。
+iOS アプリ量産パイプラインの Claude Code スキル群。**全スキルの正本はこのリポジトリ**で、
+各リポジトリ（アプリ・workspace）はセッション開始時に pull して取り込む。
 
-## インストール方法
+## プラグイン
 
-### 1. マーケットプレイスを追加
+| プラグイン | 本数 | 有効にする場所 | 中身 |
+|---|---|---|---|
+| `common` | 8 | 全リポジトリ | LINE連絡・多モデル敵対的レビュー・git操作・cloud routine・スキル索引 |
+| `swift-app` | 14 | 各アプリリポジトリ | 構成の正本・Swift規約・ビルド検証・バグ精査・ADR・全画面スクショ・AppIcon・iOS能力カタログ・リリースと審査提出・雛形同期 |
+| `ios-app-build` | 11 | ios-app-build-workspace | アイデア→審査提出のパイプライン（00〜08）・コンセプト出し・デザイン仕様 |
+| `app-store-optimize` | 4 | app-store-optimize-workspace | ASO調査・ストア文言・ストア画像の設計・レビュー返信 |
+| `sns-marketing` | 8 | sns-marketing-workspace | TikTok / Lemon8 のカルーセル・宣伝動画・日次運用 |
+
+スキルの一覧と使い分けは `/common:skill-map`。
+
+## 使う側の設定
+
+各リポジトリの `.claude/settings.json` に書く（信頼済みプロジェクトを開くと自動インストールされる）。
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "tubasasakunn-marketplace": {
+      "source": { "source": "github", "repo": "tubasasakunn/claude-code-marketplace" }
+    }
+  },
+  "enabledPlugins": {
+    "common@tubasasakunn-marketplace": true,
+    "swift-app@tubasasakunn-marketplace": true
+  }
+}
+```
+
+## 直す側の手順
 
 ```bash
-/plugin marketplace add tubasasakunn/claude-code-marketplace
+git clone git@github.com:tubasasakunn/claude-code-marketplace.git ~/workspace_tmp/claude-code-marketplace
+cd ~/workspace_tmp/claude-code-marketplace
+# <plugin>/skills/<name>/SKILL.md を編集
+python3 common/scripts/build_skill_map.py    # スキルを増減したら索引を再生成
+git commit && git push
+claude plugin marketplace update tubasasakunn-marketplace
 ```
 
-### 2. プラグインをインストール
+詳細は [CLAUDE.md](CLAUDE.md)。**`~/.claude/plugins/cache/` を直接編集しないこと**
+（次の update で消える。PreToolUse フックで塞いである）。
 
-```bash
-/plugin install <plugin-name>@tubasasakunn-marketplace
-```
+## public なので秘密を書かない
 
-### 3. Claude Code を再起動
-
-インストール後、Claude Code を再起動してプラグインを有効化します。
-
----
-
-## プラグイン一覧
-
-| プラグイン | 説明 | スキル数 |
-|-----------|------|----------|
-| [claude-code-plugin](claude-code-plugin/) | Claude Code の機能拡張スキル集 | 2 |
-| [ios-develop-plugin](ios-develop-plugin/) | iOS/Swift 開発支援プラグイン | 3 |
-| [design-plugin](design-plugin/) | デザインレビュープラグイン | 4 |
-| [common-plugin](common-plugin/) | 汎用的な開発支援プラグイン | 2 |
-
----
-
-## スキル一覧
-
-### claude-code-plugin
-
-| スキル | 説明 |
-|--------|------|
-| [plugin-guide](claude-code-plugin/skills/plugin-guide/) | プラグイン作成・インストール・管理ガイド |
-| [skill-creator](claude-code-plugin/skills/skill-creator/) | スキル（SKILL.md）作成ガイド |
-
-### ios-develop-plugin
-
-| スキル | 説明 |
-|--------|------|
-| [ios-coding-rules](ios-develop-plugin/skills/ios-coding-rules/) | iOSアプリのコーディング規約 |
-| [ios-design](ios-develop-plugin/skills/ios-design/) | iOS/SwiftUIデザインレビュー |
-| [ios-testing](ios-develop-plugin/skills/ios-testing/) | Maestro UIテスト・スクリーンショット |
-
-### design-plugin
-
-| スキル | 説明 |
-|--------|------|
-| [mobile-ui-design](design-plugin/skills/mobile-ui-design/) | モバイルUI 6カテゴリ評価 |
-| [ui-critique](design-plugin/skills/ui-critique/) | UI批評 7項目100点評価 |
-| [ui-ux-pro-max](design-plugin/skills/ui-ux-pro-max/) | UI/UX 10カテゴリ包括評価 |
-| [ux-psychology](design-plugin/skills/ux-psychology/) | 心理学的UX 8カテゴリ評価 |
-
-### common-plugin
-
-| スキル | 説明 |
-|--------|------|
-| [commit](common-plugin/skills/commit/) | 日本語Conventional Commitsでコミット |
-| [push](common-plugin/skills/push/) | リモートに安全にpush |
-
----
-
-## クイックスタート
-
-### iOS開発
-
-```bash
-/plugin install ios-develop-plugin@tubasasakunn-marketplace
-```
-
-```
-/ios-coding-rules 新しいViewModelを作成
-/ios-design screenshots/home.png
-/ios-testing ログイン画面のスクリーンショット
-```
-
-### デザインレビュー
-
-```bash
-/plugin install design-plugin@tubasasakunn-marketplace
-```
-
-```
-/ui-critique screenshots/profile.png
-/ux-psychology screenshots/checkout.png
-```
-
-### Git操作
-
-```bash
-/plugin install common-plugin@tubasasakunn-marketplace
-```
-
-```
-/commit
-/push
-```
-
----
-
-## プラグイン開発
-
-新しいプラグインを作成する場合は、claude-code-pluginをインストールして`plugin-guide`と`skill-creator`スキルを活用してください。
-
-```bash
-/plugin install claude-code-plugin@tubasasakunn-marketplace
-```
-
-```
-プラグインを作成したい
-スキルの書き方を教えて
-```
-
----
-
-## よく使うコマンド
-
-| 操作 | コマンド |
-|------|---------|
-| マーケットプレイス追加 | `/plugin marketplace add <path>` |
-| マーケットプレイス削除 | `/plugin marketplace remove <name>` |
-| プラグインインストール | `/plugin install <name>@<marketplace>` |
-| プラグインアンインストール | `/plugin uninstall <name>@<marketplace>` |
-| 対話メニュー | `/plugin` |
-
----
-
-## ライセンス
-
-MIT
+トークン類は各アプリの `.claude/secrets.env`（private リポジトリ内）に置き、
+スキルは「そこから読む」手順だけを書く。

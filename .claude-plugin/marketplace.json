@@ -1,34 +1,34 @@
 {
   "name": "tubasasakunn-marketplace",
   "owner": {
-    "name": "tubasasakunn Marketplace"
+    "name": "tubasasakunn"
   },
-  "description": "tubasasakunnのclaude code プラグインのマーケットプレイス",
+  "description": "iOSアプリ量産パイプラインのスキル正本。スキルの追加・修正は必ずこのリポジトリで行い、各リポジトリはセッション開始時に pull して取り込む。",
   "plugins": [
     {
-      "name": "claude-code-plugin",
-      "source": "./claude-code-plugin",
-      "description": "Claude Codeの機能拡張スキル集"
+      "name": "common",
+      "source": "./common",
+      "description": "全リポジトリ共通。LINE越しのユーザ連絡、多モデル敵対的レビュー、git操作、cloud routine、スキル全体の索引。"
     },
     {
-      "name": "ios-develop-plugin",
-      "source": "./ios-develop-plugin",
-      "description": "iOS/Swift開発支援プラグイン"
+      "name": "swift-app",
+      "source": "./swift-app",
+      "description": "swift-base 由来の iOS アプリリポジトリの中で使う。構成の正本・Swift規約・ビルド検証・バグ精査・ADR・全画面スクショ・AppIcon・iOS能力カタログ・リリースと審査提出・雛形同期。"
     },
     {
-      "name": "design-plugin",
-      "source": "./design-plugin",
-      "description": "デザインレビュープラグイン"
+      "name": "ios-app-build",
+      "source": "./ios-app-build",
+      "description": "アイデア一言から App Store 審査提出までを通すパイプライン。コンセプト出し・デザイン仕様・リポジトリ作成・Xcode Cloud・ASC登録・実装・規約サイト・審査提出・審査監視。"
     },
     {
-      "name": "common-plugin",
-      "source": "./common-plugin",
-      "description": "汎用的な開発支援プラグイン"
+      "name": "app-store-optimize",
+      "source": "./app-store-optimize",
+      "description": "ASO。キーワード/競合調査、ストア文言とストアスクリーンショットの設計・生成、リリース後のユーザレビュー返信。"
     },
     {
-      "name": "hono-plugin",
-      "source": "./hono-plugin",
-      "description": "Cloudflare Workers + Hono + D1を用いたエッジAPI開発支援プラグイン"
+      "name": "sns-marketing",
+      "source": "./sns-marketing",
+      "description": "TikTok / Lemon8 のカルーセル投稿と宣伝動画。デザイン正本・素材生成テクニック・実投稿・日次運用パイプライン。"
     }
   ]
 }

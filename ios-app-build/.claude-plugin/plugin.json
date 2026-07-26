@@ -1,0 +1,8 @@
+{
+  "name": "ios-app-build",
+  "description": "アイデアから App Store 審査提出までのパイプライン。新規アプリ1本を立ち上げる工程。",
+  "version": "2.0.0",
+  "author": {
+    "name": "tubasasakunn"
+  }
+}

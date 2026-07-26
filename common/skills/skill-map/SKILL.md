@@ -1,0 +1,160 @@
+---
+name: skill-map
+description: この marketplace の全スキルの索引と使い分け。どんなスキルがあるか分からない・どれを使うか迷う・似た名前のスキルの違いを知りたい・スキルを追加や修正したいときに最初に読む。プラグインごとの一覧は自動生成なので常に実態と一致する。
+---
+
+# スキルの地図
+
+## ★ スキルを直すときは、必ずこの marketplace リポジトリを直す
+
+```bash
+cd ~/workspace_tmp/claude-code-marketplace   # ここが唯一の正本
+# 編集 → commit → push → 各リポジトリは次のセッション開始時に pull で取り込む
+python3 common/scripts/build_skill_map.py     # スキルを増減したらこの索引を再生成
+```
+
+**`~/.claude/plugins/cache/` 配下を直接編集しても、次の `plugin marketplace update` で消える。**
+アプリや workspace の `.claude/skills/` にスキルを置かない（そこは空のまま維持する）。
+
+コード資産（`.github/workflows/`・`fastlane/`・`ci_scripts/`・`scripts/`・`.claude/rules/`・
+`ResultKit`）は CI がリポジトリ内のファイルを実行するため marketplace では配れない。
+**正本は swift-base で、配布は `/swift-app:sync-base`** が担う。この非対称に注意する。
+
+## どこで何が使えるか
+
+| 開いているリポジトリ | 有効なプラグイン |
+|---|---|
+| アプリリポジトリ（hioto / hanasu / mamezukan …） | `common` + `swift-app` |
+| ios-app-build-workspace | `common` + `ios-app-build` |
+| app-store-optimize-workspace | `common` + `app-store-optimize` |
+| sns-marketing-workspace | `common` + `sns-marketing` |
+
+スキルが見えないときは、そのリポジトリの `.claude/settings.json` の `enabledPlugins` を疑う。
+
+## 場面別の引き方
+
+**新しいアプリを1本作る** → `/ios-app-build:08_run_pipeline` を呼ぶだけ。中で 00〜07 と
+コンセプト出し・デザイン仕様を順に委譲する。途中から再開・1工程だけやり直すときは番号を直接指定。
+
+**既存アプリのコードを触る** → 書く前に `/swift-app:conventions` の該当領域を読む →
+書いた後に `/swift-app:verify-build` → コミット前に `/swift-app:bug-check` と
+`/swift-app:audit-conventions` → 設計を決めたら `/swift-app:adr`。
+
+**リリースする** → `/swift-app:release-version`（仕組みと手順）→ 素材は
+`/swift-app:release-assets` → 全部任せるなら `/swift-app:submit-for-review`。
+
+**ストア素材を作る** → `/app-store-optimize:aso`（何を訴求するか）→
+`/app-store-optimize:screenshot-crafting`（何を写すか）→ `/swift-app:store-layouts`（どう並べるか）
+→ `/swift-app:capture-screens`（素材を撮る）→ `/swift-app:release-assets`（置いて反映）。
+
+**SNS に投稿する** → `/sns-marketing:carousel-craft`（デザインの正本）→
+`/sns-marketing:sns-post`（1本作る）→ `/sns-marketing:tiktok-post` `lemon8-post`（実投稿）。
+毎日回すなら `/sns-marketing:sns-daily-pipeline`。
+
+**仕組みが分からなくなった** → `/swift-app:architecture`（ブランチ運用・ディレクトリ規約・CI の罠）。
+
+**iOS で何ができるか調べる** → `/swift-app:ios-capabilities`（iOS 26 の能力カタログ）。
+
+**判断に確信が持てない** → `/common:adversarial-panel`（多モデルで殴り合わせる）。
+**ユーザに聞く・報告する** → `/common:talk_to_user`（LINE）。
+
+## 迷いやすいペアの判別
+
+| 迷う組 | 違い |
+|---|---|
+| `release-version` と `06_submit_review` | 前者は2本目以降の日常リリース、後者は**初回**審査提出 |
+| `release-version` と `submit-for-review` | 前者は仕組みの説明（ランブック）、後者は「言われたら全部やる」実行レーン |
+| `screenshot-crafting` と `store-layouts` | 何を写すか決める / どう並べるか決める |
+| `capture-screens` と `release-assets` | アプリの生スクショを撮る / ストア用に加工して置く |
+| `conventions` と `audit-conventions` | 規約を読む（書く前）/ 違反を走査する（書いた後） |
+| `bug-check` と `audit-conventions` | 動かすと壊れる挙動バグ / 規約違反 |
+| `architecture` と 各アプリの `CLAUDE.md` | 共通の仕組み（正本）/ そのアプリ固有の罠とファイル地図 |
+| `sync-base` と marketplace の pull | コード資産の配布（能動）/ スキルの取得（自動） |
+
+<!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
+
+**全 45 スキル / 5 プラグイン**
+
+### `common`（8本） — 全リポジトリで有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/common:adversarial-panel` | Run a multi-model adversarial mutual review with facilitator synthesis — the "Fable 5-style" metacognition pattern, reproducible on Opus or any Claud… |
+| `/common:cloud-routines` | Claude Code の Routines（クラウド上でスケジュール/API/GitHub イベントにより自動実行されるエージェント）の作成・管理・設計を支援します。 |
+| `/common:commit` | 現在の変更を確認し、全てステージングして日本語のConventional Commitsでコミット。 |
+| `/common:plugin-guide` | Claude Codeプラグインの作成、インストール、管理について説明します。 |
+| `/common:push` | 現在のブランチをリモートにpush。 |
+| `/common:skill-creator` | Claude Code用のスキルを作成・修正します。 |
+| `/common:skill-map` | この marketplace の全スキルの索引と使い分け。 |
+| `/common:talk_to_user` | LINE 越しにユーザへ報告し、質問し、返信を待ちます。 |
+
+### `swift-app`（14本） — 各アプリリポジトリで有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/swift-app:adr` | アーキテクチャ・データモデル・並行性方針・依存ライブラリなどの意思決定をしたとき、docs/adr/ に ADR（意思決定の記録）を起こす。 |
+| `/swift-app:architecture` | swift-base 由来の iOS アプリの構成の正本。 |
+| `/swift-app:audit-conventions` | コーディング規約（Tokens / Strings / DisplayDate / 強制アンラップ禁止など）への違反をリポジトリ全体から走査して報告する。 |
+| `/swift-app:bug-check` | コミット直前に diff をバグ観点で精査する。 |
+| `/swift-app:capture-screens` | アプリの全画面スクリーンショットを material/screens/ に撮り揃える。 |
+| `/swift-app:conventions` | Swift / SwiftUI のコーディング規約の正本（7領域・628行）。 |
+| `/swift-app:icon-crafting` | Icon Composer の `.icon` バンドル（Liquid Glass アプリアイコン）を、GUIアプリを一切開かずスクリプトで生成し、actool でコンパイル検証し、Xcodeプロジェクトへ組み込みます。 |
+| `/swift-app:ios-capabilities` | 最新iOS（現在はiOS 26世代）でサードパーティアプリができること（新API・制約・最低OSバージョン・エンタイトルメント要否・審査上の注意）の調査知識を提供します。 |
+| `/swift-app:release-assets` | App Store 提出用のリリース素材一式（メタデータ .txt とストア画像）を release/<version>/ に用意・更新する。 |
+| `/swift-app:release-version` | 新バージョンとして App Store に出すための一連の手順（バージョン番号上げ → メタデータ → main マージで自動反映＆審査PR → Xcode Cloud ビルド → production マージで審査自動提出 → 通過後に自動公開）をまとめた運用ランブック。 |
+| `/swift-app:store-layouts` | App Store のストア画像を「構図」から設計・制作する。 |
+| `/swift-app:submit-for-review` | ユーザーが「審査提出して」「リリースして」「ship して」と言ったら、この一連を最後まで自動で回す ── 作業ブランチ→main へ PR 作成＆マージ→Xcode Cloud ビルド完成を harness API で待つ→失敗なら修正して最初へ戻る→main→production の審査PRを… |
+| `/swift-app:sync-base` | swift-base の雛形資産（.claude/rules・GitHub Actions・fastlane・ci_scripts・scripts・post・ResultKit）が各アプリでどれだけ古いかを表にし、逆流と配布を判断する。 |
+| `/swift-app:verify-build` | xcodebuild でビルド検証し、.swift 由来の warning / error をベースライン（0 / 0）と比較する。 |
+
+### `ios-app-build`（11本） — ios-app-build-workspaceで有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/ios-app-build:00_setup_repo` | 新規iOSアプリのリポジトリを作ります。 |
+| `/ios-app-build:01_create_xcode_cicd` | 新規iOSアプリの「App Store Connect アプリレコード作成」と「Xcode Cloud の CI/CD 設定」を、AppleScript で Xcode の GUI を自動操作して一度に完了させます。 |
+| `/ios-app-build:02_register_appstore` | App Store Connect の初期登録を API で全部済ませます。 |
+| `/ios-app-build:03_implement_app` | CONCEPT.md と DESIGN.md に沿って iOS アプリの P0 機能を実装します。 |
+| `/ios-app-build:04_build_front` | アプリの利用規約・プライバシーポリシー・サポートページを Hono + Vite + Cloudflare Workers で生成し、(アプリ名).basaapp.com へデプロイします。 |
+| `/ios-app-build:05_release_assets` | App Store のストア文言（アプリ名・サブタイトル・キーワード・説明文）とストアスクリーンショットを release/<version>/ に用意します。 |
+| `/ios-app-build:06_submit_review` | iOSアプリを App Store の審査に提出します。 |
+| `/ios-app-build:07_watch_review` | App Store の審査結果を監視し、リジェクトに対応し、リリース後のユーザレビューを読んで返信します。 |
+| `/ios-app-build:08_run_pipeline` | アイデア一言を受け取り、コンセプト出しから App Store の審査提出までを一気に走らせる指揮役です。 |
+| `/ios-app-build:concept-crafting` | 漠然としたアイデアを、新しい価値をひとつの言葉で言い当てる「コンセプト」へと磨き上げるためのワークフロー(問いを立てる→ストーリーを設計する→1行に凝縮する→用途に最適化する)とチェックリストを提供します。 |
+| `/ios-app-build:design-crafting` | コンセプト文書(CONCEPT.md)とデザインの基礎嗜好(DESIGN_BASE.md)から、そのアプリ固有のビジュアルデザイン仕様書(DESIGN.md)を作り上げるワークフロー(コンセプトを色・形・動きへ翻訳する→カラー/タイポ/モチーフ/モーション/画面ムード/AppIconを決める→アー… |
+
+### `app-store-optimize`（4本） — app-store-optimize-workspaceで有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/app-store-optimize:aso` | ASO（App Store 最適化）の観点で「何を調査し、どんな文言・画像にするか」を決めるプレイブック。 |
+| `/app-store-optimize:aso-appstore-screenshots` | Generate high-converting App Store screenshots by analyzing your app's codebase, discovering core benefits, and creating ASO-optimized screenshot ima… |
+| `/app-store-optimize:review-reply` | リリース後のユーザレビューを読み、返信し、そこから ASO を直す。 |
+| `/app-store-optimize:screenshot-crafting` | App Storeのストアスクリーンショット一式（画像セット）を設計・制作するためのワークフローと知識（Apple公式仕様、ストーリーボード3幕構成、レイアウトパターン、押させる日本語コピーの型、審査リジェクト回避、ASC API/fastlane自動化）を提供します。 |
+
+### `sns-marketing`（8本） — sns-marketing-workspaceで有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/sns-marketing:carousel-craft` | SNSカルーセル画像(TikTokフォトモード/Lemon8)の品質を上げるためのデザイン正本。 |
+| `/sns-marketing:image-gen-techniques` | Claude CodeがPython(Pillow/numpy)で画像を生成・自己レビューするときの汎用テクニック集を提供します。 |
+| `/sns-marketing:lemon8-post` | Post an image carousel + title + body + hashtags to Lemon8 on a USB-debugging Android phone via adb UI automation. Use when the user wants to publish… |
+| `/sns-marketing:promo-video` | target/<app> の宣伝動画（無音・縦9:16・~30秒・かっこいい系）を作る。 |
+| `/sns-marketing:sns-daily-pipeline` | target/配下のアプリ(Hioto / Tone など apps.json 登録のいずれか)の SNS 運用を毎日まわす本番パイプライン。 |
+| `/sns-marketing:sns-post` | TikTok / Lemon8 向けの「複数画像（カルーセル）投稿」を新規に1本作る。 |
+| `/sns-marketing:tiktok-post` | Post a photo carousel (multiple images) + caption + hashtags to TikTok on a USB-debugging Android phone via adb UI automation. Use when the user want… |
+| `/sns-marketing:tone-post` | Tone（メンズメイク診断アプリ / target/mensmakeupadvisor）の TikTok・Lemon8 向けカルーセル画像投稿を1本作って実際に公開する。 |
+
+<!-- END GENERATED -->
+
+## 索引を更新する
+
+スキルを追加・削除・description を変えたら:
+
+```bash
+python3 common/scripts/build_skill_map.py          # 一覧を再生成
+python3 common/scripts/build_skill_map.py --check   # ズレていたら exit 1
+```
+
+上の手書き部分（使い分け・迷いやすいペア）は自動生成の対象外なので、**新しいスキルが
+既存と紛らわしいなら「迷いやすいペア」に1行足す**こと。

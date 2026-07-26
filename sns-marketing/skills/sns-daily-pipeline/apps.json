@@ -1,0 +1,27 @@
+{
+  "_comment": "root側の運用配線のみ。パスはリポジトリルート相対（appmeta.py が絶対に解決）。アプリの素性(name/bundleId/ascAppId/concept/tags/brand)は各 repo の material/manifest.json が正本。マージ済み設定は scripts/appmeta.py get <id> で得る。target/ に material/manifest.json を持つ repo を置けば自動で対象になる。",
+  "hioto": {
+    "repo": "target/hioto",
+    "content_dir": "analytics",
+    "album_prefix": "hioto",
+    "gh_repo": "tubasasakunn/hioto"
+  },
+  "tone": {
+    "repo": "target/mensmakeupadvisor",
+    "content_dir": "tone_posts",
+    "album_prefix": "tone",
+    "gh_repo": "tubasasakunn/mensmakeupadvisor"
+  },
+  "anki": {
+    "repo": "target/createQuestionApple",
+    "content_dir": "anki_posts",
+    "album_prefix": "anki",
+    "gh_repo": "tubasasakunn/createQuestionApple"
+  },
+  "connect": {
+    "repo": "target/connectcalendar",
+    "content_dir": "connect_posts",
+    "album_prefix": "connect",
+    "gh_repo": "tubasasakunn/connectcalendar"
+  }
+}

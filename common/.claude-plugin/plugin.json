@@ -1,0 +1,8 @@
+{
+  "name": "common",
+  "description": "全リポジトリ共通。ユーザ連絡（LINE）・敵対的レビュー・git操作・cloud routine・スキル索引。",
+  "version": "2.0.0",
+  "author": {
+    "name": "tubasasakunn"
+  }
+}

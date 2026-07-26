@@ -1,0 +1,8 @@
+{
+  "name": "swift-app",
+  "description": "swift-base 由来の iOS アプリリポジトリの中で使うスキル群。構成・規約・検証・リリース・審査提出。",
+  "version": "2.0.0",
+  "author": {
+    "name": "tubasasakunn"
+  }
+}

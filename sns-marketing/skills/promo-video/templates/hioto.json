@@ -1,0 +1,52 @@
+{
+  "_doc": "Hioto 宣伝動画(無音/~30s/1080x1920/30fps)。standard 雛形の storyboard。文言/素材/アクセントは manifest と material から。新しい動画はこの形をコピーして書く。",
+  "size": [1080, 1920],
+  "fps": 30,
+  "scenes": [
+    {
+      "type": "cold_open", "frames": 120, "accent": "evening",
+      "tagline": "撮るだけで、1日が残る。", "kicker": "VIDEO  DIARY"
+    },
+    {
+      "type": "hook", "frames": 135, "accent": "evening", "footage": "desk",
+      "kicker": "EVERY  DAY", "head": ["毎日、撮るだけ。"], "sub": ["手間は、足さない。"]
+    },
+    {
+      "type": "day_cycle", "frames": 195,
+      "head": ["朝も、夜も。", "ぜんぶ残る。"],
+      "steps": [
+        {"footage": "camera",   "accent": "morning",   "clock": "06:12", "word": "あさ"},
+        {"footage": "review",   "accent": "forenoon",  "clock": "10:30", "word": "ひるまえ"},
+        {"footage": "calendar", "accent": "afternoon", "clock": "15:45", "word": "ひる"},
+        {"footage": "night",    "accent": "evening",   "clock": "19:20", "word": "ゆうがた"},
+        {"footage": "shorts",   "accent": "night",     "clock": "22:31", "word": "よる"}
+      ]
+    },
+    {
+      "type": "app_magic", "frames": 140, "accent": "morning",
+      "footage_bg": "camera", "shot": "camera", "viewfinder": "review",
+      "kicker": "JUST  SHOOT", "head": ["押すだけで、", "撮れている。"]
+    },
+    {
+      "type": "proof_gallery", "frames": 150, "accent": "afternoon",
+      "hero": {"shot": "month-insights"},
+      "sides": [
+        {"shot": "shorts-feed", "key": "shorts"},
+        {"shot": "calendar", "key": "calendar"}
+      ],
+      "kicker": "YOUR  MONTH",
+      "head": ["撮った1日が、", "カレンダーに並ぶ。"],
+      "foot": "見返すたび、その日が戻る。"
+    },
+    {
+      "type": "privacy", "frames": 110, "accent": "midnight", "footage": "night",
+      "motif": "shield-check-badge", "kicker": "NOT  A  SOCIAL  APP",
+      "head": ["SNSじゃない。"], "sub": ["あなただけの記録。"],
+      "foot": ["すべて、この端末の中だけに。"]
+    },
+    {
+      "type": "cta", "frames": 100, "accent": "evening",
+      "tagline": "撮るだけで、1日が残る。", "cta": "App Store  で配信中"
+    }
+  ]
+}

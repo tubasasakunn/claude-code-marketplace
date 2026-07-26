@@ -1,0 +1,8 @@
+{
+  "name": "app-store-optimize",
+  "description": "ASO。ストア文言・ストア画像の設計と生成、レビュー返信。",
+  "version": "2.0.0",
+  "author": {
+    "name": "tubasasakunn"
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "name": "common-plugin",
-  "description": "汎用的な開発支援プラグイン",
-  "version": "1.1.0",
-  "author": {
-    "name": "tubasasakun"
-  }
-}

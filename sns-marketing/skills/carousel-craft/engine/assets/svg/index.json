@@ -1,0 +1,1361 @@
+[
+  {
+    "name": "arrow-corner-up",
+    "file": "arrow-corner-up.svg",
+    "description": "上に折れて右へ向かう矢印。返信/上方向の遷移に。",
+    "tags": [
+      "矢印",
+      "折れ",
+      "corner",
+      "up",
+      "reply",
+      "遷移"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "arrow-cta-circle",
+    "file": "arrow-cta-circle.svg",
+    "description": "右向き矢印の円形CTA。次へ/詳しくはこちらへの誘導に使うリッチボタン。",
+    "tags": [
+      "矢印",
+      "次へ",
+      "arrow",
+      "CTA",
+      "詳しくは",
+      "進む",
+      "next"
+    ],
+    "mode": "multi",
+    "category": "cta"
+  },
+  {
+    "name": "arrow-curve-turn",
+    "file": "arrow-curve-turn.svg",
+    "description": "L字に曲がる矢印。分岐や方向転換の表現に。",
+    "tags": [
+      "曲がる矢印",
+      "ターン",
+      "curve",
+      "turn",
+      "arrow",
+      "分岐"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "arrow-curved-long",
+    "file": "arrow-curved-long.svg",
+    "description": "曲がる長い矢印（誘導・流れの装飾）",
+    "tags": [
+      "矢印",
+      "曲線",
+      "arrow",
+      "curved",
+      "誘導",
+      "流れ",
+      "長い"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "arrow-dashed-right",
+    "file": "arrow-dashed-right.svg",
+    "description": "破線の右矢印。予定/仮の流れやステップ移動に。",
+    "tags": [
+      "破線矢印",
+      "点線",
+      "dashed",
+      "arrow",
+      "flow",
+      "ステップ"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "arrow-long-straight",
+    "file": "arrow-long-straight.svg",
+    "description": "まっすぐな長い矢印（方向・次へ装飾）",
+    "tags": [
+      "矢印",
+      "ストレート",
+      "arrow",
+      "方向",
+      "次へ",
+      "right",
+      "長い"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "arrow-right-bold",
+    "file": "arrow-right-bold.svg",
+    "description": "太い右向き矢印。次へ/進む導線や視線誘導に。",
+    "tags": [
+      "矢印",
+      "右",
+      "arrow",
+      "right",
+      "next",
+      "誘導"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "arrow-thin-right",
+    "file": "arrow-thin-right.svg",
+    "description": "細い右矢印。控えめなリンク/補足の誘導に。",
+    "tags": [
+      "矢印",
+      "細",
+      "thin",
+      "arrow",
+      "right",
+      "link"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "arrow",
+    "file": "arrow.svg",
+    "description": "右向き矢印(汎用)。SWIPE/次へ誘導の基本。",
+    "tags": [
+      "矢印",
+      "右",
+      "arrow",
+      "right",
+      "swipe",
+      "誘導"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "award-rosette",
+    "file": "award-rosette.svg",
+    "description": "受賞ロゼット(ギザ円章+垂れリボン)の汎用エンブレム",
+    "tags": [
+      "ロゼット",
+      "rosette",
+      "受賞",
+      "award",
+      "エンブレム",
+      "badge",
+      "賞"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "bookmark-save",
+    "file": "bookmark-save.svg",
+    "description": "ブックマークのリボン。保存/あとで見るへの誘導に使う単色アイコン。",
+    "tags": [
+      "保存",
+      "ブックマーク",
+      "save",
+      "bookmark",
+      "あとで見る",
+      "しおり"
+    ],
+    "mode": "mono",
+    "category": "cta"
+  },
+  {
+    "name": "check-mark",
+    "file": "check-mark.svg",
+    "description": "チェックマーク。完了/正解/選択済みの表現に。",
+    "tags": [
+      "チェック",
+      "完了",
+      "check",
+      "done",
+      "正解",
+      "ok"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "check",
+    "file": "check.svg",
+    "description": "チェックマーク。完了/正解/箇条書き。",
+    "tags": [
+      "チェック",
+      "check",
+      "完了",
+      "正解",
+      "OK"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "chevron-double-right",
+    "file": "chevron-double-right.svg",
+    "description": "二重シェブロン。スワイプ/もっと進むの強い誘導に。",
+    "tags": [
+      "シェブロン",
+      "二重矢印",
+      "chevron",
+      "swipe",
+      "スワイプ",
+      "next"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "concept-bell-notify",
+    "file": "concept-bell-notify.svg",
+    "description": "ベル・通知・お知らせを表すラインアイコン",
+    "tags": [
+      "ベル",
+      "通知",
+      "お知らせ",
+      "bell",
+      "notification",
+      "alert"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-book-open",
+    "file": "concept-book-open.svg",
+    "description": "本・読書・知識・学習を表すラインアイコン",
+    "tags": [
+      "本",
+      "読書",
+      "知識",
+      "book",
+      "read",
+      "learn"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-brain-ai-spark",
+    "file": "concept-brain-ai-spark.svg",
+    "description": "脳・AI・ひらめき・思考を表すラインアイコン",
+    "tags": [
+      "脳",
+      "AI",
+      "思考",
+      "brain",
+      "spark",
+      "smart"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-camera-shutter",
+    "file": "concept-camera-shutter.svg",
+    "description": "カメラ・撮影・写真投稿を表す汎用ラインアイコン",
+    "tags": [
+      "カメラ",
+      "撮影",
+      "写真",
+      "camera",
+      "photo",
+      "shutter"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-checklist-tasks",
+    "file": "concept-checklist-tasks.svg",
+    "description": "チェックリスト・タスク・手順を表すラインアイコン",
+    "tags": [
+      "チェックリスト",
+      "タスク",
+      "やること",
+      "checklist",
+      "todo",
+      "tasks"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-clock-time",
+    "file": "concept-clock-time.svg",
+    "description": "時計・時間・スケジュールを表すラインアイコン",
+    "tags": [
+      "時計",
+      "時間",
+      "タイマー",
+      "clock",
+      "time",
+      "schedule"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-flame-trending",
+    "file": "concept-flame-trending.svg",
+    "description": "炎・人気・話題・急上昇を表すラインアイコン",
+    "tags": [
+      "炎",
+      "人気",
+      "急上昇",
+      "flame",
+      "hot",
+      "trending"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-gear-settings",
+    "file": "concept-gear-settings.svg",
+    "description": "歯車・設定・仕組みを表すラインアイコン",
+    "tags": [
+      "歯車",
+      "設定",
+      "仕組み",
+      "gear",
+      "settings",
+      "config"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-gift-box",
+    "file": "concept-gift-box.svg",
+    "description": "ギフト・プレゼント・特典を表すラインアイコン",
+    "tags": [
+      "ギフト",
+      "プレゼント",
+      "特典",
+      "gift",
+      "present",
+      "reward"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-heart-like",
+    "file": "concept-heart-like.svg",
+    "description": "ハート・いいね・お気に入りを表すラインアイコン",
+    "tags": [
+      "ハート",
+      "いいね",
+      "お気に入り",
+      "heart",
+      "like",
+      "love"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-key-access",
+    "file": "concept-key-access.svg",
+    "description": "鍵・セキュリティ・アクセス権を表すラインアイコン",
+    "tags": [
+      "鍵",
+      "キー",
+      "セキュリティ",
+      "key",
+      "security",
+      "lock"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-lightbulb-idea",
+    "file": "concept-lightbulb-idea.svg",
+    "description": "電球・アイデア・ひらめきを表すラインアイコン",
+    "tags": [
+      "電球",
+      "アイデア",
+      "ひらめき",
+      "lightbulb",
+      "idea",
+      "tips"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-smartphone-app",
+    "file": "concept-smartphone-app.svg",
+    "description": "スマホ・モバイルアプリ・SNS閲覧を表すラインアイコン",
+    "tags": [
+      "スマホ",
+      "携帯",
+      "アプリ",
+      "smartphone",
+      "mobile",
+      "phone"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-target-aim",
+    "file": "concept-target-aim.svg",
+    "description": "ターゲット・目標・狙いを表すラインアイコン",
+    "tags": [
+      "ターゲット",
+      "的",
+      "目標",
+      "target",
+      "goal",
+      "aim"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "concept-trend-up-graph",
+    "file": "concept-trend-up-graph.svg",
+    "description": "右肩上がりグラフ・成長・トレンドを表すラインアイコン",
+    "tags": [
+      "グラフ",
+      "成長",
+      "トレンド",
+      "graph",
+      "trend",
+      "growth"
+    ],
+    "mode": "mono",
+    "category": "icon"
+  },
+  {
+    "name": "confetti-scatter",
+    "file": "confetti-scatter.svg",
+    "description": "紙吹雪の散らし（お祝い・達成の彩り装飾）",
+    "tags": [
+      "紙吹雪",
+      "コンフェッティ",
+      "confetti",
+      "お祝い",
+      "celebration",
+      "カラフル",
+      "達成"
+    ],
+    "mode": "multi",
+    "category": "decoration"
+  },
+  {
+    "name": "corner-frame-ticks",
+    "file": "corner-frame-ticks.svg",
+    "description": "四隅のコーナー枠ティック（フォーカス・囲み装飾）",
+    "tags": [
+      "コーナー",
+      "枠",
+      "フレーム",
+      "corner",
+      "frame",
+      "囲み",
+      "ティック"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "cross-close",
+    "file": "cross-close.svg",
+    "description": "バツ印。閉じる/削除/不正解の表現に。",
+    "tags": [
+      "バツ",
+      "閉じる",
+      "close",
+      "cross",
+      "delete",
+      "不正解"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "divider-line-dot",
+    "file": "divider-line-dot.svg",
+    "description": "中央ドット付きの区切り線（セクション分割装飾）",
+    "tags": [
+      "区切り線",
+      "ディバイダー",
+      "divider",
+      "セパレーター",
+      "分割",
+      "line",
+      "装飾"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "download-count-bubble",
+    "file": "download-count-bubble.svg",
+    "description": "ダウンロード数の吹き出しバッジ(下矢印+バー)",
+    "tags": [
+      "ダウンロード",
+      "download",
+      "吹き出し",
+      "bubble",
+      "数",
+      "count",
+      "badge"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "follow-plus",
+    "file": "follow-plus.svg",
+    "description": "人物+プラスのフォローアイコン。フォロー/追加への誘導に使う単色CTA。",
+    "tags": [
+      "フォロー",
+      "追加",
+      "follow",
+      "人",
+      "ユーザー",
+      "add",
+      "プラス"
+    ],
+    "mode": "mono",
+    "category": "cta"
+  },
+  {
+    "name": "get-pill-button",
+    "file": "get-pill-button.svg",
+    "description": "GET風ピルボタン。インストール/取得CTAに使うリッチな立体ボタン。",
+    "tags": [
+      "GET",
+      "ボタン",
+      "ピル",
+      "button",
+      "取得",
+      "インストール",
+      "install",
+      "CTA"
+    ],
+    "mode": "multi",
+    "category": "cta"
+  },
+  {
+    "name": "highlight-marker-band",
+    "file": "highlight-marker-band.svg",
+    "description": "蛍光マーカー風の2段ハイライト帯（薄色・本文強調）",
+    "tags": [
+      "ハイライト",
+      "蛍光ペン",
+      "マーカー",
+      "highlight",
+      "marker",
+      "強調",
+      "帯"
+    ],
+    "mode": "multi",
+    "category": "decoration"
+  },
+  {
+    "name": "install-badge",
+    "file": "install-badge.svg",
+    "description": "下向き矢印+トレイのインストールバッジ。アプリ取得CTAに使うリッチアイコン。",
+    "tags": [
+      "インストール",
+      "ダウンロード",
+      "install",
+      "download",
+      "取得",
+      "バッジ",
+      "矢印"
+    ],
+    "mode": "multi",
+    "category": "cta"
+  },
+  {
+    "name": "link-chain",
+    "file": "link-chain.svg",
+    "description": "リンク鎖のアイコン。URL/リンクへの誘導に使う単色CTA。",
+    "tags": [
+      "リンク",
+      "鎖",
+      "link",
+      "chain",
+      "URL",
+      "つなぐ"
+    ],
+    "mode": "mono",
+    "category": "cta"
+  },
+  {
+    "name": "magnifier",
+    "file": "magnifier.svg",
+    "description": "シンプルな虫眼鏡の単色アイコン。検索ボタンや探す動作の汎用CTA。",
+    "tags": [
+      "虫眼鏡",
+      "検索",
+      "search",
+      "magnifier",
+      "探す",
+      "zoom"
+    ],
+    "mode": "mono",
+    "category": "cta"
+  },
+  {
+    "name": "medal-ribbon-star",
+    "file": "medal-ribbon-star.svg",
+    "description": "星入りメダルとリボン(ランキング/受賞の汎用バッジ)",
+    "tags": [
+      "メダル",
+      "medal",
+      "ランキング",
+      "ribbon",
+      "受賞",
+      "star",
+      "badge"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "minus-remove",
+    "file": "minus-remove.svg",
+    "description": "マイナス記号。削除/折りたたみ/減算の操作に。",
+    "tags": [
+      "マイナス",
+      "削除",
+      "minus",
+      "remove",
+      "折りたたみ",
+      "減"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "number-one-medal",
+    "file": "number-one-medal.svg",
+    "description": "No.1メダルバッジ(月桂冠風円章+リボン)の汎用1位印",
+    "tags": [
+      "1位",
+      "no1",
+      "メダル",
+      "medal",
+      "ランキング",
+      "first",
+      "badge"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "phone-download",
+    "file": "phone-download.svg",
+    "description": "スマホ+下向きDL矢印。アプリインストール誘導に使うリッチアイコン。",
+    "tags": [
+      "ダウンロード",
+      "インストール",
+      "スマホ",
+      "download",
+      "install",
+      "phone",
+      "矢印"
+    ],
+    "mode": "multi",
+    "category": "cta"
+  },
+  {
+    "name": "play-triangle",
+    "file": "play-triangle.svg",
+    "description": "再生トライアングル。動画/音声の再生開始に。",
+    "tags": [
+      "再生",
+      "プレイ",
+      "play",
+      "triangle",
+      "動画",
+      "start"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "plus-add",
+    "file": "plus-add.svg",
+    "description": "プラス記号。追加/新規作成/展開の操作に。",
+    "tags": [
+      "プラス",
+      "追加",
+      "plus",
+      "add",
+      "new",
+      "展開"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "pointing-hand",
+    "file": "pointing-hand.svg",
+    "description": "指差しハンド。タップ箇所/注目ポイントの明示に。",
+    "tags": [
+      "指差し",
+      "ハンド",
+      "tap",
+      "hand",
+      "point",
+      "注目"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "quality-seal-check",
+    "file": "quality-seal-check.svg",
+    "description": "品質シール(ギザ円章+リング+チェック)の保証バッジ",
+    "tags": [
+      "品質",
+      "quality",
+      "シール",
+      "seal",
+      "保証",
+      "guarantee",
+      "badge"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "quote-marks-pair",
+    "file": "quote-marks-pair.svg",
+    "description": "引用符のペア（コメント・名言装飾）",
+    "tags": [
+      "引用符",
+      "クォート",
+      "quote",
+      "名言",
+      "コメント",
+      "quotation",
+      "装飾"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "quote",
+    "file": "quote.svg",
+    "description": "引用符。引用/セリフ表紙の装飾。",
+    "tags": [
+      "引用",
+      "クオート",
+      "quote",
+      "セリフ",
+      "装飾"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "rating-badge-mono",
+    "file": "rating-badge-mono.svg",
+    "description": "星評価の単色アイコン(円+星)tint用バッジ",
+    "tags": [
+      "星",
+      "star",
+      "評価",
+      "rating",
+      "単色",
+      "mono",
+      "badge"
+    ],
+    "mode": "mono",
+    "category": "badge"
+  },
+  {
+    "name": "rating-stars-five",
+    "file": "rating-stars-five.svg",
+    "description": "星5つ評価(4塗り+半端1)のレビュー表示バッジ",
+    "tags": [
+      "星評価",
+      "rating",
+      "レビュー",
+      "stars",
+      "評価",
+      "review",
+      "半星"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "ribbon-banner",
+    "file": "ribbon-banner.svg",
+    "description": "リボンバナー（見出し・ラベル装飾／影付き2トーン）",
+    "tags": [
+      "リボン",
+      "バナー",
+      "ribbon",
+      "banner",
+      "見出し",
+      "ラベル",
+      "label"
+    ],
+    "mode": "multi",
+    "category": "decoration"
+  },
+  {
+    "name": "royal-crown",
+    "file": "royal-crown.svg",
+    "description": "王冠バッジ(3山+宝石)のプレミアム/上位を示す印",
+    "tags": [
+      "王冠",
+      "crown",
+      "プレミアム",
+      "premium",
+      "上位",
+      "king",
+      "badge"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "search-box",
+    "file": "search-box.svg",
+    "description": "プレースホルダ線付きの検索窓+虫眼鏡。検索/探すへの誘導に使うリッチなUIピル。",
+    "tags": [
+      "検索",
+      "検索窓",
+      "search",
+      "searchbox",
+      "虫眼鏡",
+      "探す",
+      "input"
+    ],
+    "mode": "multi",
+    "category": "cta"
+  },
+  {
+    "name": "search",
+    "file": "search.svg",
+    "description": "虫眼鏡(細)。検索CTAの基本。",
+    "tags": [
+      "検索",
+      "虫眼鏡",
+      "search",
+      "探す"
+    ],
+    "mode": "mono",
+    "category": "cta"
+  },
+  {
+    "name": "share-arrow",
+    "file": "share-arrow.svg",
+    "description": "ノード接続の共有アイコン。シェア/拡散への誘導に使う単色CTA。",
+    "tags": [
+      "共有",
+      "シェア",
+      "share",
+      "拡散",
+      "送る",
+      "social"
+    ],
+    "mode": "mono",
+    "category": "cta"
+  },
+  {
+    "name": "shield-check-badge",
+    "file": "shield-check-badge.svg",
+    "description": "盾チェックバッジ(2トーン盾+白チェック)の安全/保証印",
+    "tags": [
+      "盾",
+      "shield",
+      "保証",
+      "secure",
+      "チェック",
+      "check",
+      "badge"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "show-more-dots",
+    "file": "show-more-dots.svg",
+    "description": "三点メニュー。もっと見る/追加操作の入口に。",
+    "tags": [
+      "三点",
+      "もっと見る",
+      "more",
+      "menu",
+      "dots",
+      "メニュー"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "sparkle-four-point",
+    "file": "sparkle-four-point.svg",
+    "description": "4方向きらめき（メイン用の大きめスパークル）",
+    "tags": [
+      "きらめき",
+      "スパークル",
+      "sparkle",
+      "装飾",
+      "キラキラ",
+      "decoration",
+      "shine"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "sparkle-trio",
+    "file": "sparkle-trio.svg",
+    "description": "大中小の3きらめき（散りばめ装飾）",
+    "tags": [
+      "きらめき",
+      "スパークル",
+      "sparkle",
+      "3つ",
+      "装飾",
+      "glitter",
+      "キラキラ"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "sparkle",
+    "file": "sparkle.svg",
+    "description": "きらめき。AI/新着/装飾のアクセント。",
+    "tags": [
+      "きらめき",
+      "sparkle",
+      "キラ",
+      "装飾",
+      "AI",
+      "新着"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "star-burst-lines",
+    "file": "star-burst-lines.svg",
+    "description": "放射状の集中線バースト（強調・注目装飾）",
+    "tags": [
+      "集中線",
+      "バースト",
+      "burst",
+      "放射",
+      "強調",
+      "star-burst",
+      "注目"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "star-filled-rounded",
+    "file": "star-filled-rounded.svg",
+    "description": "塗りの五角星（評価・お気に入り装飾）",
+    "tags": [
+      "星",
+      "スター",
+      "star",
+      "塗り",
+      "お気に入り",
+      "favorite",
+      "評価"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "star-outline",
+    "file": "star-outline.svg",
+    "description": "線の五角星（未選択・アウトライン装飾）",
+    "tags": [
+      "星",
+      "スター",
+      "star",
+      "アウトライン",
+      "outline",
+      "線",
+      "評価"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "swipe-double-arrow",
+    "file": "swipe-double-arrow.svg",
+    "description": "左右両向き矢印。スワイプ/横移動や比較の示唆に。",
+    "tags": [
+      "両矢印",
+      "スワイプ",
+      "swipe",
+      "double",
+      "横移動",
+      "比較"
+    ],
+    "mode": "mono",
+    "category": "arrow"
+  },
+  {
+    "name": "swipe-hand",
+    "file": "swipe-hand.svg",
+    "description": "スワイプする手のアイコン。横スワイプ/次へ誘導に使う単色CTA。",
+    "tags": [
+      "スワイプ",
+      "手",
+      "swipe",
+      "次へ",
+      "横スワイプ",
+      "gesture"
+    ],
+    "mode": "mono",
+    "category": "cta"
+  },
+  {
+    "name": "tap-ripple",
+    "file": "tap-ripple.svg",
+    "description": "波紋付きのタップカーソル。ここを押す誘導に使うリッチなインタラクションアイコン。",
+    "tags": [
+      "タップ",
+      "波紋",
+      "tap",
+      "ripple",
+      "押す",
+      "カーソル",
+      "touch"
+    ],
+    "mode": "multi",
+    "category": "cta"
+  },
+  {
+    "name": "trophy-cup",
+    "file": "trophy-cup.svg",
+    "description": "優勝トロフィー(取っ手付きカップ+台座)の達成バッジ",
+    "tags": [
+      "トロフィー",
+      "trophy",
+      "優勝",
+      "cup",
+      "達成",
+      "winner",
+      "badge"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "ui-bell-notification",
+    "file": "ui-bell-notification.svg",
+    "description": "通知ドット付きのベル・お知らせ",
+    "tags": [
+      "ベル",
+      "bell",
+      "通知",
+      "notification",
+      "お知らせ",
+      "アラート",
+      "alert",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-checkbox-checked",
+    "file": "ui-checkbox-checked.svg",
+    "description": "チェック済みのチェックボックス",
+    "tags": [
+      "チェック",
+      "check",
+      "チェックボックス",
+      "checkbox",
+      "完了",
+      "done",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-mono-rounded-card",
+    "file": "ui-mono-rounded-card.svg",
+    "description": "単色の角丸カード・リスト枠",
+    "tags": [
+      "カード",
+      "card",
+      "単色",
+      "mono",
+      "枠",
+      "コンテナ",
+      "container",
+      "ui"
+    ],
+    "mode": "mono",
+    "category": "ui"
+  },
+  {
+    "name": "ui-mono-search-box",
+    "file": "ui-mono-search-box.svg",
+    "description": "単色の検索バー(任意色で塗り)",
+    "tags": [
+      "検索",
+      "search",
+      "単色",
+      "mono",
+      "バー",
+      "入力",
+      "ui"
+    ],
+    "mode": "mono",
+    "category": "ui"
+  },
+  {
+    "name": "ui-number-badge",
+    "file": "ui-number-badge.svg",
+    "description": "円形の番号バッジ(通知件数など)",
+    "tags": [
+      "バッジ",
+      "badge",
+      "番号",
+      "number",
+      "円",
+      "通知",
+      "カウント",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-pill-button",
+    "file": "ui-pill-button.svg",
+    "description": "角丸の大きいピル型ボタン",
+    "tags": [
+      "ボタン",
+      "button",
+      "ピル",
+      "pill",
+      "CTA",
+      "押す",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-progress-dots",
+    "file": "ui-progress-dots.svg",
+    "description": "ステップ進捗ドット(現在地表示)",
+    "tags": [
+      "進捗",
+      "progress",
+      "ドット",
+      "dots",
+      "ステップ",
+      "step",
+      "ページャ",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-rounded-card",
+    "file": "ui-rounded-card.svg",
+    "description": "角丸のコンテンツカード・パネル",
+    "tags": [
+      "カード",
+      "card",
+      "パネル",
+      "panel",
+      "角丸",
+      "コンテナ",
+      "container",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-search-box",
+    "file": "ui-search-box.svg",
+    "description": "丸い虫眼鏡付きの検索バー・入力フィールド",
+    "tags": [
+      "検索バー",
+      "search",
+      "サーチ",
+      "入力欄",
+      "magnifier",
+      "フィールド",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-segmented-control",
+    "file": "ui-segmented-control.svg",
+    "description": "選択中タブのセグメントコントロール",
+    "tags": [
+      "セグメント",
+      "segment",
+      "タブ",
+      "tab",
+      "切替",
+      "control",
+      "選択",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-speech-bubble-round",
+    "file": "ui-speech-bubble-round.svg",
+    "description": "角丸のスピーチ吹き出し・チャット",
+    "tags": [
+      "吹き出し",
+      "speech",
+      "bubble",
+      "チャット",
+      "コメント",
+      "メッセージ",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-tag-ribbon",
+    "file": "ui-tag-ribbon.svg",
+    "description": "リボン状のタグ・ラベル(価格/分類)",
+    "tags": [
+      "タグ",
+      "tag",
+      "ラベル",
+      "label",
+      "リボン",
+      "ribbon",
+      "価格",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-toggle-switch",
+    "file": "ui-toggle-switch.svg",
+    "description": "オンのトグルスイッチ(設定)",
+    "tags": [
+      "トグル",
+      "toggle",
+      "スイッチ",
+      "switch",
+      "オンオフ",
+      "設定",
+      "settings",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "ui-tooltip-hint",
+    "file": "ui-tooltip-hint.svg",
+    "description": "下向きツールチップ・ヒント吹き出し",
+    "tags": [
+      "ツールチップ",
+      "tooltip",
+      "ヒント",
+      "hint",
+      "ガイド",
+      "ポップ",
+      "popover",
+      "ui"
+    ],
+    "mode": "multi",
+    "category": "ui"
+  },
+  {
+    "name": "underline-stroke",
+    "file": "underline-stroke.svg",
+    "description": "手描き風の下線ストローク（キーワード強調）",
+    "tags": [
+      "下線",
+      "アンダーライン",
+      "underline",
+      "強調",
+      "手描き",
+      "ストローク",
+      "stroke"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  },
+  {
+    "name": "verified-check-badge",
+    "file": "verified-check-badge.svg",
+    "description": "認証チェックバッジ(ギザ円+白チェック)の信頼マーク",
+    "tags": [
+      "認証",
+      "verified",
+      "チェック",
+      "check",
+      "信頼",
+      "badge",
+      "承認"
+    ],
+    "mode": "multi",
+    "category": "badge"
+  },
+  {
+    "name": "verified-check-mono",
+    "file": "verified-check-mono.svg",
+    "description": "認証チェックの単色バッジ(ギザ円+チェック)tint用",
+    "tags": [
+      "認証",
+      "verified",
+      "チェック",
+      "check",
+      "単色",
+      "mono",
+      "badge"
+    ],
+    "mode": "mono",
+    "category": "badge"
+  },
+  {
+    "name": "wavy-divider",
+    "file": "wavy-divider.svg",
+    "description": "波線の区切り（柔らかいセクション分割装飾）",
+    "tags": [
+      "波線",
+      "ウェーブ",
+      "wavy",
+      "区切り",
+      "divider",
+      "セパレーター",
+      "装飾"
+    ],
+    "mode": "mono",
+    "category": "decoration"
+  }
+]
