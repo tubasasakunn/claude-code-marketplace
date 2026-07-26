@@ -53,13 +53,32 @@ def screen_mask(rgb, key, lo=40, hi=110):
     return np.clip((hi - d) / (hi - lo), 0, 1)
 
 
-def despill(rgb, soft, key):
-    """抜いた縁に残る色かぶりを削る。画面色の支配チャンネルを他の上限まで引き下げる。"""
+def spill_ratio(rgb, key):
+    """各画素に画面色がどれだけ混ざっているかを 0..1 で返す。
+
+    支配チャンネル（緑なら G）が他をどれだけ上回るかで測る。純色との距離だと、
+    暗く落ちた汚染（例 rgb(27,31,0)）が「遠い色」と判定されて素通りしてしまう。
+    """
     ch = int(np.argmax(key))
     others = [i for i in range(3) if i != ch]
-    out = rgb.astype(np.int16).copy()
-    cap = np.maximum(out[..., others[0]], out[..., others[1]])
-    out[..., ch] = np.where(soft > 0.08, np.minimum(out[..., ch], cap), out[..., ch])
+    strength = rgb[..., ch] - np.maximum(rgb[..., others[0]], rgb[..., others[1]])
+    ref = float(key[ch] - max(key[others[0]], key[others[1]]))
+    return np.clip(strength / max(ref, 1.0), 0.0, 1.0)
+
+
+def despill(rgb, key):
+    """画面色の混ざりを引く（アンコンポジット）。
+
+    抜く閾値に届かなかった画素にも色の汚染は残る。実際、フレームの内縁に
+    alpha=255 のまま暗いオリーブ（rgb(27,31,0) など）が数千 px 残り、暗い映像を
+    流し込むと画面の輪郭に沿って 1px の線として出た。
+
+    そこで soft の閾値とは無関係に、**全画素**から寄与ぶんを引く。
+    画面色と無関係な色（黒・シルバー・肌色）は寄与 0 になるので影響しない。
+    """
+    out = rgb.astype(np.float32)
+    bg = spill_ratio(out, key.astype(np.float32))
+    out = out - bg[..., None] * key.astype(np.float32)
     return np.clip(out, 0, 255).astype(np.uint8)
 
 
@@ -276,7 +295,7 @@ def main():
         shift = args.rotate // 90
         corners = corners[shift:] + corners[:shift]
 
-    out_rgb = despill(rgb, soft, key)
+    out_rgb = despill(rgb, key)
     out_alpha = (alpha.astype(np.float32) * (1 - soft)).astype(np.uint8)
     frame = np.dstack([out_rgb, out_alpha])
 
