@@ -69,6 +69,10 @@ def coverage(rgb, key):
     return np.clip(strength / max(ref, 1.0), 0.0, 1.0)
 
 
+def fmt_key(key):
+    return 'key #%02X%02X%02X' % tuple(int(v) for v in key)
+
+
 def fill_crop(img, size):
     """アスペクトフィルで中央クロップ。"""
     w, h = size
@@ -86,6 +90,8 @@ def main():
     ap.add_argument('--key', help='塗りつぶしの色（例: 00FF00）。既定は自動判定')
     ap.add_argument('--floor', type=float, default=0.10,
                     help='これ以下の寄与率は 0 に丸める。UI のわずかな色かぶりを守る（既定 0.10）')
+    ap.add_argument('--min-area', type=float, default=0.5,
+                    help='塗りつぶし領域がこの%%未満なら対象外とみなす（既定 0.5）')
     args = ap.parse_args()
 
     shot = Image.open(args.shot).convert('RGB')
@@ -103,6 +109,16 @@ def main():
         print(f'{args.shot}: 塗りつぶし領域が見つからない。--key で色を指定する', file=sys.stderr)
         sys.exit(2)
 
+    # 純度だけでは分離しきれない。アイコンのオレンジ #FCAC1C（差 224）のような色は
+    # 純色判定を通ってしまうので、**占める面積**でも切る。クロマキーは画面の一部を
+    # まとまって占めるが、アイコンは散在するので率が桁違いに低い
+    # （実測: 緑のサムネイル 1.9% に対し、誤検知したアイコン 0.2%）。
+    area = float((bg > 0.5).mean()) * 100
+    if not args.key and area < args.min_area:
+        print(f'{args.shot}: クロマキー領域が無い（{fmt_key(key)} が {area:.2f}% だけ）。'
+              f'この画面は原寸のまま使える', file=sys.stderr)
+        sys.exit(2)
+
     scene = np.asarray(fill_crop(Image.open(args.scene).convert('RGB'), shot.size)).astype(np.float32)
 
     a = bg[..., None]
@@ -112,9 +128,7 @@ def main():
     dst.parent.mkdir(parents=True, exist_ok=True)
     Image.fromarray(out).save(dst)
 
-    pct = float((bg > 0.5).mean()) * 100
-    print(f'{dst}  {shot.width}×{shot.height}  '
-          f'key #{int(key[0]):02X}{int(key[1]):02X}{int(key[2]):02X}  差し替え {pct:.1f}%')
+    print(f'{dst}  {shot.width}×{shot.height}  {fmt_key(key)}  差し替え {area:.1f}%')
 
 
 if __name__ == '__main__':
