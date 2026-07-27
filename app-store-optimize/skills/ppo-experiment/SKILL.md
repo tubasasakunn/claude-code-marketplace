@@ -171,14 +171,46 @@ Can't start experiment, must be reviewed!
 `reviewRequired: true` なので、手順 6 を飛ばせない。作成しただけでは配信されないので、
 **中身を ASC の画面で確認してから提出する**余裕がある。
 
-### 6.9" のリサイズは要らない
+### ★ 現行版と同じサイズ枠に入れる。アプリごとに違う
 
-`--device-type IPHONE_69` を指定すると **`APP_IPHONE_67` として登録される**。
-1320×2868 がそのまま通るので、1290×2796 へ変換する必要はない。
-Apple が 6.9" を 6.7" のスロットで受け付けるため。
+**最初に現行版が持っている display type を調べる。**
 
-CLI の `asc screenshots sizes` は 2 件しか返さず `APP_IPHONE_67` が載っていないが、
-これは CLI 側の情報が古いだけで、実際には使える。
+```bash
+LOC=$(asc localizations list --version <VERSION_ID> \
+      | python3 -c "import sys,json;print(json.load(sys.stdin)['data'][0]['id'])")
+asc localizations screenshot-sets list --localization-id $LOC
+```
+
+実測した例:
+
+| アプリ | 現行の枠 | 要る寸法 |
+|---|---|---|
+| hioto | `APP_IPHONE_67` | 1320×2868 がそのまま通る |
+| Manager | `APP_IPHONE_65` | **1284×2778 へ変換が要る** |
+
+`APP_IPHONE_67` なら `--device-type IPHONE_69` で 1320×2868 がそのまま入る
+（Apple が 6.9" を 6.7" のスロットで受け付けるため）。だが `APP_IPHONE_65` しか
+持たないアプリに 1320×2868 を出すと弾かれる。
+
+```
+unsupported size 1320x2868 for APP_IPHONE_65
+(allowed: 1242x2688, 1284x2778, ...). This size matches: APP_IPHONE_67.
+```
+
+ここで **`APP_IPHONE_67` として入れて逃げてはいけない。** treatment は指定した枠だけを
+差し替えるので、6.5" 端末には現行の画像が出てしまい、**テストとして成立しない**。
+現行と同じ枠へ、比を保ったまま変換して入れる（単純リサイズだと 0.4% 縦に潰れる）。
+
+```python
+# 1320×2868（比 0.46025）→ 1284×2778（比 0.46220）
+want, have = tw/th, im.width/im.height
+if have < want:                    # 縦に長い → 下を削る（端末が切れている側）
+    im = im.crop((0, 0, im.width, round(im.width/want)))
+im = im.resize((tw, th), Image.LANCZOS)
+```
+
+CLI の `asc screenshots sizes` は 2 件しか返さないが、これは情報が古いだけ。
+エラーメッセージの方が正確な許容寸法を教えてくれる。
 
 ### treatment には iPad のセットも自動で作られる
 
@@ -190,6 +222,26 @@ CLI の `asc screenshots sizes` は 2 件しか返さず `APP_IPHONE_67` が載�
 `screenshot-sets list` の `relationships.appScreenshots` は常に空で返る。
 入ったかどうかは `sync` の戻り値（各ファイルの `state: COMPLETE`）で判断し、
 **最終確認は ASC の画面で目視する**。
+
+### ASC は 500 を返す。復旧後もしばらく不安定
+
+`apps list` も `versions list` も**全アプリで 500** を返す時間帯がある（実測で約 18 分）。
+認証の問題と区別がつきにくいので、まず `asc doctor` で認証を確認する。
+
+**復旧直後も 1 回目は失敗することがある。** 実際、復旧を検知した直後でも 3 アプリが
+取得に失敗し、**3 回リトライして通った**。1 回の失敗で「公開版なし」と判断すると誤る。
+
+```bash
+for i in 1 2 3; do
+  out=$(asc versions list --app "$AID" 2>/dev/null)
+  echo "$out" | head -c1 | grep -q '{' && break
+done
+```
+
+### 未公開のアプリには作れない
+
+最新版が `WAITING_FOR_REVIEW` などで `READY_FOR_SALE` の版が無いと PPO は作れない。
+**先に版の状態を確認する。** 画像を作ってから気づくと手戻りになる（実際になった）。
 
 ### フラグ名が揺れている
 
