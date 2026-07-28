@@ -75,7 +75,27 @@ case "$MODE" in
   *) echo "unknown mode: $MODE"; exit 2 ;;
 esac
 
-cd "$SKILL_DIR" || exit 1
+# claude をどこから起動するか。plugin は **project スコープ**で install されているため、
+# cwd がその project でないと sns-daily-pipeline スキル自体が読み込まれない
+# （plugin cache や marketing/ から起動すると素の claude になり、ランが無言で失敗する。実測済み）。
+# データの置き場は REPO_ROOT(marketing) だが、スクリプトが返すパスは全て絶対なので
+# 起動ディレクトリは workspace 側でよい。SNS_LAUNCH_DIR で明示上書きできる。
+plugin_enabled() {
+  [ -f "$1/.claude/settings.json" ] && grep -q 'sns-marketing@' "$1/.claude/settings.json" 2>/dev/null
+}
+LAUNCH_DIR=""
+for d in "${SNS_LAUNCH_DIR:-}" "$HOME"/workspace/sns-marketing-workspace \
+         "$HOME"/*/sns-marketing-workspace "$REPO_ROOT"; do
+  [ -n "$d" ] && plugin_enabled "$d" && { LAUNCH_DIR="$d"; break; }
+done
+if [ -z "$LAUNCH_DIR" ]; then
+  echo "sns-marketing plugin を有効にした project が見つからない（SNS_LAUNCH_DIR を設定してください）" >> "$LOG"
+  python3 "$SKILL_DIR/scripts/harness.py" push \
+    --text "[SNS:${APP}] plugin を有効にした作業ディレクトリが見つからず起動できません" >> "$LOG" 2>&1 || true
+  exit 1
+fi
+echo "----- launch dir: $LAUNCH_DIR -----" >> "$LOG"
+cd "$LAUNCH_DIR" || exit 1
 echo "===== $(date '+%F %T %Z') run start app=${APP} mode=${MODE} =====" >> "$LOG"
 
 # 0) always pull ROOT (marketing.git) first — schedule.json/history.json/LEARNINGS.md/apps.json
