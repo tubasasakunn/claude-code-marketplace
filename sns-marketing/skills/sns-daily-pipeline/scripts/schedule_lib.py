@@ -22,15 +22,9 @@ import argparse, json, os, sys, datetime
 from pathlib import Path
 
 
-def _repo_root():
-    """リポジトリルート（target/ と CLAUDE.md を持つ階層）を __file__ から探す。絶対パス直書きをしない。"""
-    for d in Path(__file__).resolve().parents:
-        if (d / "target").is_dir() and (d / "CLAUDE.md").exists():
-            return d
-    return Path(__file__).resolve().parents[-1]
+from appmeta import ROOT as _REPO_ROOT   # ルート解決は appmeta.py が唯一の正本（SNS_ROOT 対応）
 
-
-REPO = _repo_root()
+REPO = _REPO_ROOT
 ROOT = os.environ.get("ANALYTICS_DIR") or str(REPO / "analytics")
 SCHED = os.path.join(ROOT, "schedule.json")
 HIST  = os.path.join(ROOT, "history.json")

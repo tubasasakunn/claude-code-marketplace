@@ -14,11 +14,28 @@ set -uo pipefail
 export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
 CLAUDE="$(command -v claude || echo "$HOME/.local/bin/claude")"
 # パスは自分の位置から導出（絶対パス直書きをしない）。symlink 経由でも実体を解決。
-SKILL_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
-find_root() { local d="$1"; while [ "$d" != "/" ]; do { [ -d "$d/target" ] && [ -f "$d/CLAUDE.md" ]; } && { echo "$d"; return; }; d="$(dirname "$d")"; done; }
-REPO_ROOT="$(find_root "$SKILL_DIR")"
+SELF_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SKILL_DIR="$(dirname "$SELF_PATH")"
 APPS="$SKILL_DIR/apps.json"
-RUN_ONCE="$SKILL_DIR/run_once.sh"
+
+# リポジトリルートは appmeta.py に一本化する（解決ロジックを2箇所に持たない）。
+# スキルは plugin cache に配られるので「自分の上へ辿る」だけでは見つからない。
+# 別サーバーで候補に当たらない時は SNS_ROOT=/path/to/marketing を渡す。
+REPO_ROOT="$(python3 "$SKILL_DIR/scripts/appmeta.py" root)" || exit 1
+
+# ワンショットの仕込みは common プラグインの local-cron スキルに任せる。
+# （旧 run_once.sh は廃止。crontab 操作は cronctl.sh が正本）
+find_cronctl() {
+  local c
+  for c in "$SKILL_DIR"/../../../../common/*/skills/local-cron/cronctl.sh \
+           "$HOME"/.claude/plugins/cache/*/common/*/skills/local-cron/cronctl.sh \
+           "$HOME"/*/claude-code-marketplace/common/skills/local-cron/cronctl.sh; do
+    [ -f "$c" ] && { readlink -f "$c"; return; }
+  done
+}
+CRONCTL="$(find_cronctl)"
+CRON_TAG="SNS"
+
 LOG="$REPO_ROOT/analytics/cron.log"
 mkdir -p "$(dirname "$LOG")"
 
@@ -27,10 +44,16 @@ MODE="${2:-analyze}"
 if [ -z "$APP" ]; then
   APP=$(python3 - "$APPS" <<'PY'
 import json, sys, datetime
-keys = sorted(json.load(open(sys.argv[1])).keys())
+# "_" 始まりは注記キー（_comment/_rotation）＝アプリではない。除外しないと
+# その日のランが存在しない app 名で走って丸ごと失敗する。
+# ここは apps.json のキーだけを見る（appmeta.py list は target/ を走査するので、
+# ローテから外したはずのアプリが manifest 経由で戻ってきてしまう）。
+keys = sorted(k for k in json.load(open(sys.argv[1])) if not k.startswith("_"))
+if not keys:
+    sys.exit("apps.json に対象アプリが1つもない")
 print(keys[datetime.date.today().timetuple().tm_yday % len(keys)])
 PY
-)
+) || exit 1
 fi
 LOCK="/tmp/sns_${APP}.lock"   # per-app lock: analyze(app A) and post(app B) can overlap
 
@@ -99,10 +122,17 @@ if [ $rc -ne 0 ]; then
 fi
 
 # analyze mode: (re)arm posting one-shots for every queued post at its golden datetime.
+# 毎晩 clear→再arm で冪等にする（途中で失敗した日があっても翌晩に自然に復旧する）。
+# 発火したワンショットは cronctl の __fire が自分の crontab 行を先に消すので溜まらない。
 if [ "$MODE" = "analyze" ] && [ $rc -eq 0 ]; then
-  CONTENT_DIR=$(python3 "$SKILL_DIR/scripts/appmeta.py" get "$APP" 2>/dev/null | python3 -c "import json,sys;print(json.load(sys.stdin).get('content_dir',''))")
-  "$RUN_ONCE" --clear-app "$APP" >> "$LOG" 2>&1 || true
-  python3 - "$CONTENT_DIR/schedule.json" <<PY 2>>"$LOG" | while read -r dt; do
+  if [ -z "$CRONCTL" ]; then
+    echo "cronctl.sh not found — common プラグインの local-cron スキルが要る。投稿one-shotは仕込めない" >> "$LOG"
+    python3 "$SKILL_DIR/scripts/harness.py" push \
+      --text "[SNS:${APP}] cronctl.sh が見つからず投稿one-shotを仕込めませんでした（common/local-cron を確認）" >> "$LOG" 2>&1 || true
+  else
+    CONTENT_DIR=$(python3 "$SKILL_DIR/scripts/appmeta.py" get "$APP" 2>/dev/null | python3 -c "import json,sys;print(json.load(sys.stdin).get('content_dir',''))")
+    "$CRONCTL" clear --tag "$CRON_TAG" --match "app=$APP" >> "$LOG" 2>&1 || true
+    python3 - "$CONTENT_DIR/schedule.json" <<PY 2>>"$LOG" | while read -r dt; do
 import json,sys
 try: posts=json.load(open(sys.argv[1]))['posts']
 except Exception: posts=[]
@@ -110,9 +140,11 @@ for p in posts:
     if p.get('status')=='queued' and p.get('scheduled_date'):
         print(f"{p['scheduled_date']} {p.get('scheduled_time','21:10')}")
 PY
-    "$RUN_ONCE" "$APP" "$dt" post >> "$LOG" 2>&1 || true
-  done
-  echo "----- armed post one-shots for $APP queued posts -----" >> "$LOG"
+      "$CRONCTL" once "$dt" --tag "$CRON_TAG" --label "app=$APP" --log "$LOG" \
+        -- "$SELF_PATH" "$APP" post >> "$LOG" 2>&1 || true
+    done
+    echo "----- armed post one-shots for $APP queued posts -----" >> "$LOG"
+  fi
 fi
 
 echo "===== $(date '+%F %T %Z') run end app=${APP} mode=${MODE} (rc=$rc) =====" >> "$LOG"

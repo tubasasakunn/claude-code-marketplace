@@ -17,17 +17,15 @@ import argparse, json, os, sys, importlib.util, urllib.request
 from pathlib import Path
 
 
-def _repo_root():
-    """リポジトリルート（target/ と CLAUDE.md を持つ階層）を __file__ から探す。絶対パス直書きをしない。"""
-    for d in Path(__file__).resolve().parents:
-        if (d / "target").is_dir() and (d / "CLAUDE.md").exists():
-            return d
-    return Path(__file__).resolve().parents[-1]
+from appmeta import ROOT as _REPO_ROOT   # ルート解決は appmeta.py が唯一の正本（SNS_ROOT 対応）
 
+# carousel-craft 側（templates/standard.py）は appmeta を持たないので、解決済みのルートを
+# 環境変数で渡す。これが無いと plugin cache から動かしたとき bg が引けず全スライドが無地になる。
+os.environ.setdefault("SNS_ROOT", str(_REPO_ROOT))
 
 # carousel-craft は同じ skills/ の兄弟（このファイルから2つ上が skills/）。移設しても不変。
 CC = Path(__file__).resolve().parents[2] / "carousel-craft"
-DEFAULT_TARGET = _repo_root() / "target"
+DEFAULT_TARGET = _REPO_ROOT / "target"
 SIZES = {"tiktok": (1080, 1920), "lemon8": (1080, 1440)}
 
 # 共通フォント（/tmp に用意）。path -> (url, min_bytes)

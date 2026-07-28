@@ -1,27 +1,22 @@
 {
-  "_comment": "root側の運用配線のみ。パスはリポジトリルート相対（appmeta.py が絶対に解決）。アプリの素性(name/bundleId/ascAppId/concept/tags/brand)は各 repo の material/manifest.json が正本。マージ済み設定は scripts/appmeta.py get <id> で得る。target/ に material/manifest.json を持つ repo を置けば自動で対象になる。",
-  "hioto": {
-    "repo": "target/hioto",
-    "content_dir": "analytics",
-    "album_prefix": "hioto",
-    "gh_repo": "tubasasakunn/hioto"
-  },
-  "tone": {
-    "repo": "target/mensmakeupadvisor",
-    "content_dir": "tone_posts",
-    "album_prefix": "tone",
-    "gh_repo": "tubasasakunn/mensmakeupadvisor"
-  },
+  "_comment": "root側の運用配線のみ。パスはリポジトリルート相対（appmeta.py が絶対に解決）。アプリの素性(name/bundleId/ascAppId/concept/tags/brand)は各 repo の material/manifest.json が正本。マージ済み設定は scripts/appmeta.py get <id> で得る。ここに載っているものが日替わりローテーションの対象（run_daily.sh が _ 始まりのキーを除いた sorted(keys) から通算日 % 個数で選ぶ）。外したいアプリはこのファイルから消す＝過去データ(content_dir)はそのまま残る。",
+  "_rotation": "2026-07-28 本人決定により hioto / anki / hanasu の3本立てに変更。tone(mensmakeupadvisor) と connect(connectcalendar) はローテから外した（target/ の submodule と tone_posts/・connect_posts/ の実績・LEARNINGS は保持。再開するときはこのファイルにエントリを戻すだけでよい）。",
   "anki": {
     "repo": "target/createQuestionApple",
     "content_dir": "anki_posts",
     "album_prefix": "anki",
     "gh_repo": "tubasasakunn/createQuestionApple"
   },
-  "connect": {
-    "repo": "target/connectcalendar",
-    "content_dir": "connect_posts",
-    "album_prefix": "connect",
-    "gh_repo": "tubasasakunn/connectcalendar"
+  "hanasu": {
+    "repo": "target/hanasu",
+    "content_dir": "hanasu_posts",
+    "album_prefix": "hanasu",
+    "gh_repo": "tubasasakunn/hanasu"
+  },
+  "hioto": {
+    "repo": "target/hioto",
+    "content_dir": "analytics",
+    "album_prefix": "hioto",
+    "gh_repo": "tubasasakunn/hioto"
   }
 }

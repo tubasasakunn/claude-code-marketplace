@@ -12,6 +12,7 @@
 - 背景は「暗幕＋文字」の一辺倒にしない（cover_card 等のクリーン表現も使う）。
 """
 import math
+import os
 import random
 from pathlib import Path
 
@@ -27,11 +28,29 @@ SOFT_W = (255, 255, 255, 235)
 
 
 def _repo_root():
-    """リポジトリルート（target/ と CLAUDE.md を持つ階層）。spec の bg は repo 相対(material/...)で書けるようにする。"""
+    """リポジトリルート（target/ と CLAUDE.md を持つ階層）。spec の bg は repo 相対(material/...)で書けるようにする。
+
+    このスキルは plugin cache（~/.claude/plugins/cache/...）に配られるので、__file__ から
+    上へ辿るだけでは見つからない（cache はリポジトリの外）。呼び出し側の gen.py が
+    SNS_ROOT を立てて渡すのでそれを最優先で使い、無ければ上方探索 → $HOME 候補の順に落ちる。
+    ここで "/" に落ちると bg が解決できず、全スライドが無地になる。
+    """
+    def ok(d):
+        d = Path(d)
+        return d.is_dir() and (d / "target").is_dir() and (d / "CLAUDE.md").exists()
+
+    env = os.environ.get("SNS_ROOT")
+    if env and ok(env):
+        return Path(env).resolve()
     for d in Path(__file__).resolve().parents:
-        if (d / "target").is_dir() and (d / "CLAUDE.md").exists():
+        if ok(d):
             return d
-    return Path(__file__).resolve().parents[-1]
+    home = Path.home()
+    for d in [home / "workspace" / "marketing", home / "workspace_tmp" / "marketing",
+              home / "marketing", *sorted(home.glob("*/marketing"))]:
+        if ok(d):
+            return d.resolve()
+    return Path("/")   # 見つからない＝素材が引けない。gen.py 側の素材チェックで落ちる
 
 
 REPO_ROOT = _repo_root()
@@ -63,7 +82,8 @@ def _path(brand, val):
         if cand.exists():
             return cand
     if mat:
-        for cand in (mat / val, mat / "screenshots" / val, mat / "footage" / val):
+        # screens/ は hanasu 系の置き場（hioto=material/直下, anki/connect=screenshots/）
+        for cand in (mat / val, mat / "screens" / val, mat / "screenshots" / val, mat / "footage" / val):
             if cand.exists():
                 return cand
         for ext in ("jpg", "png", "jpeg", "webp"):

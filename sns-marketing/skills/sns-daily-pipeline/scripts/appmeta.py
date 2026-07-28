@@ -16,12 +16,44 @@ HERE = Path(__file__).resolve().parent
 APPS = HERE.parent / "apps.json"
 
 
+def _is_root(d):
+    return d and Path(d).is_dir() and (Path(d) / "target").is_dir() and (Path(d) / "CLAUDE.md").exists()
+
+
 def _repo_root():
-    """リポジトリルート（target/ と CLAUDE.md を持つ階層）を __file__ から探す。絶対パス直書きをしない。"""
+    """リポジトリルート（target/ と CLAUDE.md を持つ階層）を解決する。ここが唯一の正本。
+
+    スキルは plugin cache（~/.claude/plugins/cache/...）に配られるため、__file__ から
+    上へ辿るだけでは絶対に見つからない（cache はリポジトリの外にある）。以前はここで
+    parents[-1]＝"/" に落ちて content_dir が "/analytics" になっていた。
+
+    解決順:
+      1. 環境変数 SNS_ROOT（別サーバーではこれを設定するのが確実）
+      2. __file__ から上へ（スキルをリポジトリ内に置いて動かす場合）
+      3. $HOME 配下の既定候補
+    絶対パスを直書きしないので、ユーザー名やホームの位置が違うマシンでも動く。
+    """
+    env = os.environ.get("SNS_ROOT")
+    if _is_root(env):
+        return Path(env).resolve()
+
     for d in Path(__file__).resolve().parents:
-        if (d / "target").is_dir() and (d / "CLAUDE.md").exists():
+        if _is_root(d):
             return d
-    return Path(__file__).resolve().parents[-1]
+
+    home = Path.home()
+    candidates = [home / "workspace" / "marketing", home / "workspace_tmp" / "marketing",
+                  home / "marketing"]
+    candidates += sorted(home.glob("*/marketing"))
+    for d in candidates:
+        if _is_root(d):
+            return d.resolve()
+
+    raise SystemExit(
+        "sns-daily-pipeline: リポジトリルートが見つかりません。"
+        "marketing リポジトリ（target/ と CLAUDE.md を持つ階層）のパスを "
+        "環境変数 SNS_ROOT に設定してください。"
+    )
 
 
 ROOT = _repo_root()
@@ -86,9 +118,12 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("list")
+    sub.add_parser("root")   # シェル側（run_daily.sh）もここからルートを得る＝解決ロジックを二重に持たない
     g = sub.add_parser("get"); g.add_argument("id")
     a = ap.parse_args()
-    if a.cmd == "list":
+    if a.cmd == "root":
+        print(ROOT)
+    elif a.cmd == "list":
         ops = _ops()
         ids = sorted(k for k in set(list(ops.keys()) + list(discover().keys()))
                      if not k.startswith("_"))

@@ -12,7 +12,8 @@ allowed-tools: Bash, Read, Write, Edit, Skill, AskUserQuestion, WebSearch, WebFe
 ## ⚙️ 実行モード（分析と投稿を分離）
 `run_daily.sh [app] [mode]` の mode で実行範囲が変わる：
 - **analyze**（深夜00:12 cronの既定）：手順 **0,1,2,2b,2c,4,5,6,7**（計測→学習→機能アイデアをissue化→外部リサーチ&考察→次の実験を生成・予約）。**投稿(手順3)はしない**。
-  ラン後、wrapperが queued 投稿それぞれに対し golden time で **postモードの単発(run_once)を仕込む**。
+  ラン後、wrapperが queued 投稿それぞれに対し golden time で **postモードの単発を仕込む**
+  （crontab 操作は common プラグインの [[local-cron]] スキル `cronctl.sh` が正本。仕込まれた行は**発火時に自分を消す**）。
 - **post**（投稿one-shotが golden time に発火）：手順 **0 と 3 のみ**（due最古1件を公開・mark・record）。計測/学習/作成はしない。
 - **full**（手動/即時）：全手順を一度に。
 → つまり日々は「深夜に分析、golden時刻に投稿one-shotが公開」の2層。下の手順表はモードに応じて該当ステップだけ実行する。
@@ -153,10 +154,14 @@ python3 schedule_lib.py --app $APP due --date $DATE
 **デザインは [[carousel-craft]] スキルが正本**（フック/タイポ/配色/セーフゾーン/構成は `DESIGN_SPEC.md`、素材在庫とspecレシピは `MATERIALS.md`）。企画時に必ず参照する。
 **素材ファースト＝表紙含め全スライドに実素材を敷く（ベタ塗り/グラデ/単色の背景を作らない）**：
 - **cover/photo の `bg` は必ず指定**（省略禁止）。anki/connect の `bg`省略＝手続き背景(灰色)、tone の footage名→ベタ赤 はいずれも**禁止**。素材は下記バンクの**絶対パス**を渡す（tone も gen.py 拡張で絶対パスOK）。
-- **shot は実app画面を複数枚**（hioto=`material/`、tone=`material/`直下、anki/connect=`material/screenshots/`）。緑クロマキーがあれば `footage` で世界観差替（hioto/tone）。
-- フッテージ: hioto=FTキー(`sunset`等6種)／tone=footage空→bg絶対パス／anki・connect=footage無し→bg絶対パス。
+- **shot は実app画面を複数枚**（hioto=`material/`、tone=`material/`直下、anki/connect=`material/screenshots/`、
+  **hanasu=`material/screens/`**＝spec には `screens/09_paper.png` のように書く）。緑クロマキーがあれば `footage` で世界観差替（hioto/tone）。
+- フッテージ: hioto=FTキー(`sunset`等6種)／tone=footage空→bg絶対パス／anki・connect・**hanasu**=footage無し→bg絶対パス。
+- **hanasu 固有**: 差別化の核が「レイアウトが毎回変わる」なので、`material/layouts/` のページ見本（`genre_*`/`density_*`）を
+  複数並べて見せる構成が効く。`09_paper.png`（完成ページ）は表紙候補。
 **cover/photo の背景＝ルートの汎用素材バンク `material/`**（repo 内 material とは別物）。`index.json`（`{name(uuid), tags[]}`）をテーマ＋`縦長`でタグ検索し `images/<name>.jpg` の絶対パスを `bg` 指定。
-タグ：hioto→`hioto`/`日記`/`film`、tone→`tone`/`メンズ`、**anki/connect→専用タグ無し→`flatlay`/`interior`/`部屋`/`日常`**（`勉強`/`カレンダー`は0件のこと多し＝必ず実在確認）。
+タグ：hioto→`hioto`/`日記`/`film`、tone→`tone`/`メンズ`、**anki/connect/hanasu→専用タグ無し→`flatlay`/`interior`/`部屋`/`日常`/`cozy`/`journal`**（`勉強`/`カレンダー`は0件のこと多し＝必ず実在確認）。
+**hanasu は hioto と同じく顔・人物入りを避ける**（個人の記録という軸）。
 **hioto は顔・人物入りを避ける**（プライバシー軸）／tone は人物（メイクシーン）歓迎。
 ```bash
 python3 - <<'PY'
@@ -204,5 +209,21 @@ adb無し→中断し状態保持。ANR/もたつき→`lib.sh` の `free_cpu`�
 **失敗・中断したら `python3 harness.py push --text "[SNS:<app>] <何が起きたか>"` で LINE 通知**（adb無し/投稿失敗/生成崩れ＝特別なこと）。状態は保持して次ランで復帰。
 
 ## スケジューラ
-本番は夜21:07 JST の system cron → `run_daily.sh`（無引数＝日替わりで apps をローテーション）→ `claude -p`。
+本番は **深夜 00:12 JST** の system cron → `run_daily.sh`（無引数＝日替わりで apps をローテーション）→
+`claude -p ... --dangerously-skip-permissions`。analyze が終わると、queued 投稿それぞれの golden time に
+**postモードのワンショット**が仕込まれ、発火時に自分の crontab 行を消してから公開する（2層構成）。
+
+crontab の登録・削除は **common プラグインの [[local-cron]] スキル**（`cronctl.sh`）に集約してある。
+このスキル側で crontab を直に叩かない。
+
+```bash
+CRONCTL="$HOME/.claude/plugins/cache/tubasasakunn-marketplace/common"/*/skills/local-cron/cronctl.sh
+$CRONCTL list --tag SNS                      # 予定を見る（深夜の常駐＋仕込まれた投稿）
+$CRONCTL clear --tag SNS --match app=hioto    # あるアプリの投稿予定だけ止める
+```
+
+**別サーバーで動かすとき**：リポジトリルートが自動で見つからなければ `SNS_ROOT=/path/to/marketing` を
+環境変数で渡す（`appmeta.py root` が解決の正本）。crontab に書かれるパスは `$HOME` 基準に畳まれるので、
+ユーザー名やホームの位置が違うマシンでもそのまま通る。
+
 詳細は `analytics/SCHEDULING.md`。新アプリ追加は apps.json に1エントリ足すだけ（cron は自動でローテに含める）。
