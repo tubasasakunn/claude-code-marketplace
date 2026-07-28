@@ -25,12 +25,17 @@ REPO_ROOT="$(python3 "$SKILL_DIR/scripts/appmeta.py" root)" || exit 1
 
 # ワンショットの仕込みは common プラグインの local-cron スキルに任せる。
 # （旧 run_once.sh は廃止。crontab 操作は cronctl.sh が正本）
+# marketplace のソースを **plugin cache より先に** 探す。cache のパスは
+# バージョン番号入り（.../common/2.1.0/...）なので、crontab にそれを書くと
+# 次のバージョン上げ以降も古いスクリプトを黙って実行し続ける。
+# ソースが無いマシン（cache だけ配られている環境）では cache に落ちる。
 find_cronctl() {
   local c
-  for c in "$SKILL_DIR"/../../../../common/*/skills/local-cron/cronctl.sh \
-           "$HOME"/.claude/plugins/cache/*/common/*/skills/local-cron/cronctl.sh \
-           "$HOME"/*/claude-code-marketplace/common/skills/local-cron/cronctl.sh; do
-    [ -f "$c" ] && { readlink -f "$c"; return; }
+  for c in "${SNS_CRONCTL:-}" \
+           "$HOME"/*/claude-code-marketplace/common/skills/local-cron/cronctl.sh \
+           "$SKILL_DIR"/../../../../common/*/skills/local-cron/cronctl.sh \
+           "$HOME"/.claude/plugins/cache/*/common/*/skills/local-cron/cronctl.sh; do
+    [ -n "$c" ] && [ -f "$c" ] && { readlink -f "$c"; return; }
   done
 }
 CRONCTL="$(find_cronctl)"
