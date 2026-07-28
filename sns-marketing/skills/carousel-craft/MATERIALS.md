@@ -48,7 +48,26 @@ PY
 
 > **★スライド仕様（最新の standard 雛形・全アプリ共通／chrome無し・太い丸/角ゴシック）**：
 > - 見出しフォントは `brand.head`（material/manifest）＝maru(丸)/kaku(角)/antique/mincho。アプリ毎に設定済（明朝の"AIっぽさ"回避）。
-> - `cover` variant：`editorial`(断定)/`card`(**写真を暗くせずクリーンな角丸パネル＝暗幕に頼らない**)/`question`/`quote`/`split`/`versus`/`numeric`。フィールドは従来通り＋`bg`必須・`kicker`任意。**暗幕＋文字の一辺倒を避け `card` 等も混ぜる**。
+> - `cover` variant：`editorial`(断定)/`card`(**写真を暗くせずクリーンな角丸パネル＝暗幕に頼らない**)/`question`/`quote`/`split`/`versus`/`numeric`/**`giant`**(巨大数字＝`big`+`unit`+`kicker`/`teaser`)/**`magazine`**(雑誌の柱＝`headline`+`en`+`issue`)。フィールドは従来通り＋`bg`必須・`kicker`任意。**暗幕＋文字の一辺倒を避け `card` 等も混ぜる**。
+> - ★**`dark`（cover/photo 共通・任意）**：背景写真の暗さ（既定 cover 0.42–0.56 / photo 0.46）。photo を連投して時間帯を見せるときは 0.28→0.52 の階調を与える（一律だと朝も夜も同じ暗さになって変化が消える）。
+> - ★**新スライド型（2026-07-27）**
+>   - `grid`：`title` + `cells`[2–4]（`{icon,label,text}`）。**1セル＝ラベル1語＋本文1行**に絞る。
+>   - `callout`：`shot`(+`footage`) + `title`(+`sub`) + `spot`[x,y]（端末内の相対座標）+ `spot_r` + `spot_label`。**強調は1点のみ受け付ける**。
+>   - `scrap`：`prints`[{`src`,`at`[x,y],`w`,`rot`,`ratio`,`memo`}] + `title`/`memo` + `mark`(`circle`|`band`)。手描きは**1枚に1つだけ**。
+>   - `panorama`：`pano`[i,n] + `stops`[accent名…] + `frames`[{`src`,`at`(全体幅比),`w`,`ratio`,`rot`,`at_label`}] + `rail`/`rail_y` + `caption`。
+>     ⚠️ **全スライドで `stops`/`frames` を同一に**（1枚の絵を切り出すため）。コマは境界（i/n）の上に置くと隣へまたがる。
+> - ★**アプリ紹介の定番型（2026-07-27 追加）**
+>   - `rank`：`rank`(順位) + `label` + `sub` + `shot`(+`footage`) / `bg`。**1位を最後に**。位置は全枚数で固定。
+>   - `table`：`title` + `cols`[2] + `rows`[{`label`,`a`,`b`}] + `mark_col`(0|1)。⚠️ 他社比較は不可（景表法）。
+>   - `bleed`：`num` + `title` + `shot`(+`footage`) + `card_label` + `card`。端末枠なしの全面ブリード＋白カード。
+>   - `spec`：`num` + `name` + `icon`(SVG名) + `specs`[{`k`,`v`}]×3 + `caption`。**全枚数で同じ様式**にする。
+>   - `steps`：`title` + `steps`[{`label`,`text`}]（3〜4手）。
+>   - `stats`：`title` + `stats`[{`n`,`unit`,`label`}]（2〜3個） + `note`。仕様から言い切れる数だけ。
+>   - `recap`：`title` + `items`[]（5〜7個）。**最終スライドの手前**に置く。
+> - ★**`layout`（写真×文字の別解・2026-07-27）**：`mode` で8通り
+>   （`margin`/`band`/`frame`/`light`/`duotone`/`cutout`/`stripe`/`edge`）。
+>   `bg` + `title` + `sub` + `kicker` + `hl` + `big`(表紙サイズ) + `at`(edge の上下) + `on_dark`(edge で白文字) + `dark`(cutout の濃さ)。
+>   **暗幕（黒＋白文字）を1投稿で2枚までに抑えるための型**。→ [[LAYOUTS]] §6。
 > - `photo`：`bg`+`caption`(+`note`)。`\n`改行可・各行短く。
 > - `shot`：`shot`(実画面)+`title`(+`sub`,`footage`,`bg`)。見出し特大＋端末見切れ。
 > - `info`：`title`+`bullets[]`。**bullets は文字列 or `{"icon":"<SVG名>","text":"…"}`**（アイコンは `engine/assets/svg/index.json` からタグ検索。例 concept-camera-shutter / concept-trend-up-graph / concept-clock-time / concept-checklist-tasks）。**項目は3〜4個まで・短文・余白大**。`ポイント`等のラベルや小さい文字は書かない。

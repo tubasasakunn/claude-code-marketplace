@@ -56,7 +56,9 @@ SAFE = {
     (1080, 1440): {"top": 130, "bottom": 173, "left": 96,  "right": 96,  "rail_top": None},
 }
 BLOCK, BUSY_STD = 40, 12.0
-MATERIAL_TYPES = ("cover", "photo", "shot")
+# callout は実画面が主役、scrap は貼るプリントが主役＝どちらも素材が無ければ成立しない。
+# grid / panorama は型ベースのグラフィック（panorama はブランド色のグラデだけでも成立する）。
+MATERIAL_TYPES = ("cover", "photo", "shot", "callout", "scrap", "bleed", "layout")
 
 
 def safe_for(w, h):
@@ -118,11 +120,13 @@ def slide_has_material(sl):
     """Does this source slide declare a real material? cover/photo need a background
     image (bg / bg_options); shot needs a screenshot (shot). footage counts as extra."""
     t = sl.get("type")
-    if t in ("cover", "photo"):
+    if t in ("cover", "photo", "layout"):
         return bool(sl.get("bg") or sl.get("bg_options"))
-    if t == "shot":
+    if t in ("shot", "callout", "bleed"):
         return bool(sl.get("shot"))
-    return True  # info / cta are intentionally type-driven graphics
+    if t == "scrap":
+        return bool(sl.get("prints"))
+    return True  # info / cta / grid は型ベースのグラフィック（素材を持たない設計）
 
 
 # MARK: - 文言の法令・規約ガード（spec のテキストを機械的に弾く）
@@ -183,7 +187,9 @@ def material_flags(spec):
     for i, sl in enumerate(spec.get("slides", []), 1):
         t = sl.get("type")
         if t in MATERIAL_TYPES and not slide_has_material(sl):
-            need = "shot(実app画面)" if t == "shot" else "bg(実写真/実画面/素材バンク)"
+            need = {"shot": "shot(実app画面)", "callout": "shot(実app画面)",
+                    "bleed": "shot(実app画面)",
+                    "scrap": "prints[](貼るプリント)"}.get(t, "bg(実写真/実画面/素材バンク)")
             flags[i] = f"NO-MATERIAL:{t} — {need} を指定（フラット背景を排除）"
         elif t in ("cover", "photo") and not sl.get("footage") and t == "shot":
             pass
