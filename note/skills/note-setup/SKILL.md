@@ -78,8 +78,9 @@ note_list_articles(status="all", limit=5)
 | 確認 | `note_show_preview` `note_get_preview_html` |
 | 公開・削除 | `note_publish_article` `note_delete_draft` `note_delete_all_drafts` |
 
-`investigator_*` 系（ブラウザでトラフィックを取って非公開 API を解析するツール）も生えているが、
-**通常の執筆・投稿では使わない**。note 側の仕様変更で壊れたときの調査用。
+通常はこの 17 個が見える（実測）。ブラウザでトラフィックを取って非公開 API を解析する
+`investigator_*` 系は **`INVESTIGATOR_MODE=1` を付けて起動したときだけ**生える。
+note 側の仕様変更で壊れたときの調査用で、執筆・投稿では使わない。
 
 ## 壊れたときの切り分け
 
