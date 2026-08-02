@@ -100,6 +100,30 @@
         "ref": "main"
       },
       "description": "（外部・RevenueCat公式）Google Play Billing 固有の話。プラン変更・価格改定・支払い回復・Webhook。"
+    },
+    {
+      "name": "last30days",
+      "source": {
+        "source": "github",
+        "repo": "mvanhorn/last30days-skill"
+      },
+      "description": "（外部）直近30日の Reddit / Hacker News / YouTube / Polymarket / GitHub を横断して、engagement 実数順に生の発言を集める。APIキー不要。SNS のネタ出し・ASO のキーワード源泉・アプリ企画のインサイト取りの前段に使う。"
+    },
+    {
+      "name": "marketing-skills",
+      "source": {
+        "source": "github",
+        "repo": "coreyhaines31/marketingskills"
+      },
+      "description": "（外部）マーケ 49 スキル。CRO・コピーライティング・ペイウォール・価格・A/Bテスト・ローンチ・チャーン防止。英語圏 SaaS 前提なので、日本語ストア文言そのものではなく設計判断の材料として使う。"
+    },
+    {
+      "name": "tiktok-video-skills",
+      "source": {
+        "source": "github",
+        "repo": "iart-ai/tiktok-video-skills"
+      },
+      "description": "（外部）短尺縦動画の構成知見。フック→リテンション→ループの文法、9:16 セーフエリア、単語単位のキャプション同期、カウントダウン。レンダリングは Remotion 前提だが、実装は /sns-marketing:promo-video の PIL+ffmpeg を使うこと。"
     }
   ]
 }

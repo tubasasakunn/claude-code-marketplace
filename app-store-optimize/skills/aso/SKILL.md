@@ -34,7 +34,7 @@ allowed-tools: Bash, Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 調査結果は `release/aso/` に Markdown で残す（例：`release/aso/2026-07-research.md`）。
 次回の見直しで「前回どの語を、どの根拠で選んだか」を diff できるようにする。
 
-### 1-1. 候補キーワードの洗い出し（4 つの源泉）
+### 1-1. 候補キーワードの洗い出し（5 つの源泉）
 
 | 源泉 | やり方 |
 |---|---|
@@ -42,6 +42,7 @@ allowed-tools: Bash, Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 | 競合メタデータ | 上位競合 3〜5 本のタイトル・サブタイトルから頻出語を抽出（下の iTunes Search API） |
 | ストアのサジェスト | App Store 検索窓に主要語を入れたときの補完候補（実機/WebSearch で「App Store <語> サジェスト」） |
 | レビュー語彙 | 自アプリ・競合のレビューでユーザーが実際に使う言い回しを拾う（機能名ではなく悩み・目的の表現） |
+| 直近の生声 | `/last30days <ジャンル> app what users want` — Reddit / HN / YouTube から直近 30 日の実発言を engagement 順で拾う。**ストアの外**でユーザーが使う語彙が取れる（キー不要） |
 
 ### 1-2. 競合・順位の実査（iTunes Search API）
 

@@ -8,7 +8,7 @@ description: この marketplace の全スキルの索引と使い分け。どん
 ## ★ スキルを直すときは、必ずこの marketplace リポジトリを直す
 
 ```bash
-cd ~/workspace_tmp/claude-code-marketplace   # ここが唯一の正本
+cd ~/workspace/claude-code-marketplace   # ここが唯一の正本
 # 編集 → commit → push → 各リポジトリは次のセッション開始時に pull で取り込む
 python3 common/scripts/build_skill_map.py     # スキルを増減したらこの索引を再生成
 ```
@@ -49,6 +49,26 @@ python3 common/scripts/build_skill_map.py     # スキルを増減したらこ�
 | `frontend-design` | `anthropics/claude-plugins-official` の `plugins/frontend-design` | 視覚デザインの方向づけ |
 | `gopls-lsp` | 同上の `plugins/gopls-lsp` | Go の LSP 連携 |
 | `using-cmux` | `hummer98/using-cmux` | cmux 内での操作 |
+| `last30days` | `mvanhorn/last30days-skill` | 直近30日の Reddit / HN / YouTube / Polymarket / GitHub を engagement 実数順で収集。**APIキー不要**（TikTok/Instagram だけ ScrapeCreators キーが要る） |
+| `marketing-skills` | `coreyhaines31/marketingskills` | マーケ 49 スキル（CRO・コピー・ペイウォール・価格・A/B・ローンチ） |
+| `tiktok-video-skills` | `iart-ai/tiktok-video-skills` | 短尺縦動画の構成知見 4 本（フック→リテンション→ループ、9:16 セーフエリア、単語単位キャプション、カウントダウン） |
+
+**`last30days` は「想像で書く」を潰すために入れてある。** SNS のネタ出し（`/sns-marketing:sns-post`）、
+ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ企画のインサイト取り
+（`/ios-app-build:concept-crafting` の第2章前）で、各スキル側から明示的に呼ぶよう書いてある。
+
+**`tiktok-video-skills` は知見だけ取って実装は流用しない。** 中身は全部 Remotion（ヘッドレス Chrome）前提で、
+`/sns-marketing:promo-video` の「ブラウザや外部サービスに依存しない（PIL でフレーム合成 → ffmpeg）」
+という設計方針と正面から衝突する。**構成の文法だけ読んで、描画は promo-video のエンジンで書く。**
+
+`marketing-skills` は英語圏 SaaS 前提で 49 本ある。日本語ストア文言をそのまま任せる相手ではなく、
+設計判断（価格の刻み方・ペイウォールの位置・A/B の回し方）の材料として引く。
+`app-store-optimize` にだけ入れてあるのは、`sns-marketing` にも入れると自作の `sns-post` /
+`tone-post` と description が競合するため。
+
+**見送ったもの**：`renezander030/capcut-cli`（CapCut / 剪映のドラフト直編集）。この Mac に CapCut が
+無く、かつ `promo-video` が GUI を介さない完全プログラム生成なので、量産パイプラインの方向と逆。
+さらに SessionStart フックが毎回無言で `npm i -g capcut-cli` を実行する作りだった。
 
 他人のプラグインを足すときは `.claude-plugin/marketplace.json` に参照を書くだけでよい
 （コピーしない）:
