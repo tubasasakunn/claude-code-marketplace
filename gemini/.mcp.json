@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "gemini": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/mcp/bin/start.sh"
+    }
+  }
+}

@@ -3,12 +3,14 @@
  *
  * Chrome 136+ は既定の user-data-dir に対して --remote-debugging-port を無効化する
  * （Cookie 窃取対策）。そのため普段使いプロファイルを別ディレクトリへコピーし、
- * そのコピーをデバッグ起動する。詳細は skills/canva-image-gen/REFERENCE.md。
+ * そのコピーをデバッグ起動する。
  *
- * **gemini プラグインの mcp/lib/chrome.mjs とほぼ同じ実装**（プラグインを独立して配れるように
- * 共有せず複製している）。Chrome まわりの事故 —— タブ 0 枚、プロファイルを生きたまま作り直す、
- * rsync が生きたキャッシュで落ちる —— の対処は両方に等しく効くので、
- * **片方を直したらもう片方も見ること**。
+ * **canva プラグインの mcp/lib/chrome.mjs とほぼ同じ実装**（プラグインを独立して
+ * 配れるようにするため、共有せず複製している）。Chrome まわりの事故 —— タブ 0 枚、
+ * プロファイルを生きたまま作り直す、rsync が生きたキャッシュで落ちる —— の対処は
+ * 両方に等しく効くので、**片方を直したらもう片方も見ること**。
+ *
+ * Canva 用（既定 9222）と Gemini 用（既定 9223）は複製先もポートも別なので、並走できる。
  */
 import { spawn, execFile } from "node:child_process";
 import { promisify } from "node:util";
@@ -18,10 +20,10 @@ import path from "node:path";
 
 const execFileAsync = promisify(execFile);
 
-export const DEFAULT_PORT = Number(process.env.CDP_PORT || 9222);
+export const DEFAULT_PORT = Number(process.env.GEMINI_CDP_PORT || 9223);
 export const CHROME_BIN = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 export const SRC_ROOT = path.join(os.homedir(), "Library/Application Support/Google/Chrome");
-export const DST_ROOT = path.join(os.homedir(), "Library/Application Support/Google/Chrome-automation");
+export const DST_ROOT = path.join(os.homedir(), "Library/Application Support/Google/Chrome-gemini");
 
 // 引き継ぎたいのは cookie と設定だけ。キャッシュ類は要らないうえ、普段使いの Chrome が
 // 動いていると転送中に消えて rsync を落とすので、まとめて除外する。
@@ -36,15 +38,15 @@ const RSYNC_EXCLUDES = [
 /** rsync の 24 は「転送中に元ファイルが消えた」。キャッシュを除外しても起きうるので通す。 */
 const RSYNC_TOLERATED_CODES = new Set([24]);
 
-/** Cookies(SQLite) の canva.com ホストの件数を数える。掴まれている DB を避けて複製してから読む。 */
-async function countCanvaCookies(cookiesPath) {
+/** Cookies(SQLite) の指定ホストの件数を数える。掴まれている DB を避けて複製してから読む。 */
+async function countCookies(cookiesPath, hostLike = "%google.com%") {
   if (!fs.existsSync(cookiesPath)) return 0;
-  const tmp = path.join(os.tmpdir(), `canva-mcp-count-${process.pid}.db`);
+  const tmp = path.join(os.tmpdir(), `gemini-mcp-count-${process.pid}.db`);
   try {
     fs.copyFileSync(cookiesPath, tmp);
     const { stdout } = await execFileAsync("sqlite3", [
       tmp,
-      "SELECT COUNT(*) FROM cookies WHERE host_key LIKE '%canva.com%';",
+      `SELECT COUNT(*) FROM cookies WHERE host_key LIKE '${hostLike}';`,
     ]);
     return Number(stdout.trim()) || 0;
   } catch {
@@ -111,47 +113,34 @@ export async function ensureTarget(port = DEFAULT_PORT) {
 }
 
 /**
- * どのプロファイルに Canva のログインがあるかを Cookies(SQLite) の件数で推定する。
- * Chrome が掴んでいるファイルを直接開くとロックに当たるので、tmp へ複製してから読む。
+ * 普段使い Chrome のプロファイルを列挙し、表示名とログイン中の Google アカウントを返す。
+ * どれを複製すればよいかは人にしか決められないので、判断材料を出すところまでをやる。
  */
-export async function detectCanvaProfile() {
+export async function detectProfiles() {
   if (!fs.existsSync(SRC_ROOT)) return [];
   const names = fs
     .readdirSync(SRC_ROOT, { withFileTypes: true })
     .filter((d) => d.isDirectory() && (d.name === "Default" || /^Profile \d+$/.test(d.name)))
     .map((d) => d.name);
 
-  let labels = {};
+  let info = {};
   try {
     const localState = JSON.parse(fs.readFileSync(path.join(SRC_ROOT, "Local State"), "utf8"));
-    labels = localState?.profile?.info_cache ?? {};
+    info = localState?.profile?.info_cache ?? {};
   } catch {
-    // Local State が読めなくても件数だけで判断できる
+    // Local State が読めなければ、ディレクトリ名だけで案内する
   }
 
   const results = [];
   for (const name of names) {
-    const src = path.join(SRC_ROOT, name, "Cookies");
-    if (!fs.existsSync(src)) continue;
-    const tmp = path.join(os.tmpdir(), `canva-mcp-cookies-${name.replace(/\s/g, "_")}.db`);
-    try {
-      fs.copyFileSync(src, tmp);
-      const { stdout } = await execFileAsync("sqlite3", [
-        tmp,
-        "SELECT COUNT(*) FROM cookies WHERE host_key LIKE '%canva.com%';",
-      ]);
-      results.push({
-        profile: name,
-        label: labels[name]?.name ?? null,
-        canvaCookies: Number(stdout.trim()) || 0,
-      });
-    } catch {
-      // sqlite3 が無い / 壊れた DB は候補から外すだけでよい
-    } finally {
-      fs.rmSync(tmp, { force: true });
-    }
+    results.push({
+      profile: name,
+      label: info[name]?.name ?? null,
+      account: info[name]?.user_name || null,
+      googleCookies: await countCookies(path.join(SRC_ROOT, name, "Cookies")),
+    });
   }
-  return results.sort((a, b) => b.canvaCookies - a.canvaCookies);
+  return results.sort((a, b) => b.googleCookies - a.googleCookies);
 }
 
 /**
@@ -159,7 +148,7 @@ export async function detectCanvaProfile() {
  * 初回と、Canva のログインが切れて普段の Chrome で入り直したときに実行する。
  */
 export async function setupProfile({
-  srcProfile = process.env.SRC_PROFILE || "Profile 1",
+  srcProfile = process.env.GEMINI_SRC_PROFILE || "Profile 1",
   dstRoot = DST_ROOT,
   log = () => {},
 } = {}) {
@@ -194,18 +183,18 @@ export async function setupProfile({
     log(`rsync が一部ファイルを取りこぼしました（コード ${e.code}）。cookie が揃っていれば問題ありません。`);
   }
 
-  // コピーできたかどうかは転送の成否ではなく、Canva の cookie が入ったかで判定する
-  const cookies = await countCanvaCookies(path.join(dst, "Cookies"));
+  // コピーできたかどうかは転送の成否ではなく、Google の cookie が入ったかで判定する
+  const cookies = await countCookies(path.join(dst, "Cookies"));
   if (cookies === 0) {
     throw new Error(
-      `コピーはできましたが、${srcProfile} から Canva の cookie を引き継げませんでした。` +
-        "普段使いの Chrome で Canva にログインしているプロファイルを src_profile に指定してください。",
+      `コピーはできましたが、${srcProfile} から Google の cookie を引き継げませんでした。` +
+        "Gemini にログインしている Chrome プロファイルを src_profile に指定してください。",
     );
   }
 
   const { stdout } = await execFileAsync("du", ["-sh", dstRoot]);
   const size = stdout.split("\t")[0]?.trim() ?? "?";
-  log(`コピー完了: ${size} / Canva cookie ${cookies} 個`);
+  log(`コピー完了: ${size} / Google cookie ${cookies} 個`);
   return { srcProfile, dst, size, cookies };
 }
 
@@ -222,7 +211,7 @@ export async function launchChrome({
     return { started: false, port, version: already };
   }
   if (!profileExists(dstRoot)) {
-    throw new Error("自動化用プロファイルがありません。先に canva_setup_profile を実行してください。");
+    throw new Error("自動化用プロファイルがありません。先に gemini_setup_profile を実行してください。");
   }
   if (!fs.existsSync(CHROME_BIN)) {
     throw new Error(`Google Chrome が見つかりません: ${CHROME_BIN}`);

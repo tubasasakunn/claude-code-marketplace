@@ -1,0 +1,7 @@
+{
+  "name": "gemini",
+  "description": "Gemini アプリ限定の機能をブラウザ操作で回す。Nano Banana の画像生成、Deep Research、モデル切替。テキスト生成だけなら公式 API を使うこと。",
+  "version": "1.0.0",
+  "author": { "name": "tubasasakunn" },
+  "mcpServers": "./.mcp.json"
+}

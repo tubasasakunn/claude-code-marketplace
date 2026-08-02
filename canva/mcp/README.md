@@ -37,6 +37,7 @@ mcp/
   `console.log` を 1 行足すだけでプロトコルが壊れる。
 - **セレクタは `lib/dreamlab.mjs` にだけ書く。** CLI（`skills/canva-image-gen/scripts/`）も
   この lib を呼ぶので、二重に持つと片方だけ腐る。
+- **`lib/chrome.mjs` は gemini プラグインと双子。** どちらかを直したらもう片方も見る。
 - **ログイン判定に cookie 数を使わない。** 複製したプロファイルでは cookie の行があっても
   復号できず未ログイン扱いになる。判定は Dream Lab のプロンプト欄の実在で行う。
 

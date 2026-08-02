@@ -1,0 +1,15 @@
+{
+  "name": "gemini-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gemini アプリの機能（Nano Banana の画像生成 / Deep Research / Canvas）を、ログイン済み Chrome の CDP 操作で叩く MCP サーバー。",
+  "bin": {
+    "gemini-mcp": "./server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "playwright-core": "^1.60.0",
+    "zod": "^3.25.0"
+  }
+}

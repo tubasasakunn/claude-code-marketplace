@@ -128,7 +128,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 67 スキル / 9 プラグイン**
+**全 68 スキル / 10 プラグイン**
 
 ### `common`（11本） — 全リポジトリで有効化
 
@@ -234,6 +234,12 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | スキル | 何をするか |
 |---|---|
 | `/canva:canva-image-gen` | Canva の AI 画像生成（Dream Lab / 旧 Magic Media）を、ログイン済み Chrome をブラウザ操作（CDP）して実行し、画像をダウンロードします。 |
+
+### `gemini`（1本） — 全リポジトリ（user スコープ）で有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/gemini:gemini-browser` | Gemini アプリ限定の機能（Nano Banana の画像生成、Deep Research、モデル切替）を、ログイン済み Chrome のブラウザ操作（CDP）で回します。 |
 
 ### `writing`（2本） — 全リポジトリ（user スコープ）で有効化
 
