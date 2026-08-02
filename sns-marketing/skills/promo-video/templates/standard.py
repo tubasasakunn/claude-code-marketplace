@@ -13,11 +13,17 @@
   proof_gallery 証拠：実画面 3 台のパララックス・ギャラリー
   privacy       メッセージ：暗い footage＋モチーフ svg＋見出し
   cta           締め：モチーフ＋ワードマーク＋タグライン＋誘導＋アクセントドット
+  shot_stage    実機1台を舞台に立てる（footage 不要・フラット面）＋音声波形/タップ波紋
+  shuffle       同じ枠の中身を高速に差し替える（「毎回ちがう」の証明）＋カウンタ
+  statement     フラット面の一言（footage 不要の privacy）＋モチーフ svg
 共通フィールド: frames(必須), accent(アクセント名), kicker, head[], sub[], foot[]
+footage を持たない app（紙もの/ドキュメント系）は shot_stage / shuffle / statement で組む。
 """
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter
 import math
+
+import numpy as np
 
 import video as V
 B = V.B
@@ -38,6 +44,66 @@ def _acc(brand, name, default="evening"):
     return brand.accent(default)
 
 
+def _motif_img(s, brand, color, height):
+    """モチーフ svg を 1 枚返す。spec の "motif"（carousel-craft の素材バンク名）が
+    最優先、無ければ manifest の brand.motif（material 内の svg）。どちらも無ければ None。"""
+    name = s.get("motif")
+    if name and B.has_svg(name):
+        return B.svg_image(name, color, height)
+    if brand.motif and Path(brand.motif).exists():
+        return B.svg_image(str(brand.motif), color, height)
+    return None
+
+
+def _shot(MAT, rel):
+    """material 相対の画像パス。拡張子を書かなければ .png を補う（"screens/03_home" 可）。"""
+    rel = str(rel)
+    if not rel.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+        rel += ".png"
+    return Path(MAT) / rel
+
+
+def _field(s, brand):
+    """フラット面の (背景色, 文字色, サブ文字色, on_dark)。bg: "paper"(既定) / "ink"。"""
+    if s.get("bg") == "ink":
+        ink = tuple(brand.ink)
+        deep = tuple(max(0, int(v * 0.72)) for v in ink)
+        return deep, B.WHITE, (196, 189, 180), True
+    return tuple(brand.bg), tuple(brand.ink), tuple(brand.sub_ink), False
+
+
+def flat_base(clip, s, brand, acc, blob_y, blob_r, blob_a):
+    """フラット面の静止背景（地色＋soft_blob＋枠ティック＋ワードマーク）を1度だけ作る。
+    soft_blob は半径150のガウスぼかし＝毎フレーム掛けると尺×秒で効く。static はキャッシュする。"""
+    if getattr(clip, "_base", None) is None:
+        bg, ink, sub_ink, on_dark = _field(s, brand)
+        c = Image.new("RGBA", (V.W, V.H), bg + (255,))
+        B.soft_blob(c, acc, V.W * 0.5 if blob_y is None else blob_y[0], blob_y[1],
+                    r=blob_r, alpha=blob_a)
+        V.frame_ticks(c, acc, alpha=130)
+        V.small_wordmark(c, brand, on_dark=on_dark)
+        clip._base = c
+        clip._pal = (ink, sub_ink, on_dark)
+    return clip._base.copy(), clip._pal
+
+
+def voice_bars(canvas, cx, y, t, accent, n=15, span=430, h=90, on_dark=True):
+    """音声レベルのバー列（話している最中の表現）。t は 0..1 の連続値。"""
+    lay = Image.new("RGBA", (V.W, V.H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    step = span / (n - 1)
+    for k in range(n):
+        # 位相を散らして「揺れる線」に。中央ほど背を高く。
+        env = 0.42 + 0.58 * math.cos((k - (n - 1) / 2) / n * math.pi)
+        amp = 0.30 + 0.70 * abs(math.sin(t * math.pi * 5.4 + k * 0.9))
+        bh = max(6, h * env * amp)
+        x = cx - span / 2 + k * step
+        a = int(235 if on_dark else 210)
+        d.rounded_rectangle([x - 4, y - bh / 2, x + 4, y + bh / 2], radius=4,
+                            fill=accent + (a,))
+    canvas.alpha_composite(lay)
+
+
 # ------------------------------------------------------------------ cold_open
 class ColdOpen(V.Clip):
     def __init__(self, s, brand, MAT):
@@ -52,11 +118,10 @@ class ColdOpen(V.Clip):
         if ta:
             V.frame_ticks(c, self.acc, alpha=ta)
         sb = V.seg(t, 0.10, 0.72)
-        if sb > 0 and br.motif and Path(br.motif).exists():
-            hgt = int(V.lerp(150, 300, V.eo_quint(sb)))
+        mot = _motif_img(s, br, self.acc, int(V.lerp(150, 300, V.eo_quint(sb)))) if sb > 0 else None
+        if mot is not None:
             ang = V.lerp(-35, 0, V.eo_quint(sb))
-            mot = B.svg_image(str(br.motif), self.acc, hgt).rotate(
-                ang, resample=Image.BICUBIC, expand=True)
+            mot = mot.rotate(ang, resample=Image.BICUBIC, expand=True)
             a = int(255 * V.eo_cubic(V.seg(t, 0.10, 0.55)))
             mot.putalpha(mot.getchannel("A").point(lambda v: v * a // 255))
             c.alpha_composite(mot, (V.W // 2 - mot.width // 2, 600 - mot.height // 2))
@@ -67,8 +132,8 @@ class ColdOpen(V.Clip):
             V.head_lines(L, [s["tagline"]], 50, V.W // 2, 1010, tuple(br.ink),
                          kind=br.head, align="c")
             if s.get("kicker"):
-                V.mono_label(L, s["kicker"], V.W // 2 - 86, 1110, tuple(br.sub_ink),
-                             size=28, tracking=8)
+                V.mono_label(L, s["kicker"], V.W // 2, 1110, tuple(br.sub_ink),
+                             size=28, tracking=8, anchor="c")
         V.anim_layer(c, w2, V.seg(t, 0.58, 0.95), dy=34)
         fi = V.eo_cubic(V.seg(t, 0.0, 0.12))
         if fi < 1:
@@ -285,8 +350,8 @@ class Privacy(V.Clip):
             sh.putalpha(sh.getchannel("A").point(lambda v: v * a // 255))
             c.alpha_composite(sh, (V.W // 2 - sh.width // 2, 560 - sh.height // 2))
         if s.get("kicker"):
-            V.anim_layer(c, lambda L: V.mono_label(L, s["kicker"], V.W // 2 - 150, 760,
-                         (220, 214, 230), size=28, tracking=6), V.seg(t, 0.2, 0.55), dy=26)
+            V.anim_layer(c, lambda L: V.mono_label(L, s["kicker"], V.W // 2, 760,
+                         (220, 214, 230), size=28, tracking=6, anchor="c"), V.seg(t, 0.2, 0.55), dy=26)
 
         def t2(L):
             V.head_lines(L, s["head"], 84, V.W // 2, 830, B.WHITE, kind=br.head, align="c")
@@ -312,9 +377,9 @@ class CTA(V.Clip):
         c = Image.new("RGBA", (V.W, V.H), tuple(br.bg) + (255,))
         B.soft_blob(c, self.acc, V.W * 0.5, 640, r=620, alpha=50)
         V.frame_ticks(c, self.acc, alpha=130)
-        if br.motif and Path(br.motif).exists():
-            pulse = 1 + 0.03 * math.sin(t * math.pi * 2)
-            mot = B.svg_image(str(br.motif), self.acc, int(216 * pulse))
+        pulse = 1 + 0.03 * math.sin(t * math.pi * 2)
+        mot = _motif_img(s, br, self.acc, int(216 * pulse))
+        if mot is not None:
             a = int(255 * V.eo_cubic(V.seg(t, 0.0, 0.3)))
             mot.putalpha(mot.getchannel("A").point(lambda v: v * a // 255))
             c.alpha_composite(mot, (V.W // 2 - mot.width // 2, 560 - mot.height // 2))
@@ -323,8 +388,8 @@ class CTA(V.Clip):
         V.anim_layer(c, lambda L: V.head_lines(L, [s["tagline"]], 54, V.W // 2, 980,
                      tuple(br.ink), kind=br.head, align="c"), V.seg(t, 0.3, 0.62), dy=34)
         if s.get("cta"):
-            V.anim_layer(c, lambda L: V.mono_label(L, s["cta"], V.W // 2 - 150, 1110,
-                         tuple(br.sub_ink), size=34, tracking=4), V.seg(t, 0.45, 0.78), dy=28)
+            V.anim_layer(c, lambda L: V.mono_label(L, s["cta"], V.W // 2, 1110,
+                         tuple(br.sub_ink), size=34, tracking=4, anchor="c"), V.seg(t, 0.45, 0.78), dy=28)
         da = V.eo_cubic(V.seg(t, 0.55, 0.9))
         if da > 0:
             dl = Image.new("RGBA", (V.W, V.H), (0, 0, 0, 0))
@@ -334,11 +399,215 @@ class CTA(V.Clip):
         return c.convert("RGB")
 
 
+# ------------------------------------------------------------------ shot_stage
+class ShotStage(V.Clip):
+    """実機1台をフラット面（紙 or 墨）に立てる。footage を持たない app 向けの app_magic。
+    fields: shot(material相対・拡張子省略可), key(緑を差し替える footage 名・任意),
+            bg("paper"/"ink"), fx("wave"/"ripple"/None), fx_y(端末高さ比・既定0.62),
+            phone_top, phone_h, kicker, head[], sub[], foot"""
+    def __init__(self, s, brand, MAT):
+        super().__init__(s["frames"]); self.s = s; self.br = brand
+        self.acc = _acc(brand, s.get("accent"))
+        vf = _ft(MAT, s["key"]) if s.get("key") else None
+        shot = Image.open(_shot(MAT, s["shot"])).convert("RGBA")
+        if vf is not None:
+            shot = B.key_out_green(shot, B.footage_scene(str(vf)))
+        self.phone = B.phone_mockup(shot.convert("RGB"))
+
+    def render(self, i):
+        s, br = self.s, self.br
+        t = i / (self.n - 1)
+        c, (ink, sub_ink, on_dark) = flat_base(
+            self, s, br, self.acc, (V.W * 0.5, 900), 700,
+            54 if s.get("bg") == "ink" else 44)
+
+        rise = V.eo_quint(V.seg(t, 0.0, 0.55))
+        ph_h = s.get("phone_h", 1420)
+        top = V.lerp(V.H + 40, s.get("phone_top", 520), rise)
+        px, py, pw, phh = V.phone_place(c, self.phone, V.W // 2, top, ph_h)
+
+        fx = s.get("fx")
+        fy = py + phh * s.get("fx_y", 0.62)
+        if fx == "ripple":
+            r = V.seg(t, 0.52, 0.95)
+            if r > 0:
+                V.ripple(c, px + pw * 0.5, fy, r, self.acc, rmax=170)
+        elif fx == "wave" and rise > 0.85:
+            voice_bars(c, px + pw * 0.5, fy, t, self.acc, on_dark=on_dark)
+
+        def cap(L):
+            y = 204
+            if s.get("kicker"):
+                V.mono_label(L, s["kicker"], _edge(), 152, sub_ink,
+                             accent=self.acc, size=30, tracking=7)
+            y = V.head_lines(L, s["head"], 70, _edge(), y, ink, kind=br.head, leading=92)
+            if s.get("sub"):
+                V.head_lines(L, s["sub"], 42, _edge(), y + 14, sub_ink,
+                             kind=br.head, leading=58)
+        V.anim_layer(c, cap, V.seg(t, 0.12, 0.52), dy=42)
+        if s.get("foot"):
+            V.anim_layer(c, lambda L: V.mono_label(L, s["foot"], _edge(), 1790, sub_ink,
+                         size=28, tracking=6), V.seg(t, 0.45, 0.85), dy=26)
+        return c.convert("RGB")
+
+
+# ------------------------------------------------------------------ shuffle
+class Shuffle(V.Clip):
+    """同じ枠の中身だけを高速に差し替える＝「毎回ちがう」の証明。
+    fields: items[{image,label?}] または items[str], card(x0,y0,x1,y1・任意),
+            bg, kicker, head[], foot, counter(bool・既定true)"""
+    XF = 0.24
+
+    def __init__(self, s, brand, MAT):
+        super().__init__(s["frames"]); self.s = s; self.br = brand
+        self.acc = _acc(brand, s.get("accent"))
+        box = s.get("card", [140, 520, 940, 1620])
+        self.box = box
+        cw, ch = box[2] - box[0], box[3] - box[1]
+        self.items = [it if isinstance(it, dict) else {"image": it} for it in s["items"]]
+        self.cards = [self._card(_shot(MAT, it["image"]), cw, ch) for it in self.items]
+
+    @staticmethod
+    def _card(path, cw, ch):
+        """紙面 png を card に収める。**倍率は常に cw/w で固定**＝どの紙面も文字の大きさが
+        揃う（枚ごとにズームが変わるとチラつく）。中身が短ければ上下中央、長ければ上端から
+        切って下端を紙色へフェード（続きがあることを示す）。"""
+        im = Image.open(path).convert("RGB")
+        w, h = im.size
+        bgc = im.getpixel((2, 2))
+        rows = np.where(np.asarray(im.convert("L")).min(axis=1) < 200)[0]
+        cb = min(h, int(rows[-1]) + int(w * 0.05)) if len(rows) else h
+        need = int(w * ch / cw)                       # 全幅で card を満たすのに要る行数
+        page = Image.new("RGB", (cw, ch), bgc)
+        cut = cb > need
+        if cut:
+            page.paste(im.crop((0, 0, w, need)).resize((cw, ch), Image.LANCZOS), (0, 0))
+            fade = Image.new("RGBA", (cw, 150), bgc + (0,))
+            fa = np.zeros((150, cw, 4), np.uint8)
+            fa[..., 0], fa[..., 1], fa[..., 2] = bgc
+            fa[..., 3] = np.repeat(np.linspace(0, 255, 150).astype(np.uint8)[:, None], cw, axis=1)
+            fade = Image.fromarray(fa, "RGBA")
+            page.paste(fade, (0, ch - 150), fade)
+        else:
+            sh = round(cb * cw / w)
+            page.paste(im.crop((0, 0, w, cb)).resize((cw, sh), Image.LANCZOS),
+                       (0, (ch - sh) // 2))
+        mask = Image.new("L", (cw, ch), 0)
+        ImageDraw.Draw(mask).rounded_rectangle([0, 0, cw - 1, ch - 1], radius=26, fill=255)
+        out = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
+        out.paste(page, (0, 0), mask)
+        ImageDraw.Draw(out).rounded_rectangle([0, 0, cw - 1, ch - 1], radius=26,
+                                              outline=(0, 0, 0, 26), width=2)
+        return out
+
+    def render(self, i):
+        s, br = self.s, self.br
+        t = i / (self.n - 1)
+        c, (ink, sub_ink, on_dark) = flat_base(
+            self, s, br, self.acc, (V.W * 0.5, 1000), 680, 46)
+
+        x0, y0, x1, y1 = self.box
+        # 束の厚み＋カード1枚ぶんの影（静止 → 1度だけ作る）
+        if getattr(self, "_deck", None) is not None:
+            c.alpha_composite(self._deck)
+            deck = None
+        else:
+            deck = Image.new("RGBA", (V.W, V.H), (0, 0, 0, 0)); dd = ImageDraw.Draw(deck)
+        if deck is not None:
+            for k, off in enumerate((22, 12)):
+                dd.rounded_rectangle([x0 + off, y0 + off, x1 + off, y1 + off], radius=26,
+                                     fill=(255, 255, 255, 90 + 40 * k),
+                                     outline=(0, 0, 0, 20), width=2)
+            sh = Image.new("RGBA", (V.W, V.H), (0, 0, 0, 0))
+            ImageDraw.Draw(sh).rounded_rectangle([x0 + 8, y0 + 22, x1 + 8, y1 + 22],
+                                                 radius=26, fill=(60, 48, 38, 78))
+            deck.alpha_composite(sh.filter(ImageFilter.GaussianBlur(30)), (0, 0))
+            self._deck = deck
+            c.alpha_composite(deck)
+
+        N = len(self.cards)
+        fpos = V.clamp01(t) * N
+        idx = min(N - 1, int(fpos)); local = fpos - idx
+        a = 0.0
+        if local > 1 - self.XF and idx < N - 1:
+            a = V.smooth((local - (1 - self.XF)) / self.XF)
+        cur = self.cards[idx]
+        if a > 0:
+            nxt = self.cards[idx + 1].copy()
+            nxt.putalpha(nxt.getchannel("A").point(lambda v: int(v * a)))
+            cur = cur.copy()
+            cur.putalpha(cur.getchannel("A").point(lambda v: int(v * (1 - a))))
+            c.alpha_composite(cur, (x0, y0))
+            c.alpha_composite(nxt, (x0, y0 - int(12 * (1 - a))))
+        else:
+            c.alpha_composite(cur, (x0, y0))
+
+        def cap(L):
+            if s.get("kicker"):
+                V.mono_label(L, s["kicker"], _edge(), 152, sub_ink,
+                             accent=self.acc, size=30, tracking=7)
+            V.head_lines(L, s["head"], 66, _edge(), 208, ink, kind=br.head, leading=88)
+        V.anim_layer(c, cap, V.seg(t, 0.06, 0.40), dy=42)
+
+        if s.get("counter", True):
+            lay = Image.new("RGBA", (V.W, V.H), (0, 0, 0, 0))
+            cnt = min(N, idx + 1 + (1 if a > 0.5 else 0))
+            V.mono_label(lay, f"{cnt:02d} / {N:02d}", _edge(), y1 + 34, sub_ink,
+                         accent=self.acc, size=32, tracking=5)
+            lab = self.items[min(N - 1, idx + (1 if a > 0.5 else 0))].get("label")
+            if lab:
+                d = ImageDraw.Draw(lay)
+                f = B.mono_font(28, "regular")
+                B.draw_tracked(d, lab, f, sub_ink, V.W - _edge(), y1 + 38, 4, anchor="r")
+            c.alpha_composite(lay)
+        if s.get("foot"):
+            V.anim_layer(c, lambda L: V.head_lines(L, [s["foot"]], 36, _edge(), 1746,
+                         sub_ink, kind=br.head), V.seg(t, 0.35, 0.75), dy=28)
+        return c.convert("RGB")
+
+
+# ------------------------------------------------------------------ statement
+class Statement(V.Clip):
+    """フラット面の一言（footage 不要の privacy）。左寄せエディトリアル。
+    fields: bg("paper"/"ink"), motif(素材バンク名・任意), kicker, head[], sub[], foot[]"""
+    def __init__(self, s, brand, MAT):
+        super().__init__(s["frames"]); self.s = s; self.br = brand
+        self.acc = _acc(brand, s.get("accent"))
+
+    def render(self, i):
+        s, br = self.s, self.br
+        t = i / (self.n - 1)
+        c, (ink, sub_ink, on_dark) = flat_base(
+            self, s, br, self.acc, (V.W * 0.78, 520), 620, 58)
+        sb = V.seg(t, 0.08, 0.6)
+        mot = _motif_img(s, br, self.acc, int(V.lerp(120, 176, V.eo_quint(sb)))) if sb > 0 else None
+        if mot is not None:
+            a = int(255 * V.eo_cubic(sb))
+            mot.putalpha(mot.getchannel("A").point(lambda v: v * a // 255))
+            c.alpha_composite(mot, (_edge(), 700 - mot.height // 2))
+
+        def t2(L):
+            d = ImageDraw.Draw(L)
+            d.line([(_edge(), 866), (_edge() + 200, 866)], fill=self.acc + (255,), width=4)
+            if s.get("kicker"):
+                V.mono_label(L, s["kicker"], _edge(), 896, sub_ink, size=28, tracking=7)
+            y = V.head_lines(L, s["head"], 88, _edge(), 960, ink, kind=br.head, leading=116)
+            if s.get("sub"):
+                V.head_lines(L, s["sub"], 48, _edge(), y + 26, sub_ink,
+                             kind=br.head, leading=66)
+        V.anim_layer(c, t2, V.seg(t, 0.18, 0.62), dy=48)
+        if s.get("foot"):
+            V.anim_layer(c, lambda L: V.head_lines(L, s["foot"], 34, _edge(), 1560,
+                         sub_ink, kind=br.head, leading=48), V.seg(t, 0.5, 0.9), dy=30)
+        return c.convert("RGB")
+
+
 # ------------------------------------------------------------------ registry / builder
 TYPES = {
     "cold_open": ColdOpen, "hook": Hook, "day_cycle": DayCycle,
     "app_magic": AppMagic, "proof_gallery": ProofGallery,
     "privacy": Privacy, "cta": CTA,
+    "shot_stage": ShotStage, "shuffle": Shuffle, "statement": Statement,
 }
 
 

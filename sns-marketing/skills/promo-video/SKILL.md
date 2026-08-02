@@ -96,6 +96,19 @@ python3 $SK/scripts/qa.py --app hioto check /tmp/hioto_promo.mp4
 | `proof_gallery` | 証拠：実画面 3 台のパララックス・ギャラリー | `hero{shot,key?}`,`sides[{shot,key?}]`,`kicker`,`head[]`,`foot` |
 | `privacy` | メッセージ：暗い footage＋モチーフ svg＋見出し | `footage`,`motif`,`kicker`,`head[]`,`sub[]`,`foot[]` |
 | `cta` | 締め：モチーフ＋ワードマーク＋タグライン＋誘導＋アクセントドット | `tagline`,`cta` |
+| `shot_stage` | 実機1台をフラット面に立てる（**footage 不要**の app_magic）＋音声波形/タップ波紋 | `shot`,`bg`,`fx`("wave"/"ripple"),`fx_y`,`kicker`,`head[]`,`sub[]` |
+| `shuffle` | 同じ枠の中身だけを高速に差し替える＝「毎回ちがう」の証明＋カウンタ | `items[]`(material相対の画像),`card`,`bg`,`kicker`,`head[]`,`foot` |
+| `statement` | フラット面の一言（**footage 不要**の privacy・左寄せ） | `bg`,`motif`,`kicker`,`head[]`,`sub[]`,`foot[]` |
+
+**footage を持たないアプリ**（紙もの/ドキュメント系＝実写フッテージが世界観に合わない）は
+`cold_open → shot_stage → shuffle → proof_gallery → statement → cta` で 1 本組める
+（実例＝`templates/hanasu.json`。実写ゼロ・実アプリ画面と紙面 png だけ）。
+
+- `bg`: `"paper"`(既定＝brand.bg) / `"ink"`(brand.ink を 0.72 倍した墨面＋白文字)。連続する
+  シーンで paper/ink を交互にすると、素材が地味でもリズムが出る。
+- `motif` は **spec 側が最優先**（carousel-craft の素材バンク名）で、無ければ manifest の
+  `brand.motif`。`cold_open`/`cta`/`privacy`/`statement` すべてで効く。
+- `shot`/`items` の画像は **material 相対パス**で拡張子を省略できる（`"screens/03_home"`）。
 
 新しい見せ方が要るときだけ `standard.py` に型を足す（`TYPES` に登録）。普段は **spec を書くだけ**。
 
@@ -140,6 +153,21 @@ python3 $SK/scripts/qa.py --app hioto check /tmp/hioto_promo.mp4
 - **緑の差し替え**：`key_out_green(shot, footage_scene)` は緑が無い画面ならそのまま返す＝常に呼んでよい。
   緑のある画面（camera/shorts-feed/calendar の clip サムネ）は footage を入れて「実写を撮っている」絵に。
 - **数値 QA で満足しない**。probe と strip を **Read で等倍に見て**定性判断する（carousel-craft と同じ）。
+- **DM Mono に和文グリフは無い＝□ 豆腐になる**。ワードマークが和文のアプリ（例「話す日記帳」）は
+  以前そのまま □□□□□ で出ていた。`B.wordmark` と `V.mono_label` は **非 ASCII を含むとき和文
+  フォントへ自動フォールバック**するようにしたが、**`cta`/`kicker`/`foot` に和文を入れたら probe で必ず目視**。
+  ラベルは `anchor="l"/"c"/"r"` で揃える（以前は `W//2 - 150` のような当て推量のオフセットだった）。
+- **フラット面のシーンは静止背景をキャッシュする**。`soft_blob` は半径150のガウスぼかしで、
+  毎フレーム掛けると 0.08s/f が 1.5s/f まで落ちる（尺 30 秒で 10 分超）。地色＋blob＋枠ティック＋
+  ワードマークは動かないので `flat_base()` が clip ごとに 1 度だけ作って `.copy()` を返す。
+  **モチーフ svg のラスタライズ（`svg_image` は ss=4 で 4 倍描画）も毎フレームやると重い** ——
+  `cold_open`/`cta` はサイズが毎フレーム変わるので現状そのまま（合わせて ~4 分/本の主因）。
+- **shuffle は倍率を固定する**。紙面ごとにズームを変えると文字サイズがチラついて「同じ枠で中身だけ
+  変わる」に見えない。`cw/w` 固定で、中身が短い紙面は**上下中央**、長い紙面は上端から切って
+  **下端を紙色へフェード**（続きがあることを示す）。空白の量は元の紙面が持つ 余白 なので潰さない。
+- **footage が無いアプリは無理に実写を作らない**。紙もの/ドキュメント系は実アプリ画面と
+  生成物（紙面 png）だけで組むほうがブランドに合う（`shot_stage`/`shuffle`/`statement`）。
+  paper 面と ink 面を交互にしてリズムを作る。
 
 ---
 

@@ -614,7 +614,9 @@ def wordmark(canvas, brand, x, y, size, anchor="l", on_dark=False):
     anchor: l=左基準 / c=中心 / r=右基準。"""
     ink = WHITE if on_dark else brand.ink
     d = ImageDraw.Draw(canvas)
-    f = mono_font(int(size * 0.74), "medium")
+    # DM Mono に和文グリフは無い（□ 豆腐になる）。和文ワードマークは見出しフォントで組む。
+    latin = all(ord(ch) < 128 for ch in brand.wordmark)
+    f = mono_font(int(size * 0.74), "medium") if latin else head_font(int(size * 0.72), brand.head)
     tw = d.textlength(brand.wordmark, font=f)
     glyph_img = _icon_rounded(brand.icon, size) if (brand.icon and Path(brand.icon).exists()) else None
     gap = int(size * 0.30)
@@ -623,7 +625,12 @@ def wordmark(canvas, brand, x, y, size, anchor="l", on_dark=False):
     cx = x0
     if glyph_img is not None:
         canvas.alpha_composite(glyph_img, (cx, y)); cx += glyph_img.width + gap
-    d.text((cx, y + size * 0.18), brand.wordmark, font=f, fill=ink)
+    if latin:
+        ty = y + size * 0.18
+    else:   # 和文はインクボックスをアイコンの正方形に対して上下中央へ
+        bb = d.textbbox((0, 0), brand.wordmark, font=f)
+        ty = y + (size - (bb[3] - bb[1])) / 2 - bb[1]
+    d.text((cx, ty), brand.wordmark, font=f, fill=ink)
     return total
 
 

@@ -1,0 +1,87 @@
+{
+  "_doc": "話す日記帳(hanasu) 宣伝動画(無音/~31s/1080x1920/30fps)。footage を持たない紙もの系アプリの例＝shot_stage/shuffle/statement で組む。差別化の核『レイアウトが毎回変わる』を shuffle で 30 種そのまま見せる。",
+  "size": [1080, 1920],
+  "fps": 30,
+  "scenes": [
+    {
+      "type": "cold_open", "frames": 110, "accent": "bengara",
+      "motif": "concept-book-open",
+      "tagline": "あなたの一日を、刊行する。", "kicker": "TALKING  DIARY"
+    },
+    {
+      "type": "shot_stage", "frames": 150, "accent": "ai", "bg": "ink",
+      "shot": "screens/07_interview", "fx": "wave", "fx_y": 0.60,
+      "kicker": "JUST  TALK",
+      "head": ["書かない。", "話すだけ。"],
+      "sub": ["AIが、今日あったことを聞き出す。"]
+    },
+    {
+      "type": "shot_stage", "frames": 125, "accent": "karashi", "bg": "paper",
+      "shot": "screens/08_assembly", "fx": "ripple", "fx_y": 0.46,
+      "kicker": "AUTO  TYPESET",
+      "head": ["話し終えたら、", "目の前で組み上がる。"],
+      "sub": ["書く工程は、ゼロ。"]
+    },
+    {
+      "type": "shuffle", "frames": 260, "accent": "bengara", "bg": "paper",
+      "kicker": "30  LAYOUTS",
+      "head": ["同じレイアウトの", "ページは、二つとない。"],
+      "foot": "その日の話に合わせて、誌面が毎回変わる。",
+      "items": [
+        "layouts/genre_full-page_short",
+        "layouts/genre_minimal_short",
+        "layouts/genre_ledger-day_short",
+        "layouts/genre_quote-centered_short",
+        "layouts/genre_stats-day_short",
+        "layouts/genre_essay-day_short",
+        "layouts/genre_task-report_short",
+        "layouts/genre_single-pillar_short",
+        "layouts/genre_timeline-detailed_short",
+        "layouts/genre_word-day_short",
+        "layouts/genre_many-small-topics_short",
+        "layouts/genre_classic-brief_short",
+        "layouts/genre_ranking-day_short",
+        "layouts/genre_quiet-day_short",
+        "layouts/genre_grand-spread_short",
+        "layouts/genre_errand-notes_short",
+        "layouts/genre_interview-page_short",
+        "layouts/genre_night-essay_short",
+        "layouts/genre_list-and-quote_short",
+        "layouts/genre_reflection_short",
+        "layouts/genre_eventful-timeline_short",
+        "layouts/genre_deep-dive_short",
+        "layouts/genre_emotion-day_short",
+        "layouts/genre_two-topics_short",
+        "layouts/genre_learning-notes_short",
+        "layouts/genre_dialogue-replay_short",
+        "layouts/genre_moving-record_short",
+        "layouts/genre_bridge-to-tomorrow_short",
+        "layouts/genre_conversation-heavy_short",
+        "layouts/genre_timeline-day_short"
+      ]
+    },
+    {
+      "type": "proof_gallery", "frames": 150, "accent": "seiji",
+      "hero": {"shot": "screens/09_paper"},
+      "sides": [
+        {"shot": "screens/03_home"},
+        {"shot": "screens/05_vocabulary"}
+      ],
+      "kicker": "YOUR  ISSUE",
+      "head": ["話した一日が、", "1枚の誌面になる。"],
+      "foot": "バックナンバーとして、ずっと残る。"
+    },
+    {
+      "type": "statement", "frames": 90, "accent": "bengara", "bg": "ink",
+      "motif": "ui-speech-bubble-round",
+      "kicker": "FROM  WRITING  TO  TALKING",
+      "head": ["書く日記から、", "話す日記へ。"],
+      "sub": ["キーボードは、もう要らない。"]
+    },
+    {
+      "type": "cta", "frames": 100, "accent": "bengara",
+      "motif": "concept-book-open",
+      "tagline": "あなたの一日を、刊行する。", "cta": "App Store  で配信中"
+    }
+  ]
+}

@@ -162,14 +162,21 @@ def head_lines(layer, lines, size, x, top, fill, leading=None, kind="kaku",
     return y
 
 
-def mono_label(layer, text, x, y, fill, accent=None, size=30, tracking=5, rule=40):
-    """DM Mono のラベル。accent を渡すと頭にアクセントの罫を引く（エディトリアル定石）。"""
+def mono_label(layer, text, x, y, fill, accent=None, size=30, tracking=5, rule=40,
+               anchor="l"):
+    """DM Mono のラベル。accent を渡すと頭にアクセントの罫を引く（エディトリアル定石）。
+    anchor: l=左基準 / c=中心 / r=右基準（罫を含めた全幅で揃える）。"""
     d = ImageDraw.Draw(layer)
+    # DM Mono に和文グリフは無い（□ 豆腐）。和文を含むラベルは Noto Sans JP で組む。
+    f = (B.mono_font(size, "medium") if all(ord(ch) < 128 for ch in text)
+         else B.font(size, 600))
+    total = B.tracked_width(d, text, f, tracking) + (
+        (rule + size * 0.55) if accent is not None else 0)
+    x = x - total / 2 if anchor == "c" else (x - total if anchor == "r" else x)
     if accent is not None:
         cy = y + size * 0.62
         d.line([(x, cy), (x + rule, cy)], fill=accent, width=3)
         x = x + rule + size * 0.55
-    f = B.mono_font(size, "medium")
     B.draw_tracked(d, text, f, fill, x, y, tracking)
 
 
