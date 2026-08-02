@@ -77,13 +77,60 @@ eyecatch: ./images/eyecatch.png
 
 ## 4. 画像を用意する
 
-- **アイキャッチ（必須）** → `/canva:canva-image-gen` で生成するか、アプリ宣伝記事なら
-  `sns-marketing` の `carousel-craft` のブランド描画で SNS と見た目を揃える
-- **本文画像は証拠になるものだけ**（実画面・グラフ・Before/After・ログ）
-- 生成したら **Read で開いて目視確認する。** 文字化け・見切れ・可読性を見る
+規範は `note-craft` の「図・画像」。**手順として外せないのは次の 3 つ。**
+
+- **アイキャッチを note 用に作る。** ストア画像の切り出しで済ませない。
+  作ったら **300px と 208px に縮小して Read で開く。** 主題が読めなければ作り直す
+
+  ```bash
+  python3 -c "
+  from PIL import Image
+  im = Image.open('articles/<slug>/images/eyecatch.png')
+  for w in (300, 208):
+      im.resize((w, int(im.height*w/im.width)), Image.LANCZOS).save(f'/tmp/eye_{w}.png')"
+  ```
+
+- **記事の背骨を図にする。** スクショだけで出さない。比較表・工程図・対比のどれかを 1 枚。
+  ブランド色は `apps/<app>/appstore.config.json` の `brand` から取る。
+  日本語フォントは Noto Sans JP（可変軸）を使う
+
+  ```python
+  ft = ImageFont.truetype("/tmp/NotoSansJP.ttf", size); ft.set_variation_by_axes([weight])
+  ```
+
+- **本文画像は証拠になるものだけ**（実画面・グラフ・Before/After・ログ）。
+  生成したら **Read で開いて目視確認する。** 文字化け・見切れ・重なり・可読性を見る
 - 形式は JPEG / PNG / GIF / WebP、1 枚 10MB 以内
 
-## 5. 下書きを作る
+## 5. 出す前に機械チェックを通す
+
+**目視の前に機械で潰す。** note に上げてから気づくと、更新が 2 段（`/note:note-publish` 参照）になる。
+
+```bash
+uv run python - <<'PY'
+from pathlib import Path
+from note_mcp.utils.markdown_to_html import markdown_to_html
+body = Path("articles/<slug>/article.md").read_text().split("---\n", 2)[2]
+html = markdown_to_html(body)
+print("生の ** の残り:", html.count("**"), "(0 でなければ太字が効いていない)")
+print("<strong>     :", html.count("<strong>"), "(意図した数と一致するか)")
+print("裸の URL     :", html.count('">http'), "(リンクになっていない URL)")
+PY
+```
+
+見るのは 3 つ。
+
+- **`**` の直後が `「` だと太字にならない。**
+  CommonMark の flanking 判定で、開始デリミタの直後が約物・直前が文字だと強調の開始と
+  見なされない。`減ったのは**「打ち込む」だけ**だった。` は生の `**` のまま出る。
+  そもそも `japanese-tech-writing` が「初出の定義は太字、以後の言及は「」」と使い分けを
+  定めているので、**この形が出たら太字を外すのが正しい**（括弧を消して太字を残すのではない）。
+  **断片だけ変換すると通ってしまう**（行頭では直前が空なので開始デリミタになる）。必ず本文全体で見る
+- **裸の URL はリンクにならない。** note-mcp が自動で埋め込むのは YouTube / X / note /
+  Gist / Zenn などだけ。App Store・自社サイトは `[表示文字](URL)` と書く
+- **`<strong>` の数が意図と合っているか。** `note-craft` は一節に一、二箇所までとしている
+
+## 6. 下書きを作る
 
 ```
 note_create_from_file(file_path="articles/<slug>/article.md")
@@ -92,15 +139,28 @@ note_create_from_file(file_path="articles/<slug>/article.md")
 - ローカル画像は自動アップロードされ、本文のパスが note の URL に置換される
 - アイキャッチもフロントマターから自動で設定される
 - 返ってくる**記事 ID / キー（`n` で始まる）を `articles/README.md` に記録する**
+- **フロントマターの tags は下書きには載らない。** これは失敗ではない（下の罠を読む）
 
 すでに下書きがある記事を直すときは、上書きではなく更新する:
 
 ```
-note_get_article(article_id="...")     # 先に現状を取る
+note_get_article(article_id="n...")    # 先に現状を取る。数字 ID は拒否される
 note_update_article(article_id="...", title=..., body=..., tags=[...])
 ```
 
-## 6. プレビューで確認する
+### 下書き更新の罠
+
+- **下書きにタグは載らない。** `draft_save` は `hashtags` を受け取るが永続化しない。
+  タグが付くのは公開時の `PUT /v1/text_notes/{id}` だけ。
+  プレビューの `hashtags:[]` を見て「失敗した」と判断しない。
+  公開時に `note_publish_article(..., file_path=...)` を渡せばフロントマターから反映される
+- **body を含めずに `draft_save` を投げると本文が消える。** 部分更新ではない。
+  タグだけ直したくても、`note_update_article` で**本文ごと**送る
+- 本文中の画像は、note に上がった URL（`https://assets.st-note.com/img/...`）を
+  Markdown に書けば再アップロードされない。ローカルの正本は相対パスのまま置き、
+  送る直前に置換する
+
+## 7. プレビューで確認する
 
 ```
 note_show_preview(article_key="n...")     # ブラウザで開く
@@ -112,9 +172,24 @@ note_get_preview_html(article_key="n...") # HTML を文字列で取る（機械�
 - 見出しの階層、リストの入れ子
 - 画像が URL に置換されているか（ローカルパスが残っていたら失敗している）
 - アイキャッチが設定されているか
+- **`<strong>` の数が意図と一致しているか**（減っていたら太字が効いていない）
 - コードブロックの言語指定
 
-## 7. 記録する
+`note_get_preview_html` は 28 万字ほど返ってツールの上限を超える。
+返ってきたファイルパスを Python で読んで構造だけ抜く:
+
+```python
+import json, re
+h = json.load(open("<返ってきたパス>"))["result"]
+print([re.sub(r'<[^>]+>','',t) for _, t in re.findall(r'<h([1-3])[^>]*>(.*?)</h\1>', h, re.S)])
+print(len(re.findall(r'<strong>', h)), "strong")
+print(h.count("./images"), "ローカルパス残存")
+```
+
+**`<ol>` を探すときは `<ol[ >]` で当てる。** note は `<ol name="..." id="...">` を出すので、
+`<ol>` で grep すると 0 件に見えて誤判定する。
+
+## 8. 記録する
 
 `articles/README.md` に 1 行足す:
 
@@ -126,7 +201,12 @@ note_get_preview_html(article_key="n...") # HTML を文字列で取る（機械�
 
 - [ ] `articles/<slug>/article.md` があり、フロントマターに title / tags / eyecatch が揃っている
 - [ ] `note-craft` の完了チェックを通した（前置きなし・転がある・タグ 3〜5）
-- [ ] `writing` の 2 規範を通した（LLM っぽい空句が残っていない）
+- [ ] `japanese-tech-writing` を通した（LLM っぽい空句が残っていない）
+- [ ] **`cognitive-rhythm-writing` の執筆後の点検手順を 5 つとも当てた**
+      （話題テスト・漏出テスト・緊張台帳・拍・境界。読んで書いただけで済ませない）
+- [ ] **機械チェックを通した**（生の `**` が 0、`<strong>` が意図の数、裸の URL が 0）
+- [ ] **記事の背骨の図がある**（スクショだけになっていない）
+- [ ] **アイキャッチを 300px に縮小して目視し、主題が読めることを確かめた**
 - [ ] 画像を Read で目視確認した
 - [ ] note に下書きが作られ、プレビューで崩れていないことを実際に見た
 - [ ] `articles/README.md` に記事 ID を記録した

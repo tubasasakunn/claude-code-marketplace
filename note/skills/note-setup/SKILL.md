@@ -59,6 +59,75 @@ note_login         # ブラウザが開くので手でログインする（最�
 note_set_username(username="<https://note.com/xxx の xxx>")
 ```
 
+### `note_login` がタイムアウトし続けるとき
+
+`note_login` は Playwright の Chromium を**新規起動**して、URL が `/login` から離れるのを待つ。
+この検出が効かず、5 分でも 10 分でもタイムアウトすることがある（2026-08-02 に発生）。
+`/tmp/note_mcp_login.log` に `is_logged_in(https://note.com/login) = False` が並び続けるのが症状。
+
+**新しいブラウザで入り直させるのではなく、普段使いの Chrome のセッションを移植する。**
+（普段使いの Chrome は既に note にログインしている。CDP で掴もうとしても、Chrome 136+ は
+デフォルトプロファイルへの `--remote-debugging-port` を無視するので、cookie を読むほうが早い）
+
+```bash
+# 1) どのプロファイルに note.com の cookie があるか数える
+CD="$HOME/Library/Application Support/Google/Chrome"
+for p in "$CD"/*/Cookies; do
+  cp "$p" /tmp/ck.db 2>/dev/null || continue
+  echo "$(basename "$(dirname "$p")"): $(sqlite3 /tmp/ck.db \
+    "select count(*) from cookies where host_key like '%note.com'")"
+done; rm -f /tmp/ck.db
+```
+
+```python
+# 2) 復号する（Keychain の許可ダイアログが出るので人に押してもらう）
+import shutil, sqlite3, subprocess
+from pathlib import Path
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+
+pw = subprocess.run(["security","find-generic-password","-w","-s","Chrome Safe Storage"],
+                    capture_output=True, text=True).stdout.strip().encode()
+key = PBKDF2HMAC(algorithm=hashes.SHA1(), length=16, salt=b"saltysalt",
+                 iterations=1003).derive(pw)
+
+def dec(blob):
+    if not blob or blob[:3] not in (b"v10", b"v11"): return None
+    c = Cipher(algorithms.AES(key), modes.CBC(b" "*16)).decryptor()
+    p = c.update(blob[3:]) + c.finalize()
+    p = p[:-p[-1]]                       # PKCS7
+    if len(p) > 32:                      # Chrome 127+ は先頭 32B がドメインハッシュ
+        try: p[:32].decode("ascii")
+        except UnicodeDecodeError: p = p[32:]
+    return p.decode("utf-8", "replace")
+```
+
+`_note_session_v5` を取り出したら、**生きているものを選ぶ**。
+同じ名前の cookie が複数プロファイルにあっても、たいてい 1 つしか通らない。
+
+```python
+import httpx
+h = {"Cookie": f"_note_session_v5={v}", "Accept": "application/json"}
+httpx.get("https://note.com/api/v2/current_user", headers=h).json()["data"]
+# -> {"id": ..., "urlname": ..., "nickname": ...} が返れば生きている。401 なら死んでいる
+```
+
+最後に note-mcp のセッションとして保存する:
+
+```python
+import time
+from note_mcp.auth.session import SessionManager
+from note_mcp.models import Session
+SessionManager().save(Session(cookies={"_note_session_v5": v},
+                              user_id="<id>", username="<urlname>",
+                              expires_at=None, created_at=int(time.time())))
+```
+
+`note_check_auth` が「認証済みです」を返せば通っている。
+
+**この手順で扱うのは cookie の値そのもの。ログには出さないし、リポジトリにも置かない。**
+
 ## 4. 疎通を確認する
 
 ```
@@ -88,7 +157,11 @@ note 側の仕様変更で壊れたときの調査用で、執筆・投稿では
 |---|---|
 | ツールが 1 つも見えない | `.mcp.json` の承認、Claude Code の再起動、`claude mcp list` |
 | 「ログインが必要です」 | `note_check_auth` → `note_login` でセッションを取り直す |
+| `note_login` がタイムアウトし続ける | ブラウザ未導入なら `uv run playwright install chromium`。入っていれば上の Chrome cookie 移植へ |
+| `Executable doesn't exist at .../chromium-XXXX` | `uv run playwright install chromium`（初回・Playwright 更新後） |
 | 作成は通るが本文が崩れる | Markdown → note 互換 HTML の変換仕様。`note_get_preview_html` で実際の HTML を見る |
+| 下書きにタグが付かない | 仕様。`draft_save` は永続化しない。公開時に `file_path` で入る（`/note:note-publish`） |
+| 公開済み記事を直したのに変わらない | 仕様。`note_update_article` のあと `note_publish_article` をもう一度通す |
 | 急に全部 404 / 形が変わった | note 側の仕様変更を疑う。上流の issue を見る。**直すより先に記事をローカルに退避** |
 
 ## やらないこと

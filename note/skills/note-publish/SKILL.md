@@ -33,8 +33,9 @@ note_show_preview(article_key="n...")
 |---|---|
 | アイキャッチが設定されているか | `note_upload_eyecatch` で入れる。ないまま出さない |
 | 画像がすべて note の URL になっているか | ローカルパスが残っていたらアップロード失敗。作り直す |
+| **`<strong>` の数が意図と一致しているか** | 減っていたら太字が効いていない。`note-post` の機械チェックへ戻る |
 | タイトル | `note-craft` の基準（具体・煽らない・30〜40字） |
-| タグ 3〜5 個 | 多すぎ・関連の薄いタグを削る |
+| タグ 3〜5 個 | **下書きでは必ず空に見える。** ここでは `article.md` のフロントマターを見る |
 | 見出しの階層・リストの入れ子 | 崩れていたら Markdown を直して `note_update_article` |
 | **事実・数字・固有名詞** | 出典のない数字、記憶で書いた仕様、実在の個人・企業への言及を潰す |
 | **未公開情報** | 未リリースのアプリ名、審査中の情報、秘密鍵・トークン・内部 URL が混ざっていないか |
@@ -50,8 +51,14 @@ note_show_preview(article_key="n...")
 ## 5. 公開する
 
 ```
-note_publish_article(article_id="<記事ID>")
+note_publish_article(article_id="n...", file_path="articles/<slug>/article.md")
 ```
+
+- **`article_id` は記事キー（`n` で始まる）で渡す。** 数字 ID は
+  `Numeric article ID is not supported` で拒否される
+- **`file_path` を必ず渡す。** タグはここで初めて記事に付く。
+  `draft_save` は `hashtags` を永続化しないので、**下書き段階のタグは必ず空**。
+  `file_path` を省くとタグなしで公開される
 
 新規作成と同時公開（`title` / `body` を渡す形）も API 上はできるが、**使わない**。
 下書き → プレビュー確認 → 公開の順を必ず通す。
@@ -63,9 +70,36 @@ note_publish_article(article_id="<記事ID>")
 
 ## 公開後
 
-- **すぐ実物の公開ページを開いて確認する。** プレビューと公開後で表示が違うことがある
-- 直すなら `note_update_article`。公開済み記事も更新できる
-- 取り下げたいときは note の Web UI から。`note_delete_draft` は**公開済みには効かない**
+**すぐ実物の公開ページを、ログインしていない状態で確認する。**
+自分の cookie 付きで見ると下書きでも 200 が返るので、公開されたことの確認にならない。
+
+```python
+import urllib.request, re
+req = urllib.request.Request("https://note.com/<user>/n/<key>",
+    headers={"User-Agent": "Mozilla/5.0 ..."})
+t = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
+print("noindex:", "noindex" in t)
+print("タグ  :", sorted(set(re.findall(r'/hashtag/([^"?&]{1,20})', t))))
+print("strong:", re.findall(r'<strong>(.{0,50}?)</strong>', t))
+print("生の **:", t.count("**"))
+```
+
+### 公開済み記事を直すときは 2 段
+
+**`note_update_article` だけでは公開ページは変わらない。**
+`draft_save?is_temp_saved=true` は下書き側にしか入らないので、`note_publish_article` を
+**もう一度通して**初めて反映される。
+
+```
+note_update_article(article_id="<数字ID>", title=..., body=..., tags=[])
+note_publish_article(article_id="n...", file_path="articles/<slug>/article.md")
+```
+
+**アイキャッチだけは非対称。** `note_upload_eyecatch` は別 API なので即座に公開ページへ反映される。
+本文を直さずアイキャッチだけ差し替えると、**新しいアイキャッチと古い本文**という状態になる。
+どちらを触っても、最後に必ず匿名で公開ページを見る。
+
+取り下げたいときは note の Web UI から。`note_delete_draft` は**公開済みには効かない**。
 
 ## やらないこと
 
