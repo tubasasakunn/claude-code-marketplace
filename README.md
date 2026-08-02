@@ -36,8 +36,8 @@ iOS アプリ量産パイプラインの Claude Code スキル群。**全スキ�
 ## 直す側の手順
 
 ```bash
-git clone git@github.com:tubasasakunn/claude-code-marketplace.git ~/workspace_tmp/claude-code-marketplace
-cd ~/workspace_tmp/claude-code-marketplace
+git clone git@github.com:tubasasakunn/claude-code-marketplace.git ~/workspace/claude-code-marketplace
+cd ~/workspace/claude-code-marketplace
 # <plugin>/skills/<name>/SKILL.md を編集
 python3 common/scripts/build_skill_map.py    # スキルを増減したら索引を再生成
 git commit && git push

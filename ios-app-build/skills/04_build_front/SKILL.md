@@ -14,7 +14,7 @@ App Store の審査には **プライバシーポリシー URL** と **サポー
 
 ## 前提
 
-- `~/workspace_tmp/ios-app-build-workspace/.env` に `CLOUDFLARE_DEPLOY_TOKEN` と `CLOUDFLARE_ACCOUNT_ID`
+- `~/workspace/ios-app-build-workspace/.env` に `CLOUDFLARE_DEPLOY_TOKEN` と `CLOUDFLARE_ACCOUNT_ID`
 - リポジトリの GitHub Secrets に `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`（`00_setup_repo` で投入済み）
 - 手本: `~/workspace/nagasu/front/`（構造をそのまま踏襲する）
 - `basaapp.com` ゾーンが Cloudflare にあり、サブドメインのカスタムドメインを作れること

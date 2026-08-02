@@ -22,7 +22,7 @@ sns-marketing/          sns-marketing-workspace で有効。SNS 投稿・宣伝�
 ## スキルを追加・修正する手順
 
 ```bash
-cd ~/workspace_tmp/claude-code-marketplace
+cd ~/workspace/claude-code-marketplace
 # 1. <plugin>/skills/<name>/SKILL.md を作る or 直す
 # 2. スキルを増減したら索引を再生成
 python3 common/scripts/build_skill_map.py

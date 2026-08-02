@@ -10,8 +10,21 @@ import json
 import os
 import sys
 
-CLONE = "~/workspace_tmp/claude-code-marketplace"
 BLOCKED = ("/.claude/plugins/cache/", "/.claude/plugins/marketplaces/")
+
+
+def clone_path() -> str:
+    """作業クローンの場所。決め打ちにすると置き場が変わったとき案内が嘘になる。"""
+    home = os.path.expanduser("~")
+    for c in (os.environ.get("MARKETPLACE_CLONE", ""),
+              os.path.join(home, "workspace", "claude-code-marketplace"),
+              os.path.join(home, "workspace_tmp", "claude-code-marketplace")):
+        if c and os.path.isdir(os.path.join(c, ".git")):
+            return c.replace(home, "~", 1)
+    return "~/workspace/claude-code-marketplace"
+
+
+CLONE = clone_path()
 
 
 def main() -> int:

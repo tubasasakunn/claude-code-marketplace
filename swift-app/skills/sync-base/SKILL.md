@@ -30,9 +30,9 @@ GitHub Actions はアプリリポジトリ内の `.github/workflows/` しか読�
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/sync_report.py \
-  --base ~/workspace_tmp/ios-apps/swift-base \
-  --apps ~/workspace_tmp/ios-apps \
-  --resultkit ~/workspace_tmp/ios-apps/ResultKit
+  --base ~/workspace/ios-apps/swift-base \
+  --apps ~/workspace/ios-apps \
+  --resultkit ~/workspace/ios-apps/ResultKit
 ```
 
 資産 × アプリのマトリクス（`=` 同一 / `!=` 差分 / `-` 欠落）とサマリが出る。
@@ -58,12 +58,12 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/sync_report.py \
 
 ```bash
 # ファイル資産（分類が済んだものだけ）
-rsync -av ~/workspace_tmp/ios-apps/swift-base/.claude/rules/ \
-          ~/workspace_tmp/ios-apps/<slug>/.claude/rules/
+rsync -av ~/workspace/ios-apps/swift-base/.claude/rules/ \
+          ~/workspace/ios-apps/<slug>/.claude/rules/
 
 # ResultKit（vendor 方式・図鑑8アプリ）
-rsync -av --delete ~/workspace_tmp/ios-apps/ResultKit/ \
-                   ~/workspace_tmp/ios-apps/<slug>/<AppName>/ResultKit/
+rsync -av --delete ~/workspace/ios-apps/ResultKit/ \
+                   ~/workspace/ios-apps/<slug>/<AppName>/ResultKit/
 ```
 
 配布後は必ず `/swift-app:verify-build` でビルドを確認する。

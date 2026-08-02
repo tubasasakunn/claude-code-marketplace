@@ -106,7 +106,7 @@ node store-images/<slug>/_lib/render.mjs store-images/<slug>/portrait
 ```
 
 スキルの実体は marketplace のチェックアウト先にある。`~/.claude/plugins/cache/...`
-に無ければ `~/workspace_tmp/claude-code-marketplace/...` を見る。
+に無ければ `~/workspace/claude-code-marketplace/...` を見る。
 
 ## 逸脱しない範囲 ★先に読む
 

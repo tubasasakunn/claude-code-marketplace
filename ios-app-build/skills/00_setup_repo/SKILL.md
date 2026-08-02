@@ -31,7 +31,7 @@ app-builder/
 **submodule は毎回最新に追従させる。** テンプレートの修正が取りこぼされる。
 
 ```bash
-cd ~/workspace_tmp/ios-app-build-workspace
+cd ~/workspace/ios-app-build-workspace
 git submodule update --init --remote common/swift-base common/marketing
 ```
 
@@ -46,7 +46,7 @@ ls common/swift-base           # テンプレートがあるか（無ければ�
 `${CLAUDE_PLUGIN_ROOT}/scripts/README.md` を読み、`asc_api.js` の認証情報（`~/.asc-key.json` か環境変数）を用意しておく。
 `HARNESS_TOKEN` はこのスキルでは使わない（`01` 以降で使う）。
 
-Cloudflare のトークンは `~/workspace_tmp/ios-app-build-workspace/.env` にある（`CLOUDFLARE_DEPLOY_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`）。
+Cloudflare のトークンは `~/workspace/ios-app-build-workspace/.env` にある（`CLOUDFLARE_DEPLOY_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`）。
 
 ## このスキルの範囲
 
@@ -65,7 +65,7 @@ Cloudflare のトークンは `~/workspace_tmp/ios-app-build-workspace/.env` に
 `swift-base` は「ストア提出・ASO・CI/CD の足回り」だけを持つテンプレート。**Swift のアプリコードは入っていない**（自分で書く）。
 
 ```bash
-ROOT=~/workspace_tmp/ios-app-build-workspace
+ROOT=~/workspace/ios-app-build-workspace
 APP=Bide                       # Xcode のプロジェクト名（英字、CONCEPT.md のアプリ名）
 SLUG=$(echo $APP | tr '[:upper:]' '[:lower:]')
 BUNDLE=com.basaapp.$SLUG

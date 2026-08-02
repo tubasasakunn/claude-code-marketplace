@@ -17,7 +17,7 @@ description: アイデア一言を受け取り、コンセプト出しから App
 `CLAUDE.md` と `PIPELINE.md` を読む。`talk_to_user` の作法に従う。
 
 ```bash
-cd ~/workspace_tmp/ios-app-build-workspace
+cd ~/workspace/ios-app-build-workspace
 git submodule update --init --remote common/swift-base common/marketing
 export LINE_ASK=${CLAUDE_PLUGIN_ROOT}/scripts/line_ask.sh
 export ASC_API=${CLAUDE_PLUGIN_ROOT}/scripts/asc_api.js
@@ -37,7 +37,7 @@ gh auth status 2>&1 | head -2
 
 ## 進捗の記録
 
-**`~/workspace_tmp/ios-app-build-workspace/.run/<slug>.md` に、節目ごとに書き足す。**
+**`~/workspace/ios-app-build-workspace/.run/<slug>.md` に、節目ごとに書き足す。**
 自分が落ちても、次のセッションがここから再開できる。
 
 ```markdown
