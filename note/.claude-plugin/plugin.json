@@ -1,0 +1,8 @@
+{
+  "name": "note",
+  "description": "note.com の記事執筆と投稿。構成設計・執筆・アイキャッチ生成・下書き保存・公開。",
+  "version": "0.1.0",
+  "author": {
+    "name": "tubasasakunn"
+  }
+}

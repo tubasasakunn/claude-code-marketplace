@@ -128,7 +128,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 63 スキル / 8 プラグイン**
+**全 67 スキル / 9 プラグイン**
 
 ### `common`（11本） — 全リポジトリで有効化
 
@@ -205,6 +205,15 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | `/sns-marketing:sns-post` | TikTok / Lemon8 向けの「複数画像（カルーセル）投稿」を新規に1本作る。 |
 | `/sns-marketing:tiktok-post` | Post a photo carousel (multiple images) + caption + hashtags to TikTok on a USB-debugging Android phone via adb UI automation. Use when the user want… |
 | `/sns-marketing:tone-post` | Tone（メンズメイク診断アプリ / target/mensmakeupadvisor）の TikTok・Lemon8 向けカルーセル画像投稿を1本作って実際に公開する。 |
+
+### `note`（4本） — note-workspaceで有効化
+
+| スキル | 何をするか |
+|---|---|
+| `/note:note-craft` | note.com 記事の設計正本。 |
+| `/note:note-post` | note.com の記事を新規に1本作って下書き保存まで持っていく。 |
+| `/note:note-publish` | note.com の下書きを公開する。 |
+| `/note:note-setup` | note-workspace で note.com への接続（note-mcp）を用意する。 |
 
 ### `cloudflare`（9本） — 全リポジトリ（user スコープ）で有効化
 

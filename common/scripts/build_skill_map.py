@@ -17,7 +17,7 @@ END = "<!-- END GENERATED -->"
 
 # 表示順（プラグインの意味的な順序。marketplace.json の順と揃える）
 ORDER = ["common", "swift-app", "ios-app-build", "app-store-optimize", "sns-marketing",
-         "cloudflare", "canva", "writing"]
+         "note", "cloudflare", "canva", "writing"]
 
 WHERE = {
     "common": "全リポジトリ",
@@ -25,6 +25,7 @@ WHERE = {
     "ios-app-build": "ios-app-build-workspace",
     "app-store-optimize": "app-store-optimize-workspace",
     "sns-marketing": "sns-marketing-workspace",
+    "note": "note-workspace",
     "cloudflare": "全リポジトリ（user スコープ）",
     "canva": "全リポジトリ（user スコープ）",
     "writing": "全リポジトリ（user スコープ）",

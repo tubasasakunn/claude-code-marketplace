@@ -31,6 +31,11 @@
       "description": "TikTok / Lemon8 のカルーセル投稿と宣伝動画。デザイン正本・素材生成テクニック・実投稿・日次運用パイプライン。"
     },
     {
+      "name": "note",
+      "source": "./note",
+      "description": "note-workspace で有効。note.com の記事執筆と投稿。媒体としての設計正本・1本作って下書き保存・公開判断。接続は非公式の note-mcp。"
+    },
+    {
       "name": "cloudflare",
       "source": "./cloudflare",
       "description": "Cloudflare 開発の公式スキル群。Workers / Wrangler / D1 / KV / R2 / Durable Objects / Agents SDK / Sandbox SDK / Email / Turnstile / Web パフォーマンス。"
