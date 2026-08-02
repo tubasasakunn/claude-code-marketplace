@@ -49,7 +49,13 @@ PY
 > **★スライド仕様（最新の standard 雛形・全アプリ共通／chrome無し・太い丸/角ゴシック）**：
 > - 見出しフォントは `brand.head`（material/manifest）＝maru(丸)/kaku(角)/antique/mincho。アプリ毎に設定済（明朝の"AIっぽさ"回避）。
 > - `cover` variant：`editorial`(断定)/`card`(**写真を暗くせずクリーンな角丸パネル＝暗幕に頼らない**)/`question`/`quote`/`split`/`versus`/`numeric`/**`giant`**(巨大数字＝`big`+`unit`+`kicker`/`teaser`)/**`magazine`**(雑誌の柱＝`headline`+`en`+`issue`)。フィールドは従来通り＋`bg`必須・`kicker`任意。**暗幕＋文字の一辺倒を避け `card` 等も混ぜる**。
-> - ★**`dark`（cover/photo 共通・任意）**：背景写真の暗さ（既定 cover 0.42–0.56 / photo 0.46）。photo を連投して時間帯を見せるときは 0.28→0.52 の階調を与える（一律だと朝も夜も同じ暗さになって変化が消える）。
+> - ★★**`treat`（cover・2026-08-02）**：**写真の扱い**＝サムネの見え方。`dark`(既定・従来の暗幕) /
+>   `light`(白幕＋濃文字。`veil` で幕の濃さ 155既定) / `duotone`(ブランド色に写し込む) /
+>   `paper`(上に写真・下は紙地) / `frame`(額装) / `band`(写真全面＋角丸の紙プレート) / `edge`(幕なし)。
+>   **`variant`（文字組）と直交**するのでどの variant にも付く（`variant:"card"` のみ併用不可）。
+>   **投稿ごとに回すのが必須**：企画前に `scripts/cover_history.py`、生成後は `qa.py` の COVER-REPEAT が
+>   直近3投稿との被りを hard fail させる。→ [[LAYOUTS]] §6b・[[DESIGN_NOTES]] 2026-08-02。
+> - ★**`dark`（cover/photo 共通・任意）**：背景写真の暗さ（既定 cover 0.42–0.56 / photo 0.46。`treat:"dark"` と `edge` でだけ効く）。photo を連投して時間帯を見せるときは 0.28→0.52 の階調を与える（一律だと朝も夜も同じ暗さになって変化が消える）。
 > - ★**新スライド型（2026-07-27）**
 >   - `grid`：`title` + `cells`[2–4]（`{icon,label,text}`）。**1セル＝ラベル1語＋本文1行**に絞る。
 >   - `callout`：`shot`(+`footage`) + `title`(+`sub`) + `spot`[x,y]（端末内の相対座標）+ `spot_r` + `spot_label`。**強調は1点のみ受け付ける**。

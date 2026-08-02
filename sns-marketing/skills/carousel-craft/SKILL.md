@@ -18,13 +18,20 @@ description: SNSカルーセル画像(TikTokフォトモード/Lemon8)の品質�
 - **[[MATERIALS]]** … 全アプリの素材在庫＋specレシピ。アプリ固有の素材/ブランドは各 `target/<app>/material/`（manifest.json＋OVERVIEW.md＋app_icon＋symbols）。
 - **engine/ ＋ templates/** … 共通描画ツールキット（`engine/brand.py`）と**雛形**（`templates/standard.py` 等）。画像は使い回さず**雛形から毎回新しく組む**。ブランドは material/manifest.json から。
 - **engine/assets/svg/** … 汎用**SVGアセットバンク**(CTA/装飾/アイコン/バッジ/UI部品/矢印・多色/単色)。台帳=`index.json`(名前/概要/タグ)。`paste_svg`で配置(multiはcolor=None)。詳細は [[MATERIALS]] §6。
-- `scripts/` … `qa.py`（客観チェック＋コンタクトシート）、`fonts.py`（高インパクト和文フォント）、生成は `sns-daily-pipeline/scripts/gen.py --app <id>`（manifest駆動）。
+- `scripts/` … `qa.py`（客観チェック＋コンタクトシート）、★`cover_history.py`（**直近のサムネ一覧＋次に使う treat**。企画の最初に叩く）、`fonts.py`（高インパクト和文フォント）、生成は `sns-daily-pipeline/scripts/gen.py --app <id>`（manifest駆動）。
 
 ## 大原則（[[DESIGN_SPEC]] §0 の要約）
 1. **素材ファースト**：表紙を含む全スライドに実素材を敷く。**ベタ塗り/グラデだけのスライドを作らない**（最重要・最大の弱点）。
-2. ★**「黒い暗幕＋白文字」は1投稿2枚まで**：写真の上に文字を置く手は8つある（[[LAYOUTS]] §6・`layout` 型の mode）。
-   下スクリムだけを常用すると**案をいくら増やしても見え方が揃う**（2026-07-27 に指摘。9 cover variant のうち8つが暗幕だった）。
-   3枚目からは `margin`/`band`/`frame`/`light`/`duotone`/`cutout`/`stripe`/`edge` か、紙地の型（info/grid/table/steps/stats/recap）へ振る。
+2. ★★**サムネ（表紙）は直近3投稿と違う `treat` にする**（最重要・2回再発している）。
+   表紙は**全員が見る唯一のスライド**で、フィードでの見え方は `variant`（文字組）ではなく
+   **`treat`（写真の扱い）** でほぼ決まる ＝ `dark` / `light` / `duotone` / `paper` / `frame` / `band` / `edge`
+   （＋自前で紙パネルを敷く `variant:"card"`）。**企画の前に `scripts/cover_history.py` を叩き、
+   「選べる treat」から選ぶ**。`qa.py` が直近との被りを **COVER-REPEAT で hard fail** させる。
+   → 一覧は [[LAYOUTS]] §6b、経緯は [[DESIGN_NOTES]] 2026-08-02。
+   ⚠ **1投稿の中で散らす必要はない**（同じ投稿の中は揃っていてよい）。**投稿と投稿の間で散らす**。
+   ⚠ かつて置いた「1投稿で暗幕は2枚まで」という**上限の規範は一度も発火しなかった**
+   （cover＋photo でちょうど2枚に張り付き、超えないから）。上限ではなく**直近との差**で判定する。
+   中面で写真に文字を重ねるときも下スクリム一辺倒にしない（[[LAYOUTS]] §6・`layout` 型の8 mode）。
 3. **0.5秒で勝負**：表紙はフックに全振り。大きく・上〜中央・1メッセージ・オチは隠す。
 4. **1スライド1メッセージ**／**3枚 or 6〜9枚**（4〜5枚は実測で谷）／最後にCTA。
 5. **質はコードで測らない**：可読性・美しさ・フック強度は**エージェントが画像を見て**判断する。`qa.py` は素材の有無とセーフゾーンを描くだけの補助。
@@ -38,6 +45,13 @@ description: SNSカルーセル画像(TikTokフォトモード/Lemon8)の品質�
 **この回でユーザから新しい指摘が出たら、作業の最後に [[DESIGN_NOTES]] へ1行追記する**（日付・対象・指示・対応）。
 
 ### 1. 企画
+★**まず直近の表紙を見る**（サムネのバラエティはここでしか作れない。書いたあとでは遅い）:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/carousel-craft/scripts/cover_history.py <repo>/<app>_posts
+```
+「選べる treat」（＝直近3投稿で使っていないもの）から**この投稿の表紙 treat を先に決める**。
+「一度も使っていない」があればそこから選ぶのが最優先。**表紙の写真も直近と被らせない**。
+
 **[[PATTERNS]] から「投稿アーキタイプ1つ＋フック1つ」を選ぶ**（過去と被らせない）。それを [[DESIGN_SPEC]] §2,§6 とアプリの `material/OVERVIEW.md`（concept/コンテンツ知識）に沿って具体化し、各スライドの中身を決める。表紙はオチを言わない。実アプリ宣伝なら [[PATTERNS]] §5 の法令ガード（**薬機法の効能標榜**・No.1/効果断定・打消し表示・「App Store」表記）を必ず守る。
 
 **枚数は 3枚 or 6〜9枚**（★2026-07-25 実測改訂）。**4〜5枚は最も弱い谷**なので避ける ——
@@ -52,15 +66,17 @@ description: SNSカルーセル画像(TikTokフォトモード/Lemon8)の品質�
 [[MATERIALS]] のエンジン別レシピに従い、`spec.json` を書く。各スライドの**配置は [[LAYOUTS]]**（ゾーン定数・配置テンプレ型・ジャンプ率・整列）に沿わせる。
 
 **使えるスライド型**（`templates/standard.py`・全19型）:
-`cover`(9 variant: editorial/card/question/quote/split/versus/numeric/**giant**/**magazine**) /
+`cover`(9 variant: editorial/card/question/quote/split/versus/numeric/**giant**/**magazine**
+　　　× ★7 treat: dark/light/duotone/paper/frame/band/edge ＝ **サムネの見え方はこちらで決まる**) /
 `photo` / `shot` / `info` / `cta` / `showcase` / `feature` /
 **`layout`**(写真×文字を8 mode で切替＝暗幕からの脱却) / `grid` / `callout` / `scrap` / `panorama` /
 `rank` / `table` / `bleed` / `spec` / `steps` / `stats` / `recap`。
 フィールドは [[MATERIALS]] §1、型の選び方は [[PATTERNS]] §6、配置は [[LAYOUTS]] §4/§6。
 
-★**書き終えたら「暗幕（黒＋白文字）が何枚あるか」を数える。3枚以上なら別 mode へ振り直す。**
-
 **必ず**：
+- ★表紙 `cover` に **手順1で決めた `treat`** を書く（`"treat": "paper"` 等）。省略＝`dark`＝これまでと同じ絵になる。
+  `variant`（文字組）と `treat`（写真の扱い）は**直交**するので、どの variant にも付けられる
+  （例外: `variant:"card"` は自前で紙パネルを敷くので `treat` と併用不可＝それ自体が1つの顔）。
 - 表紙 `cover` と `photo` に `bg`（実素材の**repo相対パス**＝ルートバンク or 自前実画面）を入れる。**省略しない**（anki/connect の手続き背景＝灰色、tone のベタ赤を避ける）。
 - `shot` を複数枚（そのアプリの実画面）。緑クロマキーがあれば `footage` で世界観差替（hioto/tone）。
 - 配色は §4 の70:25:5、見出しは強いウェイト/書体（§3・§8 のフォント表）。
@@ -78,7 +94,10 @@ rm -rf <repo>/post/__pycache__ 2>/dev/null
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/carousel-craft/scripts/qa.py <outdir> --spec <spec.json>
 ```
-- `hard_flags>0` なら **spec を直して 2 へ戻る**（exit 非0）。2種類ある：
+- `hard_flags>0` なら **spec を直して 2 へ戻る**（exit 非0）。3種類ある：
+  - ★**COVER-REPEAT** ＝ サムネが直近と被る（`treat` が直近3投稿と同じ／表紙の写真が直近4投稿と同じ／
+    variant+treat が完全一致）。**手順1の cover_history.py に戻って別の treat を選ぶ**。
+    意図して同じ型を続けるときだけ `--no-rotation` で外す（理由を [[DESIGN_NOTES]] に書くこと）。
   - **NO-MATERIAL** ＝ 素材未使用（cover/photo に `bg`、shot に `shot` が無い）
   - ★**LEGAL / BAIT** ＝ 文言が法令・規約に触れる。**薬機法**（「ストレスが減る」「メンタルが整う」
     「自己肯定感が上がる」＝日記/メンタル系アプリが直撃）・**景表法**（No.1・最上級）・
@@ -93,7 +112,9 @@ qa はセーフゾーンと素材・間延びを機械チェックするだけ�
 **コンタクトシート `_qa/*_contact.png` ＋ 表紙・info・shot・cta を各1枚 raw PNG で Read**（コンタクトは縮小なので画質・質感は raw で見る）。[[DESIGN_SPEC]]（§2,§5,§7）・[[SPACING]]（§9 余白 / §11 画質）で採点：
 - **画質・質感**：フラット面にザラつき（grain誤用）がないか／文字エッジがシャープか／写真grainが細かいfilmか（[[SPACING]]§11）。**等倍〜2倍で1枚確認**。
 - **余白の違和感**：左右対称か／番号・アイコンと本文が近接しているか（浮いていないか）／縦の重心が可視帯の中央にあるか／間延び・詰まりがないか（[[SPACING]]§9）。
-- 表紙：親指サイズでフックが読めるか／上に死に空間がないか／背景に実素材があるか／オチを割っていないか。
+- ★**表紙は直近投稿の表紙と並べて見る**（`<repo>/<app>_posts/*/imgs/tiktok/01_cover.png` を2〜3枚 Read）。
+  1枚だけ見ると必ず「良い」と判断してしまい、**フィードで並んだときに揃っている**ことに気づけない。
+  親指サイズでフックが読めるか／上に死に空間がないか／背景に実素材があるか／オチを割っていないか。
 - 全体：実画面が証拠として効いているか／写真上の文字が読めるか（スクリム）／右いいね列・下UIに被っていないか／整列が揃っているか／既存投稿と被っていないか。
 - **「なんか変／荒い」と感じたら言語化して原因を特定する**（grain・近接・重心・字面…）。感覚を放置しない。
 - ダメなら **spec（文言・素材・配色・レイアウト）または雛形を直して 2〜5 を繰り返す**。納得いくまで回す（1発で終わらせない）。

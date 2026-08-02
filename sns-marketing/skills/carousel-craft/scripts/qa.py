@@ -181,6 +181,81 @@ def legal_flags(spec):
     return {k: " / ".join(v) for k, v in flags.items()}
 
 
+# MARK: - サムネ(表紙)のローテーション強制
+#
+# ★2026-08-02 追加。「暗幕＋白文字は1投稿2枚まで」という**上限**の規範を置いていたが、
+# 実際の骨格は cover＋photo でちょうど2枚に張り付き、**一度も上限を超えないので
+# 一度も発火しなかった**。28投稿の表紙が全部「暗い写真＋白文字」のまま（実測）。
+# 上限ではなく「**直近と違うこと**」を条件にし、markdown ではなくここで hard fail させる。
+COVER_LOOKBACK = 3        # 直近何投稿と被らせないか（treat）
+BG_LOOKBACK = 4           # 表紙の写真そのものの使い回しを見る範囲
+
+
+def _cover_key(sl):
+    """表紙のサムネとしての見え方を1語で。= templates/standard.py の `cover_key()`。
+    （3行なので複製している。判定が増えたら standard.py から import に切り替える）"""
+    return "card" if sl.get("variant") == "card" else sl.get("treat", "dark")
+
+
+def _cover_slide(spec):
+    for i, sl in enumerate(spec.get("slides", []), 1):
+        if sl.get("type") == "cover":
+            return i, sl
+    return None, None
+
+
+def recent_covers(spec_path, limit=8):
+    """同じアプリの**直近投稿の表紙**を新しい順に返す。
+
+    実運用の置き方は `<app>_posts/<YYYYMMDD>/spec.json`（marketing/）。
+    ディレクトリ名が日付なので名前の降順＝新しい順で足りる。"""
+    spec_path = os.path.abspath(spec_path)
+    posts_dir = os.path.dirname(os.path.dirname(spec_path))
+    out = []
+    for p in sorted(glob.glob(os.path.join(posts_dir, "*", "spec.json")), reverse=True):
+        if os.path.abspath(p) == spec_path:
+            continue
+        try:
+            sp = json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+        _, sl = _cover_slide(sp)
+        if sl:
+            out.append({"post": os.path.basename(os.path.dirname(p)),
+                        "variant": sl.get("variant", "editorial"),
+                        "treat": _cover_key(sl), "bg": sl.get("bg", "")})
+        if len(out) >= limit:
+            break
+    return out
+
+
+def cover_flags(spec, spec_path):
+    """サムネが直近と被っていたら hard flag。表紙は**全員が見る唯一のスライド**で、
+    フィードでの見え方＝treat がほぼ全部を決める。ここだけは機械で止める。"""
+    idx, sl = _cover_slide(spec)
+    if not sl or not spec_path:
+        return {}
+    hist = recent_covers(spec_path)
+    if not hist:
+        return {}
+    key = _cover_key(sl)
+    msgs = []
+    recent = [h["treat"] for h in hist[:COVER_LOOKBACK]]
+    if key in recent:
+        avail = [t for t in ("dark", "light", "duotone", "paper", "frame", "band", "edge", "card")
+                 if t not in recent]
+        msgs.append(f"COVER-REPEAT:treat={key} — 直近{COVER_LOOKBACK}投稿({'/'.join(recent)})と同じ"
+                    f"見え方。フィードに並ぶサムネが揃う。未使用: {'/'.join(avail)}")
+    bg = sl.get("bg")
+    if bg and bg in [h["bg"] for h in hist[:BG_LOOKBACK]]:
+        msgs.append(f"COVER-REPEAT:bg — 表紙の写真が直近{BG_LOOKBACK}投稿と同じ。別の素材を引く")
+    same = [h["post"] for h in hist[:COVER_LOOKBACK]
+            if h["variant"] == sl.get("variant", "editorial") and h["treat"] == key]
+    if same and not msgs:
+        msgs.append(f"COVER-REPEAT:variant+treat — {'/'.join(same)} と完全に同じ組み合わせ")
+    return {idx: " / ".join(msgs)} if msgs else {}
+
+
 def material_flags(spec):
     """Per-slide deterministic flags from the source spec (1-indexed to match NN_)."""
     flags = {}
@@ -273,13 +348,18 @@ def main():
     ap.add_argument("imgs_dir")
     ap.add_argument("--spec", help="gen.py spec.json — enables material check")
     ap.add_argument("--strict", action="store_true")
+    ap.add_argument("--no-rotation", action="store_true",
+                    help="サムネ(表紙)の直近との被りチェックを外す。意図して同じ型を続けるときだけ")
     a = ap.parse_args()
 
     spec_flags = {}
     if a.spec and os.path.exists(a.spec):
         spec = json.load(open(a.spec, encoding="utf-8"))
         spec_flags = material_flags(spec)
-        for idx, msg in legal_flags(spec).items():   # 法令・規約は素材と同じく hard fail
+        extra = dict(legal_flags(spec))              # 法令・規約は素材と同じく hard fail
+        if not a.no_rotation:                        # サムネのローテーションも hard fail
+            extra.update(cover_flags(spec, a.spec))
+        for idx, msg in extra.items():
             spec_flags[idx] = f"{spec_flags[idx]} / {msg}" if idx in spec_flags else msg
         n_slides = len(spec.get("slides", []))
         if 4 <= n_slides <= 5:                       # 実測: 4–5枚が最も弱い谷
@@ -304,7 +384,7 @@ def main():
     print(json.dumps({
         "ok": (hard == 0) and (not a.strict or soft == 0),
         "hard_flags": hard, "soft_flags": soft,
-        "note": "hard=素材未使用(spec必須)。soft=セーフゾーン侵犯(目視)。"
+        "note": "hard=素材未使用/法令/サムネ被り(spec必須)。soft=セーフゾーン侵犯(目視)。"
                 "コンタクトシートを Read してフック/可読性/被りを確認。"
                 + ("" if a.spec else "  ※--spec 未指定: 素材チェックは skip。"),
         "platforms": results}, ensure_ascii=False, indent=2))

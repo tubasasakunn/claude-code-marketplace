@@ -9,7 +9,9 @@
 - 見出しは **太い丸/角ゴシック**（Noto明朝の"AIっぽさ"を避ける。brand.head=maru/kaku/antique/mincho）。
 - **chrome を載せない**（左上ワードマーク・右上ページ番号・「ポイント」等の汎用ラベルは削除）。
 - **余白を大きく・情報は最小限・小さい文字は書かない**。アイコン(SVGバンク)で直感的に。
-- 背景は「暗幕＋文字」の一辺倒にしない（cover_card 等のクリーン表現も使う）。
+- 背景は「暗幕＋文字」の一辺倒にしない。表紙は **variant(文字組) × treat(写真の扱い)**
+  の2軸で、`treat` を投稿ごとに回す（★2026-08-02。それまで9 variant 全部が同じ暗幕で、
+  フィードに並ぶサムネが毎回同じだった）。treat 一覧は `COVER_TREATS`。
 """
 import math
 import os
@@ -122,23 +124,178 @@ def _anchor(W, H, base, tall_ratio):
     return round(H * (tall_ratio if _tall(W, H) else base))
 
 
-def _swipe_bottom(canvas, M, W, H, s):
-    _swipe(canvas, M, round(H * 0.565) if _tall(W, H) else H - round(116 * s), s)
+def _swipe_bottom(K, x, s):
+    _swipe(K.canvas, x, K.swipe_y(s), s, color=K.sub)
+
+
+# MARK: - 表紙の『写真の扱い』= treat（文字組 variant と直交する軸）
+#
+# ★2026-08-02 **サムネのワンパターン**に対する構造的な手当て。
+# それまで cover の 9 variant は全部この `_cover_base` を通っており、写真の扱いは
+# 「darken + bottom_scrim」の**一種類しかなかった**。variant を振り分けても
+# フィードに並ぶ絵＝サムネは毎回「暗い写真＋白文字」で、案をいくら増やしても揃う
+# （2026-08-02 指摘。28投稿の表紙が全部これだった）。
+#   variant = 文字組（何をどう並べるか）
+#   treat   = 写真の扱い（地をどう作るか）★サムネの見え方はほぼこちらで決まる
+# に分解し、**treat を投稿ごとに回す**。直近投稿との衝突は scripts/qa.py が hard fail で
+# 止める（「2枚まで」のような規範文だけでは一度も守られなかった → [[DESIGN_NOTES]]）。
+COVER_TREATS = ("dark", "light", "duotone", "paper", "frame", "band", "edge")
+# 紙地の型＝写真と文字を**重ねない**（[[LAYOUTS]] §6 の第一原則そのもの）
+PAPER_TREATS = ("paper", "frame", "band")
+
+
+class Skin:
+    """`_cover_base` の返り値。canvas と、その地に合う ink / sub / 影 / テキスト帯を持つ。
+
+    variant 側は `WHITE` ではなく **`K.ink`**、`_anchor()` ではなく **`K.anchor()`**、
+    `shadow_a=130` ではなく **`shadow_a=K.sh(130)`** を使う。こうしておくと treat を
+    足しても 9 variant すべてに自動で効く（1つずつ書き足すと必ず取りこぼす）。"""
+
+    def __init__(self, canvas, W, H, ink, sub, shadow, zone=None, limit=None):
+        self.canvas, self.W, self.H = canvas, W, H
+        self.ink, self.sub, self.shadow = ink, sub, shadow
+        self.zone = zone                      # 紙地の型のみ: 文字を置ける帯 (top, bottom)
+        self.paper = zone is not None
+        self.limit = limit if limit is not None else H   # 濃文字が安全な下限（band の帯下端）
+        self.floor = 0                        # 実際に描き終えた最下端（mark() が更新）
+
+    def sh(self, a):
+        """写真に直接載るときだけ影を出す。紙地に濃文字で影を付けると汚れる。"""
+        return a if self.shadow else 0
+
+    def anchor(self, base, tall_ratio, grow="up"):
+        """従来の絶対 y を、紙地の型では『紙の帯』へ線形に写す。
+
+        単に帯の下端を返すと versus のような**複数アンカーが1点に潰れる**ので、
+        従来レンジ→帯レンジの写像にして比率を保つ。`grow="down"`（split のように
+        アンカーから下へ伸びる型）は帯の上端から始めないと帯を突き抜ける。"""
+        y = _anchor(self.W, self.H, base, tall_ratio)
+        if self.zone is None:
+            return y
+        t0, t1 = self.zone
+        if grow == "down":
+            return t0
+        lo, hi = ((0.20, 0.56) if _tall(self.W, self.H) else (0.30, 0.86))
+        lo, hi = self.H * lo, self.H * hi
+        return round(min(t1, max(t0, t0 + (t1 - t0) * (y - lo) / (hi - lo))))
+
+    def top(self, y, deco=0):
+        """テキスト群の開始 y を帯に丸める。`deco` は**その上に付く装飾**の高さ
+        （kicker / "Q." / 引用符）。紙地の型は上が写真なので、ここを見ずに
+        bottom-anchor だけで置くと装飾が写真の上に濃文字で乗って消える（実測）。"""
+        return y if self.zone is None else max(self.zone[0] + deco, y)
+
+    def mark(self, y):
+        """最後に描いた要素の下端を記録。SWIPE をその下へ逃がすために使う。"""
+        self.floor = max(self.floor, y)
+        return y
+
+    def swipe_y(self, s):
+        """SWIPE の y。紙地の型は top() で本文が下がることがあるので**実際の下端の下**へ置く
+        （固定の帯下端に置くと teaser と重なる。実測で numeric/giant が重なった）。"""
+        if self.zone:
+            return min(self.limit, max(self.zone[1] + round(46 * s), self.floor + round(44 * s)))
+        return round(self.H * 0.565) if _tall(self.W, self.H) else self.H - round(116 * s)
+
+
+def _ticks(canvas, s, color, alpha):
+    B.frame_ticks(canvas, color, alpha=alpha, margin=round(52 * s), length=round(40 * s), width=3)
 
 
 def _cover_base(spec, W, H, brand, dark=0.42, scrim_start=0.30, scrim_bot=215):
-    s = W / 1080
+    """表紙の地を作って `Skin` を返す。`dark/scrim_*` は treat="dark" のときだけ効く。"""
+    s, tall = W / 1080, _tall(W, H)
+    accent = brand.accent(spec["accent"])
+    treat = spec.get("treat", "dark")
+    if treat not in COVER_TREATS:
+        raise ValueError(f"cover treat={treat!r} は未定義。{COVER_TREATS} から選ぶ")
     bgp = _path(brand, spec.get("bg"))
+    img = Image.open(bgp) if bgp else None
     dark = spec.get("dark", dark)      # spec 側で明度を上書き（時間帯の階調・明るい素材の救済）
-    if bgp:
-        canvas = B.darken(B.cover_crop(Image.open(bgp), W, H), dark).convert("RGBA")
-    else:
+
+    if img is None:                    # 素材なし＝従来のフォールバック（treat は効かない）
         canvas = Image.new("RGBA", (W, H), brand.ink + (255,))
-        B.soft_blob(canvas, brand.accent(spec["accent"]), W // 2, round(H * 0.3), r=round(680 * s), alpha=90)
-    canvas.alpha_composite(B.vgrad_alpha(W, H, 70, 0))
-    canvas.alpha_composite(B.bottom_scrim(W, H, start=scrim_start, bot_a=scrim_bot))
-    B.frame_ticks(canvas, WHITE, alpha=90, margin=round(52 * s), length=round(40 * s), width=3)
-    return canvas
+        B.soft_blob(canvas, accent, W // 2, round(H * 0.3), r=round(680 * s), alpha=90)
+        canvas.alpha_composite(B.vgrad_alpha(W, H, 70, 0))
+        canvas.alpha_composite(B.bottom_scrim(W, H, start=scrim_start, bot_a=scrim_bot))
+        _ticks(canvas, s, WHITE, 90)
+        return Skin(canvas, W, H, WHITE, SOFT_W, True)
+
+    ink_d, sub_d = brand.ink, brand.sub_ink + (255,)
+
+    if treat == "dark":                # 従来。**1つの軸として残すが、既定にはしない**
+        canvas = B.darken(B.cover_crop(img, W, H), dark).convert("RGBA")
+        canvas.alpha_composite(B.vgrad_alpha(W, H, 70, 0))
+        canvas.alpha_composite(B.bottom_scrim(W, H, start=scrim_start, bot_a=scrim_bot))
+        _ticks(canvas, s, WHITE, 90)
+        return Skin(canvas, W, H, WHITE, SOFT_W, True)
+
+    if treat == "light":               # 暗幕の逆。フィードで**白く光る**のでいちばん目立つ
+        # 白幕は濃いほど字は読めるが、上げすぎると写真が消えて「素材ファースト」に反する
+        # （α182 は実測で写真がほぼ飛んだ）。既定 α155＋文字帯だけ追加で起こす二段構え。
+        canvas = B.cover_crop(img, W, H).convert("RGBA")
+        canvas.alpha_composite(Image.new("RGBA", (W, H), brand.bg + (spec.get("veil", 155),)))
+        lift = Image.new("RGBA", (W, H), brand.bg + (0,))   # 文字が乗る下側だけさらに起こす
+        lift.putalpha(B.bottom_scrim(W, H, start=0.24, top_a=0, bot_a=96).getchannel("A"))
+        canvas.alpha_composite(lift)
+        _ticks(canvas, s, ink_d, 70)
+        return Skin(canvas, W, H, ink_d, sub_d, False)
+
+    if treat == "duotone":             # 黒ではなく**ブランド色**で統一をかける
+        hi = tuple(round(c * 0.42 + 255 * 0.58) for c in accent)   # 明部が沈むので白寄りへ
+        canvas = _duotone(B.cover_crop(img, W, H), brand.ink, hi).convert("RGBA")
+        canvas.alpha_composite(B.bottom_scrim(W, H, start=0.58, bot_a=104))
+        _ticks(canvas, s, WHITE, 90)
+        return Skin(canvas, W, H, WHITE, SOFT_W, True)
+
+    if treat == "edge":                # 幕なし。**写真選びが全て**（明るい面に載せた瞬間に破綻）
+        canvas = B.darken(B.cover_crop(img, W, H), spec.get("dark", 0.12)).convert("RGBA")
+        _ticks(canvas, s, WHITE, 80)
+        return Skin(canvas, W, H, WHITE, SOFT_W, True)
+
+    # --- 紙地の型: 写真と文字を重ねない -------------------------------------
+    #
+    # 帯は 9:16 の可視域(y270–1110)に収める（下端に SWIPE 一行ぶんを残して 0.55H まで）。
+    # ⚠ その結果 9:16 では下 40% が必ず紙地で余る。**これは構造上避けられない**——
+    #   文字帯を 400px 確保するには写真を 0.32H までに抑えるしかなく、下 1110px 以降は
+    #   どのみち TikTok の UI（キャプション・操作）が乗って見えない領域だから。
+    #   9:16 の下 40% はどのみち TikTok の UI（キャプション・操作）が乗って見えない領域。
+    #   ただし**プロフィールのグリッドと Lemon8 では全体が見える**ので、そこは
+    #   「紙面の余白」として設計する（埋めない）。
+    # ⚠ grain は**写真部分にだけ**入れる。紙地（フラット面）に載せると JPEG 圧縮ノイズ状の
+    #   画質荒れに見える → [[SPACING]] §11。canvas 全体に掛けてはいけない。
+    def _film(im):
+        B.grain(im, seed=spec.get("idx", 0), amount=6)
+        return im
+
+    zone_bot = round(H * (0.55 if tall else 0.845))
+    limit = None
+    if treat == "paper":               # 上に写真 / 下は紙地（重ねない＝§6の第一原則そのもの）
+        canvas = Image.new("RGBA", (W, H), brand.bg + (255,))
+        ph = round(H * (0.30 if tall else 0.44))
+        canvas.alpha_composite(_film(B.cover_crop(img, W, ph).convert("RGBA")), (0, 0))
+        zone = (ph + B.sp("section", W), zone_bot)
+        _ticks(canvas, s, ink_d, 60)
+    elif treat == "frame":             # 額装。写真を主役から降ろす＝コントラスト問題が起きない
+        canvas = Image.new("RGBA", (W, H), brand.bg + (255,))
+        fw, fh = round(W * 0.78), round(H * (0.22 if tall else 0.34))
+        fx, fy = (W - fw) // 2, round(H * (0.070 if tall else 0.06))
+        sh_ = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(sh_).rectangle([fx + 8, fy + 20, fx + fw + 8, fy + fh + 20], fill=(60, 46, 36, 66))
+        canvas.alpha_composite(sh_.filter(ImageFilter.GaussianBlur(round(28 * s))))
+        canvas.alpha_composite(_film(B.cover_crop(img, fw, fh).convert("RGBA")), (fx, fy))
+        zone = (fy + fh + B.sp("section", W), zone_bot)
+    else:                              # band — 写真は全面のまま、文字は紙の帯へ
+        # 帯は**左右を空けた角丸プレート**にする。全幅ベタで敷くと 9:16 では可視域(270–1110)が
+        # ほぼ帯で埋まり、paper と同じ「白い塊」のサムネになって treat を分けた意味が消える。
+        canvas = _film(B.cover_crop(img, W, H).convert("RGBA"))   # 帯を敷く**前**に掛ける
+        z0 = round(H * (0.32 if tall else 0.44))
+        bm = round(W * 0.055)
+        plate_bot = zone_bot + round(170 * s)
+        B.rounded_plate(canvas, [bm, z0 - B.sp("pad", W), W - bm, plate_bot],
+                        round(40 * s), brand.bg + (250,))
+        zone, limit = (z0, zone_bot), plate_bot - round(58 * s)
+    return Skin(canvas, W, H, ink_d, sub_d, False, zone=zone, limit=limit)
 
 
 def _hl(canvas, head, hf, accent, M, top, lead, hl):
@@ -155,19 +312,20 @@ def _hl(canvas, head, hf, accent, M, top, lead, hl):
 
 def cover_editorial(spec, W, H, brand):
     s, M, accent = W / 1080, margin(W), brand.accent(spec["accent"])
-    canvas = _cover_base(spec, W, H, brand, dark=0.42)
+    K = _cover_base(spec, W, H, brand, dark=0.42)
+    canvas = K.canvas
     head = spec["headline"].split("\n")
     hf = H_(brand, 112 * s)
     lead = round(136 * s)
-    top = _anchor(W, H, 0.82, 0.50) - len(head) * lead
+    top = K.top(K.anchor(0.82, 0.50) - len(head) * lead, round(74 * s) if spec.get("kicker") else 0)
     if spec.get("kicker"):
-        B.tick_label(canvas, spec["kicker"], M, top - round(74 * s), WHITE, accent, size=round(30 * s))
-    B.draw_shadowed(canvas, head, hf, WHITE, M, top, lead, align="left", shadow_a=130, blur=9)
+        B.tick_label(canvas, spec["kicker"], M, top - round(74 * s), K.ink, accent, size=round(30 * s))
+    B.draw_shadowed(canvas, head, hf, K.ink, M, top, lead, align="left", shadow_a=K.sh(130), blur=9)
     _hl(canvas, head, hf, accent, M, top, lead, spec.get("hl"))
     end = top + len(head) * lead
     d = ImageDraw.Draw(canvas)
     d.line([(M, end + round(20 * s)), (M + round(110 * s), end + round(20 * s))], fill=accent, width=round(8 * s))
-    _swipe(canvas, M, end + round(46 * s), s)
+    _swipe(canvas, M, end + round(46 * s), s, color=K.sub)
     return canvas
 
 
@@ -204,88 +362,100 @@ def cover_card(spec, W, H, brand):
 
 def cover_question(spec, W, H, brand):
     s, M, accent = W / 1080, margin(W), brand.accent(spec["accent"])
-    canvas = _cover_base(spec, W, H, brand, dark=0.50, scrim_start=0.22, scrim_bot=228)
+    K = _cover_base(spec, W, H, brand, dark=0.50, scrim_start=0.22, scrim_bot=228)
+    canvas = K.canvas
     q = spec["question"].split("\n")
     qf = H_(brand, 100 * s)
     lead = round(124 * s)
     ans = spec.get("answer")
-    top = _anchor(W, H, 0.76, 0.50) - len(q) * lead - (round(108 * s) if ans else 0)
+    top = K.top(K.anchor(0.76, 0.50) - len(q) * lead - (round(108 * s) if ans else 0), round(96 * s))
     d = ImageDraw.Draw(canvas)
     B.draw_tracked(d, "Q.", B.mono_font(round(70 * s), "light"), accent + (255,), M, top - round(96 * s), 2)
-    end = B.draw_shadowed(canvas, q, qf, WHITE, M, top, lead, align="left", shadow_a=140, blur=9)
+    end = B.draw_shadowed(canvas, q, qf, K.ink, M, top, lead, align="left", shadow_a=K.sh(140), blur=9)
     if ans:
         ay = end + round(40 * s)
         ax = B.draw_tracked(d, "A.", B.mono_font(round(36 * s), "medium"), accent + (255,), M, ay, 2)
-        d.text((ax + round(16 * s), ay - round(6 * s)), spec["answer"], font=H_(brand, 48 * s), fill=SOFT_W)
-    _swipe_bottom(canvas, M, W, H, s)
+        d.text((ax + round(16 * s), ay - round(6 * s)), spec["answer"], font=H_(brand, 48 * s), fill=K.sub)
+        K.mark(ay + round(56 * s))
+    else:
+        K.mark(end)
+    _swipe_bottom(K, M, s)
     return canvas
 
 
 def cover_quote(spec, W, H, brand):
     s, M, accent = W / 1080, margin(W), brand.accent(spec["accent"])
-    canvas = _cover_base(spec, W, H, brand, dark=0.52, scrim_start=0.24, scrim_bot=224)
+    K = _cover_base(spec, W, H, brand, dark=0.52, scrim_start=0.24, scrim_bot=224)
+    canvas = K.canvas
     q = spec["quote"].split("\n")
     qf = H_(brand, 100 * s)
     lead = round(128 * s)
-    top = _anchor(W, H, 0.78, 0.52) - len(q) * lead
+    top = K.top(K.anchor(0.78, 0.52) - len(q) * lead, round(120 * s) if B.has_svg("quote") else 0)
     if B.has_svg("quote"):
         B.paste_svg(canvas, "quote", M, top - round(120 * s), round(82 * s), accent)
-    B.draw_shadowed(canvas, q, qf, WHITE, M, top, lead, align="left", shadow_a=140, blur=10)
-    _swipe_bottom(canvas, M, W, H, s)
+    K.mark(B.draw_shadowed(canvas, q, qf, K.ink, M, top, lead, align="left", shadow_a=K.sh(140), blur=10))
+    _swipe_bottom(K, M, s)
     return canvas
 
 
 def cover_split(spec, W, H, brand):
     s, M, accent = W / 1080, margin(W), brand.accent(spec["accent"])
-    canvas = _cover_base(spec, W, H, brand, dark=0.54, scrim_start=0.16, scrim_bot=232)
+    K = _cover_base(spec, W, H, brand, dark=0.54, scrim_start=0.16, scrim_bot=232)
+    canvas = K.canvas
     d = ImageDraw.Draw(canvas)
-    y = _anchor(W, H, 0.42, 0.30)
-    B.draw_tracked(d, "BEFORE", B.mono_font(round(28 * s), "medium"), (255, 255, 255, 140), M, y, 6)
+    faint = K.sub if K.paper else (255, 255, 255, 140)
+    y = K.anchor(0.42, 0.30, grow="down")     # ここから**下へ**伸びる型
+    B.draw_tracked(d, "BEFORE", B.mono_font(round(28 * s), "medium"), faint, M, y, 6)
     y += round(54 * s)
     y = B.draw_shadowed(canvas, spec["before"].split("\n"), H_(brand, 66 * s),
-                        (255, 255, 255, 210), M, y, round(86 * s), align="left", shadow_a=110, blur=7)
+                        K.sub, M, y, round(86 * s), align="left", shadow_a=K.sh(110), blur=7)
     y += round(36 * s)
-    B.hairline(canvas, M, y, W - M, color=(255, 255, 255), alpha=70, width=2)
+    B.hairline(canvas, M, y, W - M, color=K.ink, alpha=70 if not K.paper else 46, width=2)
     y += round(42 * s)
     B.draw_tracked(d, "AFTER", B.mono_font(round(28 * s), "medium"), accent + (255,), M, y, 6)
     y += round(58 * s)
-    B.draw_shadowed(canvas, spec["after"].split("\n"), H_(brand, 100 * s),
-                    accent + (255,), M, y, round(116 * s), align="left", shadow_a=120, blur=8)
-    _swipe_bottom(canvas, M, W, H, s)
+    K.mark(B.draw_shadowed(canvas, spec["after"].split("\n"), H_(brand, 100 * s),
+                           accent + (255,), M, y, round(116 * s), align="left", shadow_a=K.sh(120), blur=8))
+    _swipe_bottom(K, M, s)
     return canvas
 
 
 def cover_versus(spec, W, H, brand):
     s, cx, M, accent = W / 1080, W // 2, margin(W), brand.accent(spec["accent"])
-    canvas = _cover_base(spec, W, H, brand, dark=0.56, scrim_start=0.5, scrim_bot=120)
+    K = _cover_base(spec, W, H, brand, dark=0.56, scrim_start=0.5, scrim_bot=120)
+    canvas = K.canvas
     f1 = H_(brand, 74 * s)
-    B.draw_shadowed(canvas, [spec["a"]], f1, WHITE, cx, _anchor(W, H, 0.34, 0.22), round(92 * s), align="center", shadow_a=120, blur=9)
-    B.draw_shadowed(canvas, ["VS"], H_(brand, 124 * s), accent + (255,), cx, _anchor(W, H, 0.45, 0.32),
-                    round(124 * s), align="center", shadow_a=120, blur=10)
-    B.draw_shadowed(canvas, [spec["b"]], f1, WHITE, cx, _anchor(W, H, 0.61, 0.43), round(92 * s), align="center", shadow_a=120, blur=9)
-    B.draw_shadowed(canvas, [spec["question"]], B.font(round(42 * s), 600), SOFT_W, cx, _anchor(W, H, 0.73, 0.53),
-                    round(58 * s), align="center", shadow_a=110, blur=6)
-    _swipe(canvas, cx - round(58 * s), round(H * 0.565) if _tall(W, H) else H - round(116 * s), s)
+    B.draw_shadowed(canvas, [spec["a"]], f1, K.ink, cx, K.anchor(0.34, 0.22), round(92 * s), align="center", shadow_a=K.sh(120), blur=9)
+    B.draw_shadowed(canvas, ["VS"], H_(brand, 124 * s), accent + (255,), cx, K.anchor(0.45, 0.32),
+                    round(124 * s), align="center", shadow_a=K.sh(120), blur=10)
+    B.draw_shadowed(canvas, [spec["b"]], f1, K.ink, cx, K.anchor(0.61, 0.43), round(92 * s), align="center", shadow_a=K.sh(120), blur=9)
+    K.mark(B.draw_shadowed(canvas, [spec["question"]], B.font(round(42 * s), 600), K.sub, cx, K.anchor(0.73, 0.53),
+                           round(58 * s), align="center", shadow_a=K.sh(110), blur=6))
+    _swipe(canvas, cx - round(58 * s), K.swipe_y(s), s, color=K.sub)
     return canvas
 
 
 def cover_numeric(spec, W, H, brand):
     s, M, accent = W / 1080, margin(W), brand.accent(spec["accent"])
-    canvas = _cover_base(spec, W, H, brand, dark=0.46, scrim_start=0.30, scrim_bot=218)
+    K = _cover_base(spec, W, H, brand, dark=0.46, scrim_start=0.30, scrim_bot=218)
+    canvas = K.canvas
     big = spec["big"].split("\n")
     bf = H_(brand, 132 * s)
     lead = round(150 * s)
     teaser = spec.get("teaser")
-    top = _anchor(W, H, 0.78, 0.52) - len(big) * lead - (round(70 * s) if teaser else 0)
+    top = K.top(K.anchor(0.78, 0.52) - len(big) * lead - (round(70 * s) if teaser else 0),
+                round(78 * s) if spec.get("kicker") else 0)
     if spec.get("kicker"):
-        B.tick_label(canvas, spec["kicker"], M, top - round(78 * s), WHITE, accent, size=round(30 * s))
-    end = B.draw_shadowed(canvas, big, bf, WHITE, M, top, lead, align="left", shadow_a=120, blur=9)
+        B.tick_label(canvas, spec["kicker"], M, top - round(78 * s), K.ink, accent, size=round(30 * s))
+    end = B.draw_shadowed(canvas, big, bf, K.ink, M, top, lead, align="left", shadow_a=K.sh(120), blur=9)
     if teaser:
         d = ImageDraw.Draw(canvas)
         d.line([(M, end + round(26 * s)), (M + round(110 * s), end + round(26 * s))], fill=accent, width=round(8 * s))
-        B.draw_shadowed(canvas, [teaser], B.font(round(36 * s), 500), SOFT_W, M, end + round(46 * s),
-                        round(48 * s), align="left", shadow_a=110, blur=5)
-    _swipe_bottom(canvas, M, W, H, s)
+        K.mark(B.draw_shadowed(canvas, [teaser], B.font(round(36 * s), 500), K.sub, M, end + round(46 * s),
+                               round(48 * s), align="left", shadow_a=K.sh(110), blur=5))
+    else:
+        K.mark(end)
+    _swipe_bottom(K, M, s)
     return canvas
 
 
@@ -297,27 +467,32 @@ def cover_giant(spec, W, H, brand):
     `big`(数字) ＋ `unit`(単位・小さくアクセント色) ＋ `kicker` / `teaser`(各1行)。"""
     s, M, cx = W / 1080, margin(W), W // 2
     accent = brand.accent(spec["accent"])
-    canvas = _cover_base(spec, W, H, brand, dark=spec.get("dark", 0.56), scrim_start=0.20, scrim_bot=196)
+    K = _cover_base(spec, W, H, brand, dark=spec.get("dark", 0.56), scrim_start=0.20, scrim_bot=196)
+    canvas = K.canvas
     d = ImageDraw.Draw(canvas)
     big, unit = str(spec["big"]), spec.get("unit", "")
-    gf = H_(brand, round(H * (0.225 if _tall(W, H) else 0.185)))
-    uf = H_(brand, round(H * 0.052))
+    # 紙地の型は写真ぶん帯が狭いので数字を落とす（全面のときの 0.225H だと帯を突き抜ける）
+    gr = ((0.135 if _tall(W, H) else 0.115) if K.paper else (0.225 if _tall(W, H) else 0.185))
+    gf = H_(brand, round(H * gr))
+    uf = H_(brand, round(H * (0.036 if K.paper else 0.052)))
     bw, uw = d.textlength(big, font=gf), (d.textlength(unit, font=uf) if unit else 0)
     gap = round(16 * s) if unit else 0
     x0 = cx - (bw + gap + uw) / 2
-    top = _anchor(W, H, 0.70, 0.47) - round(gf.size * 1.06)
+    top = K.top(K.anchor(0.70, 0.47) - round(gf.size * 1.06), round(88 * s) if spec.get("kicker") else 0)
     if spec.get("kicker"):
-        B.tick_label(canvas, spec["kicker"], M, top - round(88 * s), WHITE, accent, size=round(30 * s))
-    B.draw_shadowed(canvas, [big], gf, WHITE, x0, top, gf.size, align="left", shadow_a=150, blur=16)
+        B.tick_label(canvas, spec["kicker"], M, top - round(88 * s), K.ink, accent, size=round(30 * s))
+    B.draw_shadowed(canvas, [big], gf, K.ink, x0, top, gf.size, align="left", shadow_a=K.sh(150), blur=16)
     if unit:
         d.text((x0 + bw + gap, top + gf.size * 0.62), unit, font=uf, fill=accent + (255,))
     y = top + round(gf.size * 1.06)
     d.line([(cx - round(70 * s), y + round(20 * s)), (cx + round(70 * s), y + round(20 * s))],
            fill=accent, width=round(8 * s))
     if spec.get("teaser"):
-        B.draw_shadowed(canvas, [spec["teaser"]], H_(brand, 52 * s), SOFT_W, cx, y + round(52 * s),
-                        round(66 * s), align="center", shadow_a=130, blur=8)
-    _swipe(canvas, cx - round(58 * s), round(H * 0.565) if _tall(W, H) else H - round(116 * s), s)
+        K.mark(B.draw_shadowed(canvas, [spec["teaser"]], H_(brand, 52 * s), K.sub, cx, y + round(52 * s),
+                               round(66 * s), align="center", shadow_a=K.sh(130), blur=8))
+    else:
+        K.mark(y + round(40 * s))
+    _swipe(canvas, cx - round(58 * s), K.swipe_y(s), s, color=K.sub)
     return canvas
 
 
@@ -329,30 +504,39 @@ def cover_magazine(spec, W, H, brand):
     → [[LAYOUTS]] §7-2。`headline`(日本語) ＋ `en`(英字サブ) ＋ `issue`(柱の右)。"""
     s, M = W / 1080, margin(W)
     accent = brand.accent(spec["accent"])
-    canvas = _cover_base(spec, W, H, brand, dark=spec.get("dark", 0.44), scrim_start=0.26, scrim_bot=210)
+    K = _cover_base(spec, W, H, brand, dark=spec.get("dark", 0.44), scrim_start=0.26, scrim_bot=210)
+    canvas = K.canvas
     d = ImageDraw.Draw(canvas)
-    # 柱: 英字ワードマーク（左）と号数（右）を1本の罫線で締める
-    top = round(H * (0.150 if _tall(W, H) else 0.105))
-    lf = B.mono_font(round(40 * s), "medium")
-    B.draw_tracked(d, brand.wordmark.upper(), lf, WHITE, M, top, round(14 * s))
+    # 柱: 英字ワードマーク（左）と号数（右）を1本の罫線で締める。
+    # 紙地の型では上部は写真が占めるので、柱は帯の頭へ（絶対yに置くと写真の上に濃文字が乗る）
+    top = K.zone[0] if K.paper else round(H * (0.150 if _tall(W, H) else 0.105))
+    # 柱のワードマークは英字前提の mono だが、和文ワードマーク（anki 等）だと**全部豆腐**になる。
+    # ASCII でなければ見出しフォントへ落とす（この variant が和文アプリで使えなかった原因）
+    wm = brand.wordmark.upper()
+    ascii_wm = wm.isascii()
+    lf = B.mono_font(round(40 * s), "medium") if ascii_wm else H_(brand, round(44 * s))
+    B.draw_tracked(d, wm, lf, K.ink, M, top, round(14 * s) if ascii_wm else round(4 * s))
     if spec.get("issue"):
-        B.draw_tracked(d, spec["issue"], B.mono_font(round(30 * s), "light"), (255, 255, 255, 190),
+        B.draw_tracked(d, spec["issue"], B.mono_font(round(30 * s), "light"), K.sub,
                        W - M, top + round(8 * s), 6, anchor="r")
     rule_y = top + round(64 * s)
-    d.line([(M, rule_y), (W - M, rule_y)], fill=WHITE + (230,), width=round(6 * s))
+    d.line([(M, rule_y), (W - M, rule_y)], fill=K.ink, width=round(6 * s))
 
     head = spec["headline"].split("\n")
     hf = H_(brand, 104 * s)
     lead = round(128 * s)
-    hy = _anchor(W, H, 0.74, 0.485) - len(head) * lead
-    B.draw_shadowed(canvas, head, hf, WHITE, M, hy, lead, align="left", shadow_a=140, blur=10)
+    hy = max(rule_y + B.sp("group", W), K.anchor(0.74, 0.485) - len(head) * lead)
+    B.draw_shadowed(canvas, head, hf, K.ink, M, hy, lead, align="left", shadow_a=K.sh(140), blur=10)
     _hl(canvas, head, hf, accent, M, hy, lead, spec.get("hl"))
     end = hy + len(head) * lead
-    B.hairline(canvas, M, end + round(22 * s), W - M, color=(255, 255, 255), alpha=120, width=2)
+    B.hairline(canvas, M, end + round(22 * s), W - M, color=K.ink, alpha=120 if not K.paper else 60, width=2)
     if spec.get("en"):
         B.draw_tracked(d, spec["en"].upper(), B.mono_font(round(28 * s), "regular"),
                        accent + (255,), M, end + round(44 * s), round(10 * s))
-    _swipe_bottom(canvas, M, W, H, s)
+        K.mark(end + round(92 * s))
+    else:
+        K.mark(end + round(30 * s))
+    _swipe_bottom(K, M, s)
     return canvas
 
 
@@ -364,8 +548,22 @@ COVER_VARIANTS = {
 }
 
 
+def cover_key(sl):
+    """表紙の**サムネとしての見え方**を1語で表す（投稿間のローテーション判定用）。
+
+    `card` は `_cover_base` を通らず自前でパネルを敷く＝それ自体が1つの treat。
+    qa.py の COVER-REPEAT と scripts/cover_history.py はこの関数を正本にする。"""
+    if sl.get("variant") == "card":
+        return "card"
+    return sl.get("treat", "dark")
+
+
 def slide_cover(spec, W, H, brand):
-    return COVER_VARIANTS[spec.get("variant", "editorial")](spec, W, H, brand)
+    variant = spec.get("variant", "editorial")
+    if variant == "card" and spec.get("treat"):
+        raise ValueError("variant='card' は自前で紙パネルを敷くので treat と併用できない"
+                         "（card 自体が1つの treat。cover_key() を参照）")
+    return COVER_VARIANTS[variant](spec, W, H, brand)
 
 
 def slide_photo(spec, W, H, brand):

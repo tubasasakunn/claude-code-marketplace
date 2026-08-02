@@ -152,6 +152,12 @@ python3 schedule_lib.py --app $APP due --date $DATE
 **1要素だけ変えた**次の実験を決める（切り口・数字・フックはリサーチで裏取りした事実を根拠にする）。**OVERVIEW.md は必ず読む**
 （例: Tone は統計フック/理論/5ステップ/失敗例の正本がここに集約済み。切り口・info内容・数字は捏造せずここから引く）。1枚目＝強いフック（疑問形／○○な人へ／数字…）。5〜10枚・各スライド価値あり。
 **デザインは [[carousel-craft]] スキルが正本**（フック/タイポ/配色/セーフゾーン/構成は `DESIGN_SPEC.md`、素材在庫とspecレシピは `MATERIALS.md`）。企画時に必ず参照する。
+★**まず表紙の `treat` を決める**（毎日回すぶん、放っておくとサムネが必ず揃う。実測で28投稿すべて同じだった）:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/carousel-craft/scripts/cover_history.py "$ANALYTICS_DIR"
+```
+「選べる treat」（＝直近3投稿で未使用）から選び、spec の `cover` に `"treat": "..."` を書く。
+**表紙の写真も直近と被らせない**。手順5の `qa.py` が COVER-REPEAT で hard fail させる。→ [[carousel-craft]] §大原則2
 **素材ファースト＝表紙含め全スライドに実素材を敷く（ベタ塗り/グラデ/単色の背景を作らない）**：
 - **cover/photo の `bg` は必ず指定**（省略禁止）。anki/connect の `bg`省略＝手続き背景(灰色)、tone の footage名→ベタ赤 はいずれも**禁止**。素材は下記バンクの**絶対パス**を渡す（tone も gen.py 拡張で絶対パスOK）。
 - **shot は実app画面を複数枚**（hioto=`material/`、tone=`material/`直下、anki/connect=`material/screenshots/`、
@@ -183,8 +189,10 @@ rm -rf "$REPO/post/__pycache__" 2>/dev/null
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/carousel-craft/scripts/qa.py "$ANALYTICS_DIR/$TODAY/imgs" --spec "$ANALYTICS_DIR/$TODAY/spec.json"
 ```
 **自己レビュー（[[carousel-craft]] §5）＝コードでなく自分の目で採点する**：
-1. `qa.py` が `hard_flags>0`（NO-MATERIAL）なら素材未使用＝**spec を直して再生成**（exit非0）。
+1. `qa.py` が `hard_flags>0` なら**spec を直して再生成**（exit非0）。NO-MATERIAL＝素材未使用、
+   LEGAL/BAIT＝文言、★**COVER-REPEAT＝サムネが直近と被る**（手順4に戻って別 treat を選ぶ）。
 2. `imgs/_qa/<platform>_contact.png`（全スライド一覧＋セーフゾーン枠）と表紙・shot を **Read で目視**：フック強度・上の死に空間・実素材の有無・オチを割ってないか・写真上文字の可読性・右いいね列/下UI被り・整列・既存被り。
+   ★**表紙は直近2〜3投稿の `01_cover.png` と並べて Read する**。1枚だけ見ると必ず「良い」と判断してしまい、フィードで並んだときに揃っていることに気づけない。
 3. ダメなら**文言/素材/配色/レイアウトを直して納得いくまで反復**（1発で終わらせない）。崩れも同様。
 
 ## 6. POST.md（仮説を明記）
