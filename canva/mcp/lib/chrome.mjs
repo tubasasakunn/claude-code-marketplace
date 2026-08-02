@@ -67,13 +67,18 @@ export async function isAlive(port = DEFAULT_PORT) {
   }
 }
 
-export function profileExists() {
-  return fs.existsSync(path.join(DST_ROOT, "Default"));
+export function profileExists(dstRoot = DST_ROOT) {
+  return fs.existsSync(path.join(dstRoot, "Default"));
 }
 
-/** 自動化用プロファイルを掴んでいる Chrome を落とす。普段使いの Chrome は別ディレクトリなので巻き込まない。 */
-export async function killAutomationChrome() {
-  await execFileAsync("pkill", ["-f", `user-data-dir=${DST_ROOT}`]).catch(() => {});
+/**
+ * 指定した自動化用プロファイルを掴んでいる Chrome を落とす。
+ * 普段使いの Chrome は別ディレクトリなので巻き込まない。
+ * dstRoot を変えれば、用途ごとに別プロファイル・別ポートで並走させられる
+ * （例: Canva 用は 9222、別サービス用は 9223）。
+ */
+export async function killAutomationChrome(dstRoot = DST_ROOT) {
+  await execFileAsync("pkill", ["-f", `user-data-dir=${dstRoot}`]).catch(() => {});
   await new Promise((r) => setTimeout(r, 1200));
 }
 
@@ -149,28 +154,32 @@ export async function detectCanvaProfile() {
  * 普段使いプロファイルを自動化用ディレクトリへコピーする。
  * 初回と、Canva のログインが切れて普段の Chrome で入り直したときに実行する。
  */
-export async function setupProfile({ srcProfile = process.env.SRC_PROFILE || "Profile 1", log = () => {} } = {}) {
+export async function setupProfile({
+  srcProfile = process.env.SRC_PROFILE || "Profile 1",
+  dstRoot = DST_ROOT,
+  log = () => {},
+} = {}) {
   const src = path.join(SRC_ROOT, srcProfile);
   if (!fs.existsSync(src)) {
     throw new Error(`コピー元プロファイルがありません: ${src}`);
   }
   // コピー先を作り直すので、そこを掴んでいる Chrome は先に落とす。
   // 生きたまま消すと、以後その Chrome は壊れた状態のまま CDP に応答しなくなる。
-  await killAutomationChrome();
+  await killAutomationChrome(dstRoot);
   log(`コピー元: ${src}`);
-  log(`コピー先: ${path.join(DST_ROOT, "Default")}`);
+  log(`コピー先: ${path.join(dstRoot, "Default")}`);
 
-  fs.rmSync(DST_ROOT, { recursive: true, force: true });
-  fs.mkdirSync(DST_ROOT, { recursive: true });
+  fs.rmSync(dstRoot, { recursive: true, force: true });
+  fs.mkdirSync(dstRoot, { recursive: true });
   for (const f of ["Local State", "First Run"]) {
     try {
-      fs.copyFileSync(path.join(SRC_ROOT, f), path.join(DST_ROOT, f));
+      fs.copyFileSync(path.join(SRC_ROOT, f), path.join(dstRoot, f));
     } catch {
       // First Run は無いことがある
     }
   }
 
-  const dst = path.join(DST_ROOT, "Default");
+  const dst = path.join(dstRoot, "Default");
   const args = ["-a"];
   for (const e of RSYNC_EXCLUDES) args.push("--exclude", e);
   args.push(`${src}/`, `${dst}/`);
@@ -190,20 +199,25 @@ export async function setupProfile({ srcProfile = process.env.SRC_PROFILE || "Pr
     );
   }
 
-  const { stdout } = await execFileAsync("du", ["-sh", DST_ROOT]);
+  const { stdout } = await execFileAsync("du", ["-sh", dstRoot]);
   const size = stdout.split("\t")[0]?.trim() ?? "?";
   log(`コピー完了: ${size} / Canva cookie ${cookies} 個`);
   return { srcProfile, dst, size, cookies };
 }
 
 /** 自動化用プロファイルをデバッグ起動する。既に待ち受けていれば何もしない。 */
-export async function launchChrome({ port = DEFAULT_PORT, timeoutMs = 16000, log = () => {} } = {}) {
+export async function launchChrome({
+  port = DEFAULT_PORT,
+  dstRoot = DST_ROOT,
+  timeoutMs = 16000,
+  log = () => {},
+} = {}) {
   const already = await isAlive(port);
   if (already) {
     log(`既にポート ${port} で待ち受け中`);
     return { started: false, port, version: already };
   }
-  if (!profileExists()) {
+  if (!profileExists(dstRoot)) {
     throw new Error("自動化用プロファイルがありません。先に canva_setup_profile を実行してください。");
   }
   if (!fs.existsSync(CHROME_BIN)) {
@@ -211,14 +225,14 @@ export async function launchChrome({ port = DEFAULT_PORT, timeoutMs = 16000, log
   }
 
   // 同じ user-data-dir を掴んだままの古いプロセスが残っているとポートを開けない
-  await killAutomationChrome();
+  await killAutomationChrome(dstRoot);
 
   log(`デバッグ起動（ポート ${port}）`);
   const child = spawn(
     CHROME_BIN,
     [
       `--remote-debugging-port=${port}`,
-      `--user-data-dir=${DST_ROOT}`,
+      `--user-data-dir=${dstRoot}`,
       "--profile-directory=Default",
       "--no-first-run",
       "--no-default-browser-check",
