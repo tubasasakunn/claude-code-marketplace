@@ -233,7 +233,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 
 | スキル | 何をするか |
 |---|---|
-| `/canva:canva-image-gen` | Canva の AI 画像生成（Dream Lab / 旧 Magic Media）を、ログイン済みの普段使い Chrome をブラウザ操作（CDP）して CLI から実行し、画像をダウンロードします。 |
+| `/canva:canva-image-gen` | Canva の AI 画像生成（Dream Lab / 旧 Magic Media）を、ログイン済み Chrome をブラウザ操作（CDP）して実行し、画像をダウンロードします。 |
 
 ### `writing`（2本） — 全リポジトリ（user スコープ）で有効化
 
