@@ -243,7 +243,7 @@ def _cover_base(spec, W, H, brand, dark=0.42, scrim_start=0.30, scrim_bot=215):
 
     if treat == "duotone":             # 黒ではなく**ブランド色**で統一をかける
         hi = tuple(round(c * 0.42 + 255 * 0.58) for c in accent)   # 明部が沈むので白寄りへ
-        canvas = _duotone(B.cover_crop(img, W, H), brand.ink, hi).convert("RGBA")
+        canvas = _duotone(B.cover_crop(img, W, H), _brand_dark(brand), hi).convert("RGBA")
         canvas.alpha_composite(B.bottom_scrim(W, H, start=0.58, bot_a=104))
         _ticks(canvas, s, WHITE, 90)
         return Skin(canvas, W, H, WHITE, SOFT_W, True)
@@ -1122,6 +1122,14 @@ def slide_panorama(spec, W, H, brand):
 #   ② 重ねる時の手は5つ（下スクリム／半透明帯／縁取り／不透明塗り30–50%／背景ぼかし）
 # で、②の1番目だけを常用していたことになる。以下は ① と ②の残りを型にしたもの。
 
+def _brand_dark(brand):
+    """duotone の暗部に使う色＝ブランドの ink/bg の**暗い方**。
+    ダークテーマのブランド（tone: ink=クリーム/bg=こげ茶）では ink が明色なので、
+    暗部→ink に写すと写真全体が淡色に飛んで白文字が読めなくなる（実測）。"""
+    lum = lambda c: 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]
+    return brand.ink if lum(brand.ink) <= lum(brand.bg) else brand.bg
+
+
 def _duotone(img, dark_rgb, light_rgb):
     """写真を2色の間に写し込む（暗部→dark / 明部→light）。黒幕とは別の統一のかけ方。"""
     g = np.asarray(img.convert("L"), np.float32)[..., None] / 255.0
@@ -1174,7 +1182,8 @@ def slide_layout(spec, W, H, brand):
         B.soft_blob(canvas, accent, W // 2, round(H * 0.3), r=round(700 * s), alpha=80)
 
     elif mode == "margin":
-        ph = round(H * (0.38 if tall else 0.56))
+        # 9:16 は 0.38H だと kicker＋2行＋sub が可視帯下限(y1110)を割る → 0.34H
+        ph = round(H * (0.34 if tall else 0.56))
         canvas.alpha_composite(B.cover_crop(img, W, ph).convert("RGBA"), (0, 0))
         ty = ph + B.sp("section", W)
 
@@ -1187,8 +1196,9 @@ def slide_layout(spec, W, H, brand):
         ty = by + B.sp("pad", W)
 
     elif mode == "frame":
-        fw, fh = round(W * 0.76), round(H * (0.30 if tall else 0.46))
-        fx, fy = (W - fw) // 2, round(H * (0.145 if tall else 0.10))
+        # 9:16 は額を少し小さく・上へ（0.30H/0.145H だと文字ブロックが可視帯下限を割る）
+        fw, fh = round(W * 0.76), round(H * (0.25 if tall else 0.46))
+        fx, fy = (W - fw) // 2, round(H * (0.135 if tall else 0.10))
         sh_ = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         ImageDraw.Draw(sh_).rectangle([fx + 8, fy + 18, fx + fw + 8, fy + fh + 18], fill=(60, 46, 36, 60))
         canvas.alpha_composite(sh_.filter(ImageFilter.GaussianBlur(round(26 * s))))
@@ -1204,7 +1214,7 @@ def slide_layout(spec, W, H, brand):
         # 明部は accent をそのまま使わず白寄りに振る。濃いアクセント(night など)だと
         # 明部まで沈んで写真の階調が消えるため
         hi = tuple(round(c * 0.42 + 255 * 0.58) for c in accent)
-        canvas = _duotone(B.cover_crop(img, W, H), brand.ink, hi).convert("RGBA")
+        canvas = _duotone(B.cover_crop(img, W, H), _brand_dark(brand), hi).convert("RGBA")
         ink, sub_ink = WHITE, (245, 240, 236)
         ty = _anchor(W, H, 0.78, 0.48) - len(lines) * round(hs * 1.3)
 
@@ -1219,13 +1229,24 @@ def slide_layout(spec, W, H, brand):
 
     elif mode == "stripe":
         n, gap = 3, B.sp("group", W)
-        top = round(H * (0.135 if tall else 0.10))
-        sh_ = round((H * (0.40 if tall else 0.58) - gap * (n - 1)) / n)
+        if tall:
+            # 9:16 で帯の**下**に文字を置くと y≈1210〜＝下UI帯に丸ごと沈む（実測）。
+            # 文字を先に上帯へ置き、写真帯はその下に敷く（帯はUIに被ってよい＝装飾）。
+            ty = round(H * 0.155)
+            text_h = ((round(64 * s) if spec.get("kicker") else 0)
+                      + len(lines) * round(hs * 1.3)
+                      + ((B.sp("hd_body", W) + len(spec["sub"].split("\n")) * round(58 * s))
+                         if spec.get("sub") else 0))
+            top = ty + text_h + B.sp("section", W)
+            sh_ = round((H * 0.40 - gap * (n - 1)) / n)
+        else:
+            top = round(H * 0.10)
+            sh_ = round((H * 0.58 - gap * (n - 1)) / n)
+            ty = top + n * sh_ + (n - 1) * gap + B.sp("section", W)
         full = B.cover_crop(img, W, sh_ * n + gap * (n - 1))
         for i in range(n):
             y0 = i * (sh_ + gap)
             canvas.alpha_composite(full.crop((0, y0, W, y0 + sh_)).convert("RGBA"), (0, top + y0))
-        ty = top + n * sh_ + (n - 1) * gap + B.sp("section", W)
 
     else:                                        # edge — 幕なし。写真の余白側へ直接置く
         canvas = B.cover_crop(img, W, H).convert("RGBA")
