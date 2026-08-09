@@ -13,6 +13,22 @@ ADBKB_IME="com.android.adbkeyboard/.AdbIME"
 
 adb_dev() { adb devices -l | grep -E "\sdevice\s" | head -1; }
 
+# adb_pin — pin one transport so every bare `adb` below targets it.
+# The same phone reachable over BOTH USB and Wi-Fi (`adb tcpip`) shows up as two
+# transports, and then every helper here dies with "more than one device/emulator".
+# ANDROID_SERIAL is honoured by adb itself, so pinning it once fixes all of them.
+# Prefers the TCP transport (serial contains ':'): a marginal cable re-enumerates
+# mid-run and takes the session with it, while the Wi-Fi transport survives.
+adb_pin() {
+  if [ -n "${ANDROID_SERIAL:-}" ]; then echo "$ANDROID_SERIAL"; return 0; fi
+  local serials tcp
+  serials=$(adb devices | awk '$2=="device"{print $1}')
+  [ -z "$serials" ] && { echo "adb_pin: no device" >&2; return 1; }
+  tcp=$(printf '%s\n' "$serials" | grep ':' | head -1)
+  export ANDROID_SERIAL="${tcp:-$(printf '%s\n' "$serials" | head -1)}"
+  echo "$ANDROID_SERIAL"
+}
+
 # --- screen / power ---
 wake_unlock() {
   # $1 = optional PIN. Wakes screen and unlocks with swipe-up + PIN if given.

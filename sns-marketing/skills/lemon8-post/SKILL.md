@@ -31,12 +31,29 @@ locate elements when a screenshot is ambiguous.
 cd ${CLAUDE_PLUGIN_ROOT}/skills/lemon8-post/scripts
 source lib.sh
 adb devices -l
+adb_pin                      # ⚠️ pin ONE transport if USB + Wi-Fi both show up (see below)
 wake_unlock "<PIN>"          # only if locked
 keep_awake_on
 free_cpu                     # cancel bg dexopt (ANR prevention)
 mem_guard 2500               # ⚠️ #1 reliability fix: reclaim RAM so taps don't derail (see below)
 kb_install; kb_save_orig; kb_on
 ```
+
+## ⚠️ Two transports = every adb call fails
+A phone reachable over **both USB and Wi-Fi** (`adb tcpip 5555`) appears twice in
+`adb devices`, and then every bare `adb` — i.e. every helper in `lib.sh` — aborts with
+`adb: more than one device/emulator`. Mid-run this looks like a random device failure.
+
+`adb_pin` exports `ANDROID_SERIAL`, which adb applies to every later call, so no helper
+needs `-s`. It prefers the **TCP** transport: a marginal USB cable re-enumerates mid-session
+(`usb N-M: USB disconnect` in `journalctl -k`) and kills the run, while Wi-Fi rides through.
+An already-set `ANDROID_SERIAL` is left alone.
+
+> **Call it bare — `adb_pin`, never `$(adb_pin)`.** Command substitution runs it in a
+> subshell, so the `export` is lost and you get the same error one line later.
+
+A dropping USB link is a **cable/port fault, not an adb problem**. `adb connect <ip>:5555`
+needs no pairing once `adb tcpip 5555` has been issued (survives until the phone reboots).
 
 ## ⚠️ Memory is the #1 cause of failure — reclaim before driving (verified 2026-06-23)
 Lemon8 holds ~750MB; under low `MemAvailable` the device thrashes ZRAM swap, transitions lag,

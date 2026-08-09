@@ -55,7 +55,15 @@ export ANALYTICS_DIR=$(echo "$CFG" | python3 -c "import json,sys;print(json.load
 export REPO=$(echo "$CFG" | python3 -c "import json,sys;print(json.load(sys.stdin)['repo'])")
 export PREFIX=$(echo "$CFG" | python3 -c "import json,sys;print(json.load(sys.stdin)['album_prefix'])")
 export TODAY=$(date +%Y%m%d); export DATE=$(date +%F)
-adb devices | grep -qw device || { echo "no device — abort"; exit 1; }
+ADB_SERIALS=$(adb devices | awk '$2=="device"{print $1}')
+[ -n "$ADB_SERIALS" ] || { echo "no device — abort"; exit 1; }
+# ⚠️ USB と Wi-Fi(adb tcpip) の両方が生きていると transport が2つ見え、以降の adb が
+# 全部 `more than one device/emulator` で落ちる（実行中だと端末故障に見える）。
+# 途中で切れにくい TCP 側（serial に ':' を含む）を優先して ANDROID_SERIAL に固定する。
+# adb がこれを全呼び出しに効かせるので、個々のコマンドに -s は不要。
+export ANDROID_SERIAL=$(printf '%s\n' "$ADB_SERIALS" | grep ':' | head -1)
+[ -n "$ANDROID_SERIAL" ] || export ANDROID_SERIAL=$(printf '%s\n' "$ADB_SERIALS" | head -1)
+echo "device: $ANDROID_SERIAL"
 # 全モード共通: まず ROOT(marketing.git 本体) を pull（schedule.json/history.json/LEARNINGS.md/apps.json
 # やスキル自体の更新を先に取り込む。失敗してもローカルで続行）。headless cron では run_daily.sh が自動で同じ pull を行う。
 GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=10" timeout 90 git pull --ff-only \
