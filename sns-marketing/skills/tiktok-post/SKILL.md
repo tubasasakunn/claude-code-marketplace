@@ -90,7 +90,7 @@ Then build a labelled contact sheet of the images so you can map each one in the
 | # | Step | Pixel-7 coords | Notes |
 |---|------|----------------|-------|
 | 1 | `mem_guard 2500; fresh_launch com.ss.android.ugc.trill`; wait ~10s | — | reclaim RAM, then cold-launch; feed loads (splash first) |
-| 2 | Tap **+** (create) | `540 2255` | opens camera (SAAActivity). If ANR dialog → tap 待機 and wait |
+| 2 | Tap **+** (create) | `540 2223` | opens camera (SAAActivity). If ANR dialog → tap 待機 and wait. **`2255` (the old value) is ~3px BELOW the button** — measured bottom edge is 2252, so it lands on the system nav bar and does nothing. Crop `0 2050 1080 2400` and measure the + before the first run. |
 | 3 | Tap **gallery thumbnail** (bottom-left of camera) | `88 2117` | opens picker. x<70 risks back-gesture |
 | 4 | Open **album dropdown** ("最近 ▾" 上部中央) → 専用アルバムを選ぶ | 開く=`540 195` | **★誤爆多発・別アプリ誤投稿の事故ポイント**。ドロップダウンは**トグル**(再タップで閉じる)。開いたら**座標の目分量で行を押さない**(「最近」「Live Photos」等を誤選択しがち)。必ず `uiautomator dump`(picker画面はdump可)で**目的アルバム行のテキスト＝`<album_prefix>_<id>_<platform>` の node bounds を実測**し、その中心をタップ。選択後はグリッドのセル位置も変わるので**再 dump**して○座標を取り直す。**フォールバック**: 専用アルバムが見つからない時のみ「最近」グリッド先頭の**新着N枚(=今アップした画像)** を直接○選択（badge番号で中身を必ず確認）。 |
 | 5 | **Select 6 images via the top-right ○ of each cell** | circles ≈ y480 (row1) / y780 (row2), x≈316/655/995 | **CRITICAL**: tapping image CENTER only opens a preview and does NOT select → that bug = only 1 image posts. Tap the **circle**, confirm a red number badge ①②… and that "次へ(N)" increments. Tap in the order you want the carousel (01→06). |
@@ -99,10 +99,23 @@ Then build a labelled contact sheet of the images so you can map each one in the
 | 7 | **Set cover = image 01**: swipe the main image right→prev until it shows 01/06 | swipe `230 1000 → 900 1000` | **CRITICAL**: the image displayed when you press 次へ becomes the cover. Land on 01. **編集画面のメイン表示(03等)に惑わされない**＝最終確認は step8 公開画面の先頭『カバー』サムネ＋公開前プレビュー 1/N で 01 を確認。 |
 | 7c | **トレンド音源に差し替え**（任意だが推奨） | 上部の「♪ <曲名>」をタップ → 音楽ピッカー | 写真投稿でもトレンド/人気音源で発見性が上がる（GROWTH_PLAYBOOK §音源）。「おすすめ」上位や急上昇の曲を選ぶ。自動付与のままでも可だが、可能なら差し替える |
 | 8 | Editor **次へ** | `800 2190` | → publish screen; first thumbnail should read "カバー" = 01 |
-| 9 | Tap **caption field** ("キャッチーなタイトルを追加しよう") | `250 575` | counter shows `0/90` — **TikTok caption max = 90 chars** |
+| 9 | Tap **title field** ("キャッチーなタイトルを追加しよう") | `540 596` | counter shows `0/90` — **max 90 chars**. The publish screen now has **TWO** EditTexts (see below) — this is the upper one. |
 | 10 | Type caption with `kb_type` / `kb_type_file` | — | 90-char cap ⇒ use title + one hook line + the 5 hashtags (see below) |
 | 11 | Dismiss keyboard (`keyevent 111`), tap **投稿** (red) | `820 2210` | publishes. Returns to main view |
 | 12 | If a notification-permission dialog appears | "後で" ≈ `310 2180` | dismiss |
+
+## Two caption fields on the publish screen (observed 2026-08-09)
+The publish screen exposes **two** EditTexts, not one. `ui_dump` and pick by placeholder —
+never by y-coordinate alone:
+
+| field | placeholder | limit | center |
+|---|---|---|---|
+| title | `キャッチーなタイトルを追加しよう` | **90 chars** (`0/90` counter) | `540 596` |
+| description | `長い説明を書くと、視聴数が平均で3倍増える可能性があります。` | long | `540 831` |
+
+The title field is **single-line**: `\n` in the typed text is silently converted to a space,
+so compose for that rather than expecting line breaks. The description field is untested by
+this skill — the flow below fills the title only.
 
 ## Caption (90-char limit)
 Full body won't fit. Compose title + a hook + all hashtags within 90 chars, e.g. for post3:

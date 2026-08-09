@@ -80,14 +80,14 @@ Build a labelled contact sheet of the images — in the picker you identify cell
 | 3 | Open **album dropdown** ("ギャラリー ▾", top-left) | `140 410` | tap the label center; pick the album with just your images |
 | 4 | Select album (e.g. post3_lemon8) | re-measure row | grid then shows only those 6 |
 | 5 | **Select images in carousel order** | per image: tap cell → preview → "選択する" `160 2235` → BACK | In Lemon8 the cell **circle is small/unreliable** and tapping the cell opens a **preview**. The robust path: tap the cell, the preview's top shows `NN/06`, tap **選択する** (bottom-left), press BACK, repeat for 01→06. Selection order = carousel order. |
-|   | grid cell centers (this album) | row1 `(180,680)(540,680)(900,680)` row2 `(180,1180)(540,1180)(900,1180)` | content order is NOT filename order — confirm each via the preview's `NN/06` |
+|   | grid cell centers (measured 2026-08-09, 7-image album) | row1 `(180,637)(540,637)(900,637)` row2 `(180,997)(540,997)(900,997)` row3 `(180,1357)` | cells are 358x358 on a 360px pitch starting at y=458 — **`ui_dump` and filter for 358x358 nodes rather than reusing these**. content order is NOT filename order (observed 07,02,03,04,05,06,01) — confirm each via the preview's `NN/07` |
 | 6 | Confirm **次へ(6)**, tap it | `920 2235` | → image editor (EditorActivity) |
 | 7 | Editor **次へ** (yellow) | `540 2225` | → publish (PublishActivity). Keep taps off the nav bar (y>2300 → home) |
 | 8 | Tap **title field** ("見出しを追加") | `250 565` | |
 | 9 | Type title with `kb_type` | — | e.g. `SNSじゃない“自分だけ”の動画日記が落ち着く📔` |
 | 10 | Tap **body field** ("投稿について説明しましょう") | `250 720` | |
 | 11 | Type body + **≤5 hashtags** with `kb_type_file body.txt` | — | **Lemon8 hashtag max = 5** — more triggers a warning and can block publish. Lemon8 allows a long body, so put the full post body + 5 tags. Re-enter via `kb_clear` then type again if needed. |
-| 12 | Turn **OFF "TikTokにシェア"** toggle | `990 1355` | default ON → would cross-post a duplicate to TikTok. Confirm it goes grey. |
+| 12 | Ensure **"TikTokにシェア"** is OFF | `999 1365` | would cross-post a duplicate to TikTok. **The setting persists across runs** — it was already OFF on 2026-08-09, so tapping blindly would turn it back ON. Read the `Switch` node's `checked` attribute in `ui_dump` and tap only if `checked="true"`. |
 | 13 | Tap **投稿する** (yellow) | `710 2200` | publishes; returns to MainActivity |
 | 14 | Dismiss any post-publish share sheet / notification dialog | BACK / × `984 963` | |
 
@@ -103,9 +103,13 @@ kb_type $'\n#日記 #ライフログ #日記アプリ #動画日記 #プライ�
 keep only 5.)
 
 ## Verify success
-After 投稿する, Lemon8 returns to the feed and shows a share sheet / your post. Open **profile**
-(bottom-right ≈ `980 2310`) and confirm your post appears with the title, body, and the
-carousel (the share-sheet card shows a `01/06` first slide).
+After 投稿する, Lemon8 returns to the feed and shows a share sheet / your post. Dismiss the sheet
+with BACK, then confirm the post appears with its title and body.
+
+**Do NOT count the feed's dots** — Lemon8 caps the dot strip at **5** (the rightmost shrinks to
+signal "more"), so a 7-image carousel and a 5-image one look identical. Instead **tap the image**
+to open `PhotoViewerActivity`, which shows a real **`1/7` counter at the top** — that is the
+proof of carousel size. Confirm slide 1 is your cover.
 
 ## Teardown
 ```bash
