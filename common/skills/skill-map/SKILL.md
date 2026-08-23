@@ -128,7 +128,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 68 スキル / 10 プラグイン**
+**全 69 スキル / 10 プラグイン**
 
 ### `common`（11本） — 全リポジトリで有効化
 
@@ -146,7 +146,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | `/common:skill-map` | この marketplace の全スキルの索引と使い分け。 |
 | `/common:talk_to_user` | LINE 越しにユーザへ報告し、質問し、返信を待ちます。 |
 
-### `swift-app`（15本） — 各アプリリポジトリで有効化
+### `swift-app`（16本） — 各アプリリポジトリで有効化
 
 | スキル | 何をするか |
 |---|---|
@@ -159,6 +159,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | `/swift-app:conventions` | Swift / SwiftUI のコーディング規約の正本（7領域・628行）。 |
 | `/swift-app:icon-crafting` | Icon Composer の `.icon` バンドル（Liquid Glass アプリアイコン）を、GUIアプリを一切開かずスクリプトで生成し、actool でコンパイル検証し、Xcodeプロジェクトへ組み込みます。 |
 | `/swift-app:ios-capabilities` | 最新iOS（現在はiOS 26世代）でサードパーティアプリができること（新API・制約・最低OSバージョン・エンタイトルメント要否・審査上の注意）の調査知識を提供します。 |
+| `/swift-app:purchase-health` | 課金が止まった・購入ボタンを押しても何も起きない・売上が急落した、を診断するランブック。 |
 | `/swift-app:release-assets` | App Store 提出用のリリース素材一式（メタデータ .txt とストア画像）を release/<version>/ に用意・更新する。 |
 | `/swift-app:release-version` | 新バージョンとして App Store に出すための一連の手順（バージョン番号上げ → メタデータ → main マージで自動反映＆審査PR → Xcode Cloud ビルド → production マージで審査自動提出 → 通過後に自動公開）をまとめた運用ランブック。 |
 | `/swift-app:store-layouts` | App Store のストア画像を「構図」から設計・制作する。 |
