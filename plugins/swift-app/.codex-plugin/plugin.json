@@ -1,0 +1,22 @@
+{
+  "name": "swift-app",
+  "version": "2.0.0",
+  "description": "Swift と iOS アプリの構成、規約、検証、リリース、審査提出を支援する。",
+  "author": {
+    "name": "tubasasakunn"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "swift-app",
+    "shortDescription": "Swift と iOS アプリの構成、規約、検証、リリース、審査提出を支援する。",
+    "longDescription": "Swift と iOS アプリの構成、規約、検証、リリース、審査提出を支援する。",
+    "developerName": "tubasasakunn",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "このプラグインのスキルを使って作業を始めてください。"
+    ]
+  }
+}

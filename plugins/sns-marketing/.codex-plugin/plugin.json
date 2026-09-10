@@ -1,0 +1,22 @@
+{
+  "name": "sns-marketing",
+  "version": "2.2.1",
+  "description": "TikTok と Lemon8 のカルーセル投稿、宣伝動画の制作と運用。",
+  "author": {
+    "name": "tubasasakunn"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "sns-marketing",
+    "shortDescription": "TikTok と Lemon8 のカルーセル投稿、宣伝動画の制作と運用。",
+    "longDescription": "TikTok と Lemon8 のカルーセル投稿、宣伝動画の制作と運用。",
+    "developerName": "tubasasakunn",
+    "category": "Marketing",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "このプラグインのスキルを使って作業を始めてください。"
+    ]
+  }
+}

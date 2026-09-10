@@ -1,0 +1,22 @@
+{
+  "name": "app-store-optimize",
+  "version": "2.0.0",
+  "description": "ASO。ストア文言・ストア画像の設計と生成、レビュー返信。",
+  "author": {
+    "name": "tubasasakunn"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "app-store-optimize",
+    "shortDescription": "ASO。ストア文言・ストア画像の設計と生成、レビュー返信。",
+    "longDescription": "ASO。ストア文言・ストア画像の設計と生成、レビュー返信。",
+    "developerName": "tubasasakunn",
+    "category": "Productivity",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "このプラグインのスキルを使って作業を始めてください。"
+    ]
+  }
+}

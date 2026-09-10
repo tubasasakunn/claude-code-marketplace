@@ -1,7 +1,7 @@
 ---
 name: push
 description: 現在のブランチをリモートにpush。リモートとの状態確認後に実行。/pushで呼び出し。
-disable-model-invocation: true
+disable-model-invocation: false
 allowed-tools:
   - Bash(git *)
 ---

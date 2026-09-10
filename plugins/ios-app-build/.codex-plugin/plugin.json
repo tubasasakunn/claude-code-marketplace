@@ -1,0 +1,22 @@
+{
+  "name": "ios-app-build",
+  "version": "2.0.0",
+  "description": "アイデアから App Store 審査提出までの iOS アプリ開発パイプライン。",
+  "author": {
+    "name": "tubasasakunn"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ios-app-build",
+    "shortDescription": "アイデアから App Store 審査提出までの iOS アプリ開発パイプライン。",
+    "longDescription": "アイデアから App Store 審査提出までの iOS アプリ開発パイプライン。",
+    "developerName": "tubasasakunn",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "このプラグインのスキルを使って作業を始めてください。"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "cloudflare",
+  "version": "2.0.0",
+  "description": "Cloudflare 開発の公式スキル群。Workers、Wrangler、D1、KV、R2、Durable Objects を扱う。",
+  "author": {
+    "name": "tubasasakunn"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "cloudflare",
+    "shortDescription": "Cloudflare 開発の公式スキル群。Workers、Wrangler、D1、KV、R2、Durable Objects を扱う。",
+    "longDescription": "Cloudflare 開発の公式スキル群。Workers、Wrangler、D1、KV、R2、Durable Objects を扱う。",
+    "developerName": "tubasasakunn",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "このプラグインのスキルを使って作業を始めてください。"
+    ]
+  }
+}

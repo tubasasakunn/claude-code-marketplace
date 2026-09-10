@@ -7,52 +7,52 @@
   "plugins": [
     {
       "name": "common",
-      "source": "./common",
+      "source": "./plugins/common",
       "description": "全リポジトリ共通。LINE越しのユーザ連絡、多モデル敵対的レビュー、git操作、cloud routine、スキル全体の索引。"
     },
     {
       "name": "swift-app",
-      "source": "./swift-app",
+      "source": "./plugins/swift-app",
       "description": "swift-base 由来の iOS アプリリポジトリの中で使う。構成の正本・Swift規約・ビルド検証・バグ精査・ADR・全画面スクショ・AppIcon・iOS能力カタログ・リリースと審査提出・雛形同期。"
     },
     {
       "name": "ios-app-build",
-      "source": "./ios-app-build",
+      "source": "./plugins/ios-app-build",
       "description": "アイデア一言から App Store 審査提出までを通すパイプライン。コンセプト出し・デザイン仕様・リポジトリ作成・Xcode Cloud・ASC登録・実装・規約サイト・審査提出・審査監視。"
     },
     {
       "name": "app-store-optimize",
-      "source": "./app-store-optimize",
+      "source": "./plugins/app-store-optimize",
       "description": "ASO。キーワード/競合調査、ストア文言とストアスクリーンショットの設計・生成、リリース後のユーザレビュー返信。"
     },
     {
       "name": "sns-marketing",
-      "source": "./sns-marketing",
+      "source": "./plugins/sns-marketing",
       "description": "TikTok / Lemon8 のカルーセル投稿と宣伝動画。デザイン正本・素材生成テクニック・実投稿・日次運用パイプライン。"
     },
     {
       "name": "note",
-      "source": "./note",
+      "source": "./plugins/note",
       "description": "note-workspace で有効。note.com の記事執筆と投稿。媒体としての設計正本・1本作って下書き保存・公開判断。接続は非公式の note-mcp。"
     },
     {
       "name": "cloudflare",
-      "source": "./cloudflare",
+      "source": "./plugins/cloudflare",
       "description": "Cloudflare 開発の公式スキル群。Workers / Wrangler / D1 / KV / R2 / Durable Objects / Agents SDK / Sandbox SDK / Email / Turnstile / Web パフォーマンス。"
     },
     {
       "name": "canva",
-      "source": "./canva",
+      "source": "./plugins/canva",
       "description": "Canva の AI 画像生成（Dream Lab）をログイン済み Chrome の CDP 操作で CLI から回す。ストア画像・SNS 画像の素材生成に使う。"
     },
     {
       "name": "gemini",
-      "source": "./gemini",
+      "source": "./plugins/gemini",
       "description": "Gemini アプリ限定の機能をブラウザ操作で回す。Nano Banana の画像生成、Deep Research、モデル切替。テキスト生成だけなら公式 API を使う。"
     },
     {
       "name": "writing",
-      "source": "./writing",
+      "source": "./plugins/writing",
       "description": "日本語の説明的文章の規範。技術文書・書籍原稿の書き方と、読ませるための緩急（認知モードの切替）の設計。k16shikano さんの gist から取り込み。"
     },
     {

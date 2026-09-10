@@ -1,0 +1,22 @@
+{
+  "name": "note",
+  "version": "0.1.0",
+  "description": "note.com の記事執筆、アイキャッチ生成、下書き保存、公開を支援する。",
+  "author": {
+    "name": "tubasasakunn"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "note",
+    "shortDescription": "note.com の記事執筆、アイキャッチ生成、下書き保存、公開を支援する。",
+    "longDescription": "note.com の記事執筆、アイキャッチ生成、下書き保存、公開を支援する。",
+    "developerName": "tubasasakunn",
+    "category": "Writing",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "このプラグインのスキルを使って作業を始めてください。"
+    ]
+  }
+}

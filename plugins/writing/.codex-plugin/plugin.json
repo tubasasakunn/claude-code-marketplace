@@ -1,0 +1,22 @@
+{
+  "name": "writing",
+  "version": "1.0.0",
+  "description": "日本語の技術文書・書籍原稿の執筆と認知的な読みやすさを支援する。",
+  "author": {
+    "name": "tubasasakunn"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "writing",
+    "shortDescription": "日本語の技術文書・書籍原稿の執筆と認知的な読みやすさを支援する。",
+    "longDescription": "日本語の技術文書・書籍原稿の執筆と認知的な読みやすさを支援する。",
+    "developerName": "tubasasakunn",
+    "category": "Writing",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "このプラグインのスキルを使って作業を始めてください。"
+    ]
+  }
+}

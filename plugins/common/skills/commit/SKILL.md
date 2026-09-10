@@ -1,7 +1,7 @@
 ---
 name: commit
 description: 現在の変更を確認し、全てステージングして日本語のConventional Commitsでコミット。/commitで呼び出し。
-disable-model-invocation: true
+disable-model-invocation: false
 allowed-tools:
   - Bash(git *)
   - Read
@@ -37,7 +37,7 @@ Conventional Commits形式（日本語）で作成:
 
 <詳細説明（任意）>
 
-Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: Codex <noreply@openai.com>
 ```
 
 #### Type一覧

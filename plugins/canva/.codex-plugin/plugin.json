@@ -1,0 +1,23 @@
+{
+  "name": "canva",
+  "version": "3.0.0",
+  "description": "Canva の AI 画像生成（Dream Lab）を MCP ツールとして利用する。",
+  "author": {
+    "name": "tubasasakunn"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "canva",
+    "shortDescription": "Canva の AI 画像生成（Dream Lab）を MCP ツールとして利用する。",
+    "longDescription": "Canva の AI 画像生成（Dream Lab）を MCP ツールとして利用する。",
+    "developerName": "tubasasakunn",
+    "category": "Creativity",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "このプラグインのスキルを使って作業を始めてください。"
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}
