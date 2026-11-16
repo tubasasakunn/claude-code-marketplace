@@ -128,7 +128,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 69 スキル / 10 プラグイン**
+**全 70 スキル / 10 プラグイン**
 
 ### `common`（11本） — 全リポジトリで有効化
 
@@ -194,7 +194,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | `/app-store-optimize:screenshot-build` | App Store のストアスクリーンショットを HTML+CSS で組み、Playwright で PNG に書き出すための道具一式とサンプル。 |
 | `/app-store-optimize:screenshot-crafting` | App Storeのストアスクリーンショット一式（画像セット）を設計・制作するためのワークフローと知識（Apple公式仕様、ストーリーボード3幕構成、レイアウトパターン、押させる日本語コピーの型、審査リジェクト回避、ASC API/fastlane自動化）を提供します。 |
 
-### `sns-marketing`（8本） — sns-marketing-workspaceで有効化
+### `sns-marketing`（9本） — sns-marketing-workspaceで有効化
 
 | スキル | 何をするか |
 |---|---|
@@ -206,6 +206,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | `/sns-marketing:sns-post` | TikTok / Lemon8 向けの「複数画像（カルーセル）投稿」を新規に1本作る。 |
 | `/sns-marketing:tiktok-post` | Post a photo carousel (multiple images) + caption + hashtags to TikTok on a USB-debugging Android phone via adb UI automation. Use when the user want… |
 | `/sns-marketing:tone-post` | Tone（メンズメイク診断アプリ / target/mensmakeupadvisor）の TikTok・Lemon8 向けカルーセル画像投稿を1本作って実際に公開する。 |
+| `/sns-marketing:transcript-subscriber-estimator` | 文字起こしの本文からYouTubeチャンネル登録者数の桁を推定し、不確実性と量産感を別々に評価する。 |
 
 ### `note`（4本） — note-workspaceで有効化
 

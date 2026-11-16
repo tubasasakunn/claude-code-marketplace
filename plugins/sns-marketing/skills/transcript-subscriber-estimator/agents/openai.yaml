@@ -1,0 +1,4 @@
+interface:
+  display_name: "文字起こしから登録者数を推定"
+  short_description: "匿名の文字起こしからYouTube登録者数の桁と不確実性を推定する"
+  default_prompt: "$transcript-subscriber-estimator でこの文字起こしの登録者数を推定して。"
