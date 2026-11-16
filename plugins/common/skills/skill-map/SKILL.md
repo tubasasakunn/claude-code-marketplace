@@ -128,7 +128,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 70 スキル / 10 プラグイン**
+**全 71 スキル / 10 プラグイン**
 
 ### `common`（11本） — 全リポジトリで有効化
 
@@ -194,11 +194,12 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | `/app-store-optimize:screenshot-build` | App Store のストアスクリーンショットを HTML+CSS で組み、Playwright で PNG に書き出すための道具一式とサンプル。 |
 | `/app-store-optimize:screenshot-crafting` | App Storeのストアスクリーンショット一式（画像セット）を設計・制作するためのワークフローと知識（Apple公式仕様、ストーリーボード3幕構成、レイアウトパターン、押させる日本語コピーの型、審査リジェクト回避、ASC API/fastlane自動化）を提供します。 |
 
-### `sns-marketing`（9本） — sns-marketing-workspaceで有効化
+### `sns-marketing`（10本） — sns-marketing-workspaceで有効化
 
 | スキル | 何をするか |
 |---|---|
 | `/sns-marketing:carousel-craft` | SNSカルーセル画像(TikTokフォトモード/Lemon8)の品質を上げるためのデザイン正本。 |
+| `/sns-marketing:conversation-segment-judge` | 会話の区間ごとに、聴き続けたい理由と量産感を分けて評価する。 |
 | `/sns-marketing:image-gen-techniques` | Claude CodeがPython(Pillow/numpy)で画像を生成・自己レビューするときの汎用テクニック集を提供します。 |
 | `/sns-marketing:lemon8-post` | Post an image carousel + title + body + hashtags to Lemon8 on a USB-debugging Android phone via adb UI automation. Use when the user wants to publish… |
 | `/sns-marketing:promo-video` | target/<app> の宣伝動画（無音・縦9:16・~30秒・かっこいい系）を作る。 |
@@ -206,7 +207,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | `/sns-marketing:sns-post` | TikTok / Lemon8 向けの「複数画像（カルーセル）投稿」を新規に1本作る。 |
 | `/sns-marketing:tiktok-post` | Post a photo carousel (multiple images) + caption + hashtags to TikTok on a USB-debugging Android phone via adb UI automation. Use when the user want… |
 | `/sns-marketing:tone-post` | Tone（メンズメイク診断アプリ / target/mensmakeupadvisor）の TikTok・Lemon8 向けカルーセル画像投稿を1本作って実際に公開する。 |
-| `/sns-marketing:transcript-subscriber-estimator` | 文字起こしの本文からYouTubeチャンネル登録者数の桁を推定し、不確実性と量産感を別々に評価する。 |
+| `/sns-marketing:transcript-subscriber-estimator` | 文字起こしの本文からYouTubeチャンネル登録者数の桁を試験的に推定し、不確実性を示す。 |
 
 ### `note`（4本） — note-workspaceで有効化
 

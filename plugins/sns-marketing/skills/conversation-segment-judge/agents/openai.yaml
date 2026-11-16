@@ -1,0 +1,4 @@
+interface:
+  display_name: "会話の面白さと量産感を判定"
+  short_description: "会話を区間ごとに読み、続きを聴きたい理由と量産感を分けて評価する"
+  default_prompt: "$conversation-segment-judge でこの会話の面白さと量産感を区間ごとに判定して。"
