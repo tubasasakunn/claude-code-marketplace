@@ -3,6 +3,11 @@
 # Slack通知スクリプト
 # 環境変数: SLACK_TOKEN, SLACK_CHANNEL_ID
 
+# 起動済みセッションでも、ローテーション後の認証情報を使用する。
+if [ -r "$HOME/.config/slack/credentials.env" ]; then
+  source "$HOME/.config/slack/credentials.env"
+fi
+
 if [ -z "$SLACK_TOKEN" ] || [ -z "$SLACK_CHANNEL_ID" ]; then
   exit 0
 fi
