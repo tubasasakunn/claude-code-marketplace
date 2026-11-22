@@ -1,15 +1,15 @@
 {
   "name": "common",
-  "version": "2.1.0",
-  "description": "全リポジトリ共通の作業、git 操作、クラウドルーチン、スキル索引。",
+  "version": "2.2.0",
+  "description": "全リポジトリ共通の作業、git 操作、クラウドルーチン、Analytics 接続、スキル索引。",
   "author": {
     "name": "tubasasakunn"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "common",
-    "shortDescription": "全リポジトリ共通の作業、git 操作、クラウドルーチン、スキル索引。",
-    "longDescription": "全リポジトリ共通の作業、git 操作、クラウドルーチン、スキル索引。",
+    "shortDescription": "全リポジトリ共通の作業、git 操作、Analytics 接続、スキル索引。",
+    "longDescription": "全リポジトリ共通の作業、git 操作、クラウドルーチン、Analytics 接続、スキル索引。",
     "developerName": "tubasasakunn",
     "category": "Productivity",
     "capabilities": [

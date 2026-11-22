@@ -112,6 +112,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 
 **判断に確信が持てない** → `/common:adversarial-panel`（多モデルで殴り合わせる）。
 **ユーザに聞く・報告する** → `/common:talk_to_user`（LINE）。
+**GA4・Firebase Analytics のデータを読む** → `/common:google-analytics`（既存認証を先に確認。Hioto の接続情報もここ）。
 
 ## 迷いやすいペアの判別
 
@@ -128,9 +129,9 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 
 <!-- BEGIN GENERATED — python3 common/scripts/build_skill_map.py で再生成する -->
 
-**全 71 スキル / 10 プラグイン**
+**全 72 スキル / 10 プラグイン**
 
-### `common`（11本） — 全リポジトリで有効化
+### `common`（12本） — 全リポジトリで有効化
 
 | スキル | 何をするか |
 |---|---|
@@ -138,6 +139,7 @@ ASO のキーワード源泉（`/app-store-optimize:aso` の 1-1）、アプリ�
 | `/common:cloud-routines` | Claude Code の Routines（クラウド上でスケジュール/API/GitHub イベントにより自動実行されるエージェント）の作成・管理・設計を支援します。 |
 | `/common:commit` | 現在の変更を確認し、全てステージングして日本語のConventional Commitsでコミット。 |
 | `/common:find-skills` | Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or … |
+| `/common:google-analytics` | GA4・Firebase Analytics の実データを、既存の認証と Google 公式 Analytics MCP または設定済み CLI で読み取る。 |
 | `/common:local-cron` | このマシンの crontab を操作して、定期ジョブや「指定時刻に1回だけ走って自分の登録を消すワンショット」を仕込みます。 |
 | `/common:new-routine-site` | ~/workspace/routine 配下に、Claude Code Routine が定期実行でコンテンツを追加する新しいサイトを 0 から立ち上げます（Hono+Vite+bun+Cloudflare Workers、xxx.basaapp.com、記事台帳による重複防止、cloud rou… |
 | `/common:plugin-guide` | Claude Codeプラグインの作成、インストール、管理について説明します。 |
